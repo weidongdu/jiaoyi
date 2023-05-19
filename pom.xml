@@ -13,6 +13,7 @@
     <properties>
         <java.version>17</java.version>
         <spring-boot.version>3.0.6</spring-boot.version>
+        <fastjson.version>2.0.32</fastjson.version>
     </properties>
 
     <dependencyManagement>
@@ -30,7 +31,15 @@
                 <artifactId>spring-boot-starter-web</artifactId>
                 <version>${spring-boot.version}</version>
             </dependency>
+
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
         </dependencies>
+
 
     </dependencyManagement>
 
