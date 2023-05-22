@@ -1,15 +1,9 @@
 server:
   port: 8888
 
-logging:
-  level:
-    org:
-      springframework:
-        boot:
-          autoconfigure: DEBUG
 
 okhttp4:
   enabled: true
-  connectTimeout: 3000
+  connectTimeout: 2000
   readTimeout: 3000
   writeTimeout: 3000

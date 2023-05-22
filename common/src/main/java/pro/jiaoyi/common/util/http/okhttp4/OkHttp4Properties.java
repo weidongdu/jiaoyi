@@ -3,11 +3,11 @@ package pro.jiaoyi.common.util.http.okhttp4;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
 
 @ConfigurationProperties(prefix = "okhttp4")
-@Component
+@Configuration
 @Data
 public class OkHttp4Properties {
 

@@ -22,6 +22,12 @@
         <lombok-version>1.18.26</lombok-version>
     </properties>
 
+    <modules>
+        <module>tushare</module>
+        <module>common</module>
+    </modules>
+
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -104,11 +110,6 @@
             </plugins>
         </pluginManagement>
     </build>
-
-    <modules>
-        <module>tushare</module>
-        <module>common</module>
-    </modules>
 
 
 </project>
