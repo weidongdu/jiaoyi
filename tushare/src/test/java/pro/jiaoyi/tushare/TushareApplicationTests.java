@@ -4,9 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import pro.jiaoyi.tushare.config.TsClient;
-import pro.jiaoyi.tushare.model.stockbasic.StockBasic;
 
-import java.util.List;
+import java.util.Map;
 
 @SpringBootTest
 class TushareApplicationTests {
@@ -22,9 +21,17 @@ class TushareApplicationTests {
 
 //        List<StockBasicResp> list = JSON.parseArray(null, StockBasicResp.class);
 //        System.out.println(list);
-        List<StockBasic> list =
-                tsClient.getStockBasicList();
 
-        System.out.println(list);
+//        List<StockBasic> list =
+//                tsClient.getStockBasicList();
+//
+//        System.out.println(list);
+//
+//
+//        Map<String, String> tsCodeNameMap = tsClient.tsCodeNameMap(true);
+//        System.out.println(tsCodeNameMap);
+//
+        Map<String, String> map = tsClient.nameTsCodeMap(true);
+        System.out.println(map);
     }
 }

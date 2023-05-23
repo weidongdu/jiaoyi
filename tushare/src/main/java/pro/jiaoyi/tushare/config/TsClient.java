@@ -35,6 +35,8 @@ public class TsClient {
 
     /**
      * 获取 stock basic 列表
+     * "fields":["ts_code","symbol","name","area","industry","market","list_date"]
+     * "items":[["000001.SZ","000001","平安银行","深圳","银行","主板","19910403"]
      */
     public List<StockBasic> getStockBasicList() {
         //先检查本地缓存
@@ -78,6 +80,42 @@ public class TsClient {
         return Collections.emptyList();
     }
 
+    /**
+     * 获取 ts_code name map
+     *
+     * @return 000001.SZ -> 平安银行
+     */
+    public Map<String, String> tsCodeNameMap(boolean isSimple) {
+        List<StockBasic> stockBasicList = getStockBasicList();
+        if (stockBasicList.size() > 0) {
+            //list stream 转换map
+            return stockBasicList.stream().collect(
+                    ConcurrentHashMap::new,
+                    isSimple ? (m, v) -> m.put(v.getSymbol(), v.getName()) : (m, v) -> m.put(v.getTs_code(), v.getName()),
+                    ConcurrentHashMap::putAll);
+        }
+        return Collections.emptyMap();
+    }
+
+    /**
+     * 平安银行 -> 000001.SZ
+     * 获取 name->ts_code map
+     *
+     * @return
+     */
+    public Map<String, String> nameTsCodeMap(boolean isSimple) {
+        List<StockBasic> stockBasicList = getStockBasicList();
+        if (stockBasicList.size() > 0) {
+            //list stream 转换map
+            return stockBasicList.stream().collect(
+                    ConcurrentHashMap::new,
+                    isSimple ? (m, v) -> m.put(v.getName(), v.getSymbol()) : (m, v) -> m.put(v.getName(), v.getTs_code()),
+                    ConcurrentHashMap::putAll);
+        }
+        return Collections.emptyMap();
+    }
+
+
     public JSONObject param(String apiName) {
         JSONObject param = new JSONObject();
         param.put("api_name", apiName);
@@ -89,8 +127,8 @@ public class TsClient {
         return JSON.parseObject(bytes, TushareResult.class);
     }
 
-    public void cacheClear(){
-        if (STOCK_BASIC_MAP.size() > 50){
+    public void cacheClear() {
+        if (STOCK_BASIC_MAP.size() > 50) {
             ArrayList<String> keys = new ArrayList<>(STOCK_BASIC_MAP.keySet());
             for (int i = 0; i < 10; i++) {
                 //移除10天之前的缓存
@@ -99,4 +137,5 @@ public class TsClient {
             keys.forEach(STOCK_BASIC_MAP::remove);
         }
     }
+
 }
