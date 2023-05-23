@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Slf4j
-public class TsClient {
+public class TuShareClient {
 
     @Value("${tushare.token}")
     private String token;
@@ -139,16 +139,23 @@ public class TsClient {
             }
         }
 
+        if (param.size() == 2) {
+            log.info("dailyKs param is empty {}",param.toJSONString());
+            return Collections.emptyList();
+        }
 
-        byte[] bytes = httpUtil.postJsonForBytes(baseUrl, null, param.toJSONString());
-        TushareResult tr = parse(bytes);
+
         //vol	float	成交量 （手）
         //amount	float	成交额 （千元）
         //fields=[ts_code, trade_date, open, high, low, close, pre_close, change, pct_chg, vol, amount]
         //[605336.SH, 20230523, 17.11, 17.19, 16.71, 16.76, 17.11, -0.35, -2.0456, 22055.92, 37362.742]
-        Map<String, String> tsCodeNameMap = tsCodeNameMap(false);
-
+        byte[] bytes = httpUtil.postJsonForBytes(baseUrl, null, param.toJSONString());
+        TushareResult tr = parse(bytes);
         if (tr != null) {
+            Map<String, String> tsCodeNameMap = tsCodeNameMap(false);
+            BigDecimal B100 = new BigDecimal(100);
+            BigDecimal B1000 = new BigDecimal(1000);
+
             TushareResult.DataResult data = tr.getData();
             if (data.getItems() != null && data.getItems().size() > 0) {
                 ArrayList<DailyK> list = new ArrayList<>(data.getItems().size());
@@ -171,8 +178,8 @@ public class TsClient {
                     dailyK.setChange(new BigDecimal(item.get(7)));
                     dailyK.setPct(new BigDecimal(item.get(8)));
 
-                    dailyK.setVol(new BigDecimal(item.get(9)).multiply(new BigDecimal(100)));
-                    dailyK.setAmt(new BigDecimal(item.get(10)).multiply(new BigDecimal(1000)));
+                    dailyK.setVol(new BigDecimal(item.get(9)).multiply(B100));
+                    dailyK.setAmt(new BigDecimal(item.get(10)).multiply(B1000));
                     list.add(dailyK);
                 });
                 return list;

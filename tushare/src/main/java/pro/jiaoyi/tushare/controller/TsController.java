@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
-import pro.jiaoyi.tushare.config.TsClient;
+import pro.jiaoyi.tushare.config.TuShareClient;
 
 @RestController
 @RequestMapping("/ts")
@@ -25,7 +25,7 @@ public class TsController {
 
 
     @Autowired
-    private TsClient tsClient;
+    private TuShareClient tsClient;
 
     @GetMapping("/stock_basic")
     public Object stockBasic() {

@@ -3,7 +3,7 @@ package pro.jiaoyi.tushare;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import pro.jiaoyi.tushare.config.TsClient;
+import pro.jiaoyi.tushare.config.TuShareClient;
 import pro.jiaoyi.tushare.model.kline.DailyK;
 import pro.jiaoyi.tushare.model.kline.DailyKReq;
 
@@ -18,7 +18,7 @@ class TushareApplicationTests {
     }
 
     @Autowired
-    private TsClient tsClient;
+    private TuShareClient tsClient;
     @Test
     public void testTsClient() {
 
