@@ -2,6 +2,7 @@ package pro.jiaoyi.common.util.http.okhttp4;
 
 
 import lombok.Data;
+import okhttp3.MediaType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,5 +16,8 @@ public class OkHttp4Properties {
     private int connectTimeout;
     private int writeTimeout;
     private int readTimeout;
+
+    public static final MediaType JSON
+            = MediaType.get("application/json; charset=utf-8");
 
 }
