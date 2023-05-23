@@ -4,8 +4,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import pro.jiaoyi.tushare.config.TsClient;
+import pro.jiaoyi.tushare.model.kline.DailyK;
+import pro.jiaoyi.tushare.model.kline.DailyKReq;
 
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.List;
 
 @SpringBootTest
 class TushareApplicationTests {
@@ -31,7 +34,14 @@ class TushareApplicationTests {
 //        Map<String, String> tsCodeNameMap = tsClient.tsCodeNameMap(true);
 //        System.out.println(tsCodeNameMap);
 //
-        Map<String, String> map = tsClient.nameTsCodeMap(true);
-        System.out.println(map);
+//        Map<String, String> map = tsClient.nameTsCodeMap(true);
+//        System.out.println(map);
+
+        DailyKReq req = new DailyKReq();
+        req.setTrade_date(LocalDate.now().toString().replaceAll("-",""));
+        List<DailyK> dailyKS =
+                tsClient.dailyKs(new DailyKReq());
+
+        System.out.println(dailyKS);
     }
 }

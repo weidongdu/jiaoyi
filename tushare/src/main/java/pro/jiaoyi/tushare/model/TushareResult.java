@@ -6,7 +6,6 @@ import java.util.List;
 
 @Data
 public class TushareResult {
-
     private String request_id;
     private int code;
     private String msg;

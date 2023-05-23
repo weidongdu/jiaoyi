@@ -34,6 +34,10 @@ public class K {
      */
     private BigDecimal low;
     /**
+     * 涨跌幅
+     */
+    private BigDecimal pct;
+    /**
      * 成交量
      */
     private BigDecimal vol;

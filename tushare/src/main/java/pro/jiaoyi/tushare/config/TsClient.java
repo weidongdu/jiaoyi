@@ -6,15 +6,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
 import pro.jiaoyi.tushare.model.TushareResult;
+import pro.jiaoyi.tushare.model.kline.DailyK;
+import pro.jiaoyi.tushare.model.kline.DailyKReq;
 import pro.jiaoyi.tushare.model.stockbasic.StockBasic;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -115,6 +116,70 @@ public class TsClient {
         return Collections.emptyMap();
     }
 
+    /**
+     * 获取日线行情数据
+     * 调取说明：120积分每分钟内最多调取500次，每次6000条数据，相当于单次提取23年历史数据。
+     *
+     * @return
+     */
+    public List<DailyK> dailyKs(DailyKReq req) {
+        JSONObject param = param("daily");
+
+        if (req != null) {
+            if (req.getTrade_date() == null || req.getTrade_date().isEmpty()) {
+                Optional.ofNullable(req.getTs_code())
+                        .ifPresent(ts_code -> param.put("ts_code", ts_code));
+                Optional.ofNullable(req.getStart_date())
+                        .ifPresent(start_date -> param.put("start_date", start_date));
+                Optional.ofNullable(req.getEnd_date())
+                        .ifPresent(end_date -> param.put("end_date", end_date));
+            } else {
+                //需要获取某一个交易日的全部股票数据 只需要传入trade_date
+                param.put("trade_date", req.getTrade_date());
+            }
+        }
+
+
+        byte[] bytes = httpUtil.postJsonForBytes(baseUrl, null, param.toJSONString());
+        TushareResult tr = parse(bytes);
+        //vol	float	成交量 （手）
+        //amount	float	成交额 （千元）
+        //fields=[ts_code, trade_date, open, high, low, close, pre_close, change, pct_chg, vol, amount]
+        //[605336.SH, 20230523, 17.11, 17.19, 16.71, 16.76, 17.11, -0.35, -2.0456, 22055.92, 37362.742]
+        Map<String, String> tsCodeNameMap = tsCodeNameMap(false);
+
+        if (tr != null) {
+            TushareResult.DataResult data = tr.getData();
+            if (data.getItems() != null && data.getItems().size() > 0) {
+                ArrayList<DailyK> list = new ArrayList<>(data.getItems().size());
+                data.getItems().forEach(item -> {
+                    DailyK dailyK = new DailyK();
+
+                    dailyK.setCode(item.get(0));
+                    dailyK.setName(tsCodeNameMap.get(item.get(0)));
+
+                    String trade_date = item.get(1);
+                    dailyK.setTrade_date(trade_date);
+                    dailyK.setTsOpen(DateUtil.toTimestamp(DateUtil.strToLocalDate(trade_date, DateUtil.PATTERN_yyyyMMdd)));
+                    dailyK.setTsClose(DateUtil.toTimestamp(DateUtil.strToLocalDate(trade_date, DateUtil.PATTERN_yyyyMMdd)));
+
+                    dailyK.setOpen(new BigDecimal(item.get(2)));
+                    dailyK.setHigh(new BigDecimal(item.get(3)));
+                    dailyK.setLow(new BigDecimal(item.get(4)));
+                    dailyK.setClose(new BigDecimal(item.get(5)));
+                    dailyK.setPre_close(new BigDecimal(item.get(6)));
+                    dailyK.setChange(new BigDecimal(item.get(7)));
+                    dailyK.setPct(new BigDecimal(item.get(8)));
+
+                    dailyK.setVol(new BigDecimal(item.get(9)).multiply(new BigDecimal(100)));
+                    dailyK.setAmt(new BigDecimal(item.get(10)).multiply(new BigDecimal(1000)));
+                    list.add(dailyK);
+                });
+                return list;
+            }
+        }
+        return Collections.emptyList();
+    }
 
     public JSONObject param(String apiName) {
         JSONObject param = new JSONObject();
