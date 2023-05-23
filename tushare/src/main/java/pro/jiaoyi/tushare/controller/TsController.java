@@ -1,9 +1,11 @@
 package pro.jiaoyi.tushare.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
+import pro.jiaoyi.tushare.config.TsClient;
 
 @RestController
 @RequestMapping("/ts")
@@ -22,5 +24,12 @@ public class TsController {
     }
 
 
+    @Autowired
+    private TsClient tsClient;
+
+    @GetMapping("/stock_basic")
+    public Object stockBasic() {
+        return tsClient.getStockBasicList();
+    }
 
 }
