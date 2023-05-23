@@ -16,6 +16,9 @@ import java.util.concurrent.TimeUnit;
 @DependsOn("okHttp4Properties")
 public class OkHttpUtil {
 
+
+    public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
+
     private final OkHttpClient client;
 
     //保证了 okHttp4Properties 的初始化在先
@@ -69,17 +72,33 @@ public class OkHttpUtil {
      * @param request
      * @return
      */
-    public Response send(Request request) {
+    private Response send(Request request) {
+        HttpUrl url = request.url();
+
         //发送请求
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                log.error("post请求失败, code != 2xx, url:{}", request.url());
+                log.warn("post请求失败, code != 2xx, url:{}", url);
             }
             return response;
         } catch (IOException e) {
-            log.error("请求异常，url:{}", request.url(), e);
+            log.error("请求异常，url:{}", url, e);
             throw new RuntimeException(e);
         }
+    }
+
+    private byte[] sendDefault(Request request) {
+        HttpUrl url = request.url();
+        //发送请求
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                log.warn("post请求失败, code != 2xx, url:{}", url);
+            }
+            return response.body().bytes();
+        } catch (IOException e) {
+            log.error("请求异常，url:{}", url, e);
+        }
+        return EMPTY_BYTE_ARRAY;
     }
 
     //基本的Get 请求
@@ -112,5 +131,10 @@ public class OkHttpUtil {
         return send(req);
     }
 
+    public byte[] postJsonForBytes(String url, Map<String, String> headers, String json) {
+        RequestBody body = RequestBody.create(json, OkHttp4Properties.JSON);
+        Request req = buildRequest(url, headers, body);
+        return sendDefault(req);
+    }
 
 }
