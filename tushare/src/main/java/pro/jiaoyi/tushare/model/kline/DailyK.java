@@ -1,11 +1,13 @@
 package pro.jiaoyi.tushare.model.kline;
 
 import lombok.Data;
+import lombok.ToString;
 import pro.jiaoyi.common.model.K;
 
 import java.math.BigDecimal;
 
 @Data
+@ToString(callSuper = true)
 public class DailyK extends K {
 
     //fields=[ts_code, trade_date, open, high, low, close, pre_close, change, pct_chg, vol, amount]

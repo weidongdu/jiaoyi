@@ -180,6 +180,8 @@ public class TuShareClient {
 
                     dailyK.setVol(new BigDecimal(item.get(9)).multiply(B100));
                     dailyK.setAmt(new BigDecimal(item.get(10)).multiply(B1000));
+
+                    log.debug("dailyK {}", dailyK);
                     list.add(dailyK);
                 });
                 return list;

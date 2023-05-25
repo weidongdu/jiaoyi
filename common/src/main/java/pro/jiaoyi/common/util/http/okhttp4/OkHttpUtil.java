@@ -106,6 +106,10 @@ public class OkHttpUtil {
         Request request = buildRequest(url, headers);
         return send(request);
     }
+    public byte[] getForBytes(String url, Map<String, String> headers) {
+        Request request = buildRequest(url, headers);
+        return sendDefault(request);
+    }
 
 
     //基本的Post Form请求
