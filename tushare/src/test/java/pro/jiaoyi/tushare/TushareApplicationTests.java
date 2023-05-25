@@ -39,8 +39,7 @@ class TushareApplicationTests {
 
         DailyKReq req = new DailyKReq();
         req.setTrade_date(LocalDate.now().toString().replaceAll("-",""));
-        List<DailyK> dailyKS =
-                tsClient.dailyKs(new DailyKReq());
+        List<DailyK> dailyKS = tsClient.dailyKs(req);
 
         System.out.println(dailyKS);
     }
