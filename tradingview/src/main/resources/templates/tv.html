@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="/css/bulma-tooltip.min.css">
     <script src="/js/jquery/jquery.min.js"></script>
     <script type="text/javascript" src="/js/tv/lightweight-charts.standalone.production.v4.0.1.js"></script>
+    <script src="/js/tv/api.js"></script>
+    <script src="/js/tv/pressKey.js"></script>
+    <script src="/js/tv/tv-api.js"></script>
     <style>
         .legend {
             position: absolute;
@@ -26,7 +29,6 @@
             padding: 1rem;
         }
     </style>
-    <link rel="stylesheet" href="../static/css/bulma-switch.min.css">
 </head>
 
 <body>
@@ -235,6 +237,67 @@
 </section>
 
 <script type="text/javascript">
+    <!--    初始化tv chart     -->
+
+    const chart = LightweightCharts.createChart(
+        document.getElementById('charts'), getOption()
+    );
+    // Setting the border color for the vertical axis
+
+
+    //析构数据 initChart(chart);
+    const {
+        kSeries,
+        ma5Series,
+        ma10Series,
+        ma20Series,
+        ma30Series,
+        ma60Series,
+        ma120Series,
+        ma250Series,
+        volumeSeries,
+        ma5VolumeSeries,
+        ma60VolumeSeries,
+        changeSeries,
+        hslSeries,
+        ma5HslSeries,
+        ma60HslSeries,
+        oscSeries,
+        ma5OscSeries,
+        ma60OscSeries,
+    } = initChart(chart);
+
+
+
+    //生成主图
+
+    // Set the data for the Main Series
+    let code = '000001';
+    getTvChart(code, (data) => {
+        console.log(data.k);
+        updateChartData(data,{
+            kSeries,
+            ma5Series,
+            ma10Series,
+            ma20Series,
+            ma30Series,
+            ma60Series,
+            ma120Series,
+            ma250Series,
+            volumeSeries,
+            ma5VolumeSeries,
+            ma60VolumeSeries,
+            changeSeries,
+            hslSeries,
+            ma5HslSeries,
+            ma60HslSeries,
+            oscSeries,
+            ma5OscSeries,
+            ma60OscSeries,
+        })
+    });
+
+
 
 </script>
 </body>

@@ -1,8 +1,9 @@
 package pro.jiaoyi.tradingview.config;
 
 public enum Colors {
-    RED("DE5E57","红色"),
-    GREEN("52A49A","绿色");
+    ZISE("#71649C","紫色"),
+    RED("#DE5E57","红色"),
+    GREEN("#52A49A","绿色");
 
     private String color;
     private String desc;

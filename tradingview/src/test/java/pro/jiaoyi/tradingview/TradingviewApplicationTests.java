@@ -23,9 +23,10 @@ class TradingviewApplicationTests {
     private TvTransUtil tvTransUtil;
     @Autowired
     private EmClient emClient;
+
     @Test
     void test() {
-        List<EmDailyK> dailyKs = emClient.getDailyKs("002422", LocalDate.now(), 500);
+        List<EmDailyK> dailyKs = emClient.getDailyKs("002422", LocalDate.now(), 500, false);
         TvChart tvChart = tvTransUtil.tranEmDailyKLineToTv(dailyKs);
         System.out.println(tvChart);
     }

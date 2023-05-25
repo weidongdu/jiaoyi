@@ -26,9 +26,23 @@ public class EmClient {
     public static final BigDecimal B1000 = new BigDecimal("1000");
 
     //获取日线行情数据
-    public List<EmDailyK> getDailyKs(String code, LocalDate end, int lmt) {
+    public List<EmDailyK> getDailyKs(String code, LocalDate end, int lmt, boolean force) {
+        if (!force) {
+            //查本地缓存
+            String key = DateUtil.today() + "-" + code;
+            List<EmDailyK> emDailyKS = DATE_KLINE_MAP.get(key);
+            if (emDailyKS != null && emDailyKS.size() > 0) {
+                log.info("hit local cache for code:{}", key);
+                return emDailyKS;
+            }
+        }
+
+
         String secid = code.startsWith("6") ? "1." + code : "0." + code;
-        String url = "http://push2his.eastmoney.com/api/qt/stock/kline/get?secid=" + secid + "&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6" + "&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61" + "&klt=101&fqt=1" + "&end=" + end.toString().replace("-", "") + "&lmt=" + lmt;
+        String url = "http://push2his.eastmoney.com/api/qt/stock/kline/get?secid=" + secid
+                + "&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6"
+                + "&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61"
+                + "&klt=101&fqt=1" + "&end=" + end.toString().replace("-", "") + "&lmt=" + lmt;
 
         byte[] bytes = okHttpUtil.getForBytes(url, headerMap);
         if (bytes.length > 0) {
@@ -86,6 +100,7 @@ public class EmClient {
             }
 
             log.info("获取日线行情数据 size={}\nstart=\t{}\nend=\t{}", size, size > 0 ? list.get(0) : "", size > 0 ? list.get(size - 1) : "");
+            DATE_KLINE_MAP.put(DateUtil.today() + "-" + code, list);
             return list;
         }
 
@@ -156,6 +171,7 @@ public class EmClient {
 
     /**
      * code name map
+     *
      * @param force 是否强制刷新, true 则不使用缓存, false 则使用缓存
      * @return
      */
@@ -182,6 +198,7 @@ public class EmClient {
 
     /**
      * name code map
+     *
      * @param force
      * @return
      */
@@ -239,5 +256,6 @@ public class EmClient {
     public static final Map<String, Map<String, String>> DATE_CODE_NAME_MAP = new ConcurrentHashMap<>();
     public static final Map<String, Map<String, String>> DATE_NAME_CODE_MAP = new ConcurrentHashMap<>();
     public static final Map<String, List<EmCList>> DATE_LIST_MAP = new ConcurrentHashMap<>();
+    public static final Map<String, List<EmDailyK>> DATE_KLINE_MAP = new ConcurrentHashMap<>();
 
 }
