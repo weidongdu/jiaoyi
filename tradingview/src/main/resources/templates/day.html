@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>刷图</title>
+    <link rel="stylesheet" href="/css/bulma.min.css">
+    <link rel="stylesheet" href="/css/bulma-switch.min.css">
+    <link rel="stylesheet" href="/css/bulma-tooltip.min.css">
+    <script src="/js/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/lightweight-charts.standalone.production.js"></script>
+    <style>
+        .legend {
+            position: absolute;
+            right: 150px;
+            top: 100px;
+            text-align: right;
+            z-index: 1;
+            font-size: 12px;
+            line-height: 18px;
+            font-weight: 300;
+        }
+
+        .section {
+            padding: 1rem;
+        }
+    </style>
+    <link rel="stylesheet" href="../static/css/bulma-switch.min.css">
+</head>
+
+<body>
+<section class="section">
+    <div class="columns">
+        <div class="column is-1">
+            <div id="iSelectType" class="control select is-danger">
+                <select>
+                    <option value="p7">p7</option>
+                    <option value="zp7">zp7</option>
+                    <option value="all_index">all指数</option>
+                    <option value="all_index_v60">all指数(v60<1.5亿)</option>
+                    <option value="all">all</option>
+                    <option value="all_v60">all(v60<1.5亿)</option>
+                    <option value="zuijin">最近</option>
+                    <option value="other">其他</option>
+                    <option value="ZT">涨停板</option>
+                    <option value="hk">hk</option>
+                    <option value="amtMa60">5倍AmtMa60</option>
+                    <option value="Tshadow">上影线</option>
+                    <option value="Kcross">穿越均线</option>
+                    <option value="longMost">一年内最大涨幅</option>
+                    <option value="longMostRecent">一年内最大涨幅(今日收盘)</option>
+                    <option value="shortMost">一年内最大跌幅</option>
+                    <option value="shortMostRecent">一年内最大跌幅(今日收盘)</option>
+
+
+                    <option value="icyb">创业成分</option>
+                    <option value="i300">沪深300</option>
+                    <option value="i500">中证500</option>
+                    <option value="i1000">中证1000</option>
+                    <option value="kc50">科创50</option>
+                </select>
+            </div>
+        </div>
+        <div class="column is-3">
+            <div class="field is-horizontal">
+                <div class="field-body">
+                    <div class="field ">
+
+                        <p class="control" hidden>
+                            <input class="input" id="iCC" type="text" hidden>
+                        </p>
+                    </div>
+                    <div class="field ">
+
+                        <p class="control">
+                            <input class="input" id="iCode" type="text">
+                        </p>
+                    </div>
+                    <div class="field ">
+
+                        <p class="control">
+                            <input class="input" id="iName" type="text">
+                        </p>
+                    </div>
+                    <div class="field ">
+
+                        <p class="control">
+                            <input class="input" id="iIndex" type="text" value="">
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="column is-3">
+            <div class="field is-horizontal">
+                <div class="field-body">
+                    <div class="field ">
+                        <p class="control">
+                            <button class="button has-tooltip-right" onclick="setIndex()" data-tooltip="快捷键[n]"
+                                    id="iSet">
+                                set
+                            </button>
+                        </p>
+                    </div>
+                    <div class="field ">
+                        <p class="control">
+                            <button class="button has-tooltip-right" onclick="index()" data-tooltip="快捷键[n]"
+                                    id="iBtnChart">
+                                后
+                            </button>
+                        </p>
+                    </div>
+                    <div class="field ">
+                        <p class="control">
+                            <button class="button has-tooltip-right" onclick="pre()" data-tooltip="快捷键[n]"
+                                    id="iBtnChartPre">
+                                前
+                            </button>
+                        </p>
+                    </div>
+                    <div class="field ">
+                        <p class="control">
+                            <button class="button has-tooltip-right" id="saveButton">
+                                截图
+                            </button>
+                        </p>
+                    </div>
+                    <div class="field ">
+                        <p class="control">
+                            <button class="button" id="iBtnXueqiu">
+                                <a href="#" id="iLinkxq" target="_blank">雪球</a>
+                            </button>
+                        </p>
+                    </div>
+                    <div class="field ">
+                        <p class="control">
+                            <button class="button is-hidden" id="iBtnFenshi">
+                                <a href="#" id="iLinkFenshi" target="_blank">Fenshi</a>
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="column is-3">
+            <div class="field is-horizontal">
+                <div class="field-body">
+                    <div class="field is-expanded">
+                        <div class="field has-addons">
+                            <p class="control">
+                                <a class="button is-static">
+                                    高
+                                </a>
+                            </p>
+                            <p class="control ">
+                                <input class="input" type="text" id="iHigh" placeholder="">
+                            </p>
+                            <p class="control">
+                                <a class="button is-static">
+                                    低
+                                </a>
+                            </p>
+                            <p class="control">
+                                <input class="input" type="text" id="iLow" placeholder="">
+                            </p>
+
+                            <p class="control">
+                                <button class="button is-static" id="iBtnCalc">
+                                    =
+                                </button>
+                            </p>
+                            <p class="control is-expanded">
+                                <input class="input" type="text" id="iRes" placeholder="">
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="field is-horizontal">
+                <div class="field-body">
+                    <div class="field ">
+                        <p class="control" hidden>
+                        <div class="field has-tooltip-right" hidden data-tooltip="快捷键[,]">
+                            <input id="iMAUpDn" type="checkbox" name="swMAupdn" class="switch is-rounded is-danger"
+                                   checked="checked">
+                            <label for="iMAUpDn">pct</label>
+                        </div>
+                        </p>
+                    </div>
+                    <div class="field ">
+                        <p class="control">
+                        <div class="field has-tooltip-right" data-tooltip="快捷键[m]">
+                            <input id="iMA" type="checkbox" name="swMA" class="switch is-rounded is-danger"
+                                   checked="checked">
+                            <label for="iMA">MA</label>
+                        </div>
+                        </p>
+                    </div>
+                    <div class="field ">
+                        <p class="control">
+                        <div class="field has-tooltip-right" data-tooltip="快捷键[k]">
+                            <input id="iK" type="checkbox" name="swK" class="switch is-rounded is-danger"
+                                   checked="checked">
+                            <label for="iK">K</label>
+                        </div>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</section>
+<section>
+    <div id="charts"></div>
+</section>
+
+<section>
+
+    <br>
+    <div class="container">
+
+        <div class="field is-grouped is-grouped-multiline" id="iTag">
+        </div>
+
+    </div>
+</section>
+
+<script type="text/javascript">
+
+    // updating candlestick series options on the fly
+
+    const colorRedT = 'rgba(239,83,80,0.8)';// rgba(239,83,80,0.2)
+    const colorGreenT = 'rgba(38,166,154,0.8)';
+
+    const colorRedT1 = 'rgba(255,204,0,0.8)';// rgba(239,83,80,0.2)
+    const colorGreenT1 = 'rgba(0,153,255,0.8)';
+
+    const colorRed = 'rgba(239,83,80,1)';// rgba(239,83,80,0.2)
+    const colorGreen = 'rgba(38,166,154,1)';
+
+    const RED = '#FF0000';
+    const ORINGE = '#FF9900';
+    const YELLOW = '#FFCC00';
+    const GREEN = '#006600';
+    const BLUE = '#0066CC';
+    const PINE = '#993399';
+    const GREY = '#AAAAAA';
+    const WHITE = '#EEEEEE';
+    let RESULT_NORMAL = {};
+
+    let index_arr = []
+
+
+    let index_count = 0;
+    let index_flag = 1;
+
+    function setIndex() {
+        index_count = $("#iIndex").val();
+    }
+
+    function index() {
+        if (index_count === index_arr.length - 1) {
+            alert("已经是最后一个了");
+            return;
+        }
+        //获取当前的 index , 如果index < length , index + 1
+        if (index_count < index_arr.length - 1) {
+            index_count++;
+        }
+
+        $("#iIndex").val(index_count + "/" + index_arr.length);
+        chart(index_arr[index_count], 500);
+
+    }
+
+    function pre() {
+        if (index_count === 0) {
+            alert("已经是第一个了");
+            return;
+        }
+
+        if (index_count > 0) {
+            index_count--;
+        }
+
+        $("#iIndex").val(index_count + "/" + index_arr.length);
+        chart(index_arr[index_count], 500);
+    }
+
+    function chart(symbol, days) {
+        //设置 symbols
+
+
+        let url = "/stock/chart/day";
+        let params = {
+            "symbols": symbol,
+            "days": days,
+            "ma": true,
+            "boll": false,
+        };
+
+
+        $("#iBtnChart").addClass("is-loading");
+        $.get(url, params, function (data) {
+            $("#iBtnChart").removeClass("is-loading");
+            RESULT_NORMAL = data;
+
+            updateData(RESULT_NORMAL);
+
+            let c = RESULT_NORMAL.code.split(".")[0];
+            let m = RESULT_NORMAL.code.split(".")[1];
+            if (!m) {
+                m = '';
+            }
+            $("#iLinkxq").attr("href", "https://xueqiu.com/S/" + m + c);
+            $("#iLinkFenshi").attr("href", "http://qm?code=" + c + '/5direct');
+
+        }).fail(function () {
+            $("#iBtnChart").removeClass("is-loading");
+            alert('系统异常,请重试');
+        });
+    }
+
+
+    /**
+     * 渲染 chart
+     *
+     * 填充数据
+     * @param id
+     */
+
+    let CHART = {};
+
+    function getChart(id) {
+
+        if (!document.getElementById(id)) {
+            let div = document.createElement("div");
+            div.setAttribute("id", id);
+            document.getElementById("charts").append(div);
+        } else {
+            return CHART;
+        }
+
+        let option = {
+            width: 800,
+            height: 600,
+            rightPriceScale: {
+                visible: true,
+                borderColor: 'rgba(197, 203, 206, 1)',
+            },
+            leftPriceScale: {
+                visible: true,
+                borderColor: 'rgba(197, 203, 206, 1)',
+            },
+            layout: {
+                textColor: '#d1d4dc',
+                background: {type: "solid", color: '#131722'}
+            },
+            grid: {
+                vertLines: {
+                    color: 'rgba(42, 46, 57, 0.6)',
+                },
+                horzLines: {
+                    color: 'rgba(42, 46, 57, 0.6)',
+                },
+            },
+            crosshair: {
+                mode: 0
+            }
+        };
+        CHART = LightweightCharts.createChart(id, option);
+        CHART.priceScale('right').applyOptions({
+            mode: 1,
+            scaleMargins: {
+                top: 0.1,
+                bottom: 0.1,
+            },
+        });
+
+        return CHART;
+    }
+
+    function getMaOption() {
+        return {
+            // color: RED,
+            lineWidth: 1,
+            crosshairMarkerVisible: false,
+            priceLineVisible: false,
+            lastValueVisible: false,
+        };
+    }
+
+    function getMaVolOption() {
+        return {
+            priceFormat: {
+                type: 'volume',
+            },
+            priceScaleId: '',
+            scaleMargins: {
+                top: 0.8,
+                bottom: 0,
+            },
+        };
+    }
+
+    function createMa(chart, color) {
+        let o = getMaOption();
+        o.color = color;
+        return chart.addLineSeries(o);
+    }
+
+    function createMa(chart, color, lineStyle, lineType) {
+        let o = getMaOption();
+        o.color = color;
+        o.lineStyle = lineStyle;
+        o.lineType = lineType;
+        return chart.addLineSeries(o);
+    }
+
+    function createMaVol(chart) {
+        let o = getMaVolOption();
+        return chart.addLineSeries(o);
+    }
+
+    function createK(chart) {
+        return chart.addCandlestickSeries({
+            priceLine: {
+                color: "#FFFFFF"
+            },
+
+            upColor: colorRedT,
+            borderUpColor: colorRed,
+            wickUpColor: colorRed,
+
+            downColor: colorGreenT,
+            borderDownColor: colorGreen,
+            wickDownColor: colorGreen,
+        });
+
+    }
+
+    function createV(chart) {
+
+        return chart.addHistogramSeries({
+            // color: '#26a69a',
+            priceFormat: {
+                type: 'volume',
+            },
+            priceScaleId: '',
+            scaleMargins: {
+                top: 0.8,
+                bottom: 0,
+            },
+        });
+
+    }
+
+    function createPct(chart) {
+
+        return chart.addHistogramSeries({
+            priceScaleId: 'left',
+            color: 'rgba(255,255,255,0.1)',
+        });
+
+    }
+
+
+    function resize() {
+        let w = window.innerWidth;
+        let h = window.innerHeight;
+        let sectionH = document.getElementsByTagName('section')[0].offsetHeight;
+        // getChart("chart").resize(w, h - (sectionH), true);
+        getChart("chart").resize(w, w * 6 / 15, true);
+    }
+
+    window.onresize = function () {
+        resize();
+    }
+
+
+    function initTv() {
+        let chart = getChart("chart");
+
+        let m5 = createMa(chart, RED);
+        let m10 = createMa(chart, ORINGE);
+        let m20 = createMa(chart, YELLOW);
+        let m30 = createMa(chart, GREEN);
+        let m60 = createMa(chart, BLUE);
+        let m120 = createMa(chart, GREY);
+        let m250 = createMa(chart, WHITE);
+
+        let style = 4;
+        let lineType = 2;
+        //    const colorRedT1 = 'rgba(255,204,0,0.8)';// rgba(239,83,80,0.2)
+        // const colorGreenT1 = 'rgba(0,153,255,0.8)';
+        let mup2 = createMa(chart, 'rgba(255,204,0,0.8)', style, 1);
+        let mup5 = createMa(chart, 'rgba(255,150,0,0.8)', style, 1);
+        // let mup10 = createMa(chart, 'rgba(255,100,0,0.8)', style, 1);
+        let mdn2 = createMa(chart, 'rgba(0,150,255,0.8)', style, 2);
+        let mdn5 = createMa(chart, 'rgba(0,180,255,0.8)', style, 2);
+        // let mnd10 = createMa(chart, 'rgba(0,220,255,0.8)', style, 2);
+
+
+        m5.setData([]);
+        m10.setData([]);
+        m20.setData([]);
+        m30.setData([]);
+        m60.setData([]);
+        m120.setData([]);
+        m250.setData([]);
+
+
+        mup2.setData([]);
+        mup5.setData([]);
+        // mup10.setData([]);
+        mdn2.setData([]);
+        mdn5.setData([]);
+        // mnd10.setData([]);
+
+
+        let bollUP = createMa(chart, RED);
+        let bollMID = createMa(chart, WHITE);
+        let bollDN = createMa(chart, GREEN);
+
+        bollUP.setData([]);
+        bollMID.setData([]);
+        bollDN.setData([]);
+
+
+        let k = createK(chart);
+        k.setData([]);
+        k.setMarkers([]);
+
+        let v = createV(chart);
+        v.setData([]);
+
+        let vm = createMaVol(chart);
+        vm.setData([]);
+
+        let p = createPct(chart);
+        p.setData([]);
+
+        return {
+            m5,
+            m10,
+            m20,
+            m30,
+            m60,
+            m120,
+            m250,
+            mup2,
+            mup5,
+            // mup10,
+            mdn2,
+            mdn5,
+            // mnd10,
+            k,
+            v,
+            p,
+            bollUP,
+            bollMID,
+            bollDN,
+            vm
+        }
+    }
+
+
+    $(document).ready(function () {
+        resize();
+        legend();
+        init();
+    });
+
+    function init() {
+        //设置 symbols
+        let url = "/stock/init";
+        // alert("init...")
+        $.get(url, function (data) {
+            alert(data);
+        }).fail(function () {
+            alert('系统异常,请重试');
+        });
+    }
+
+    //获取 股票列表
+    function filter() {
+        //设置 symbols
+        let type = selectType();
+        let url = "/stock/filter" + "?type=" + type;
+        $.get(url, function (data) {
+            index_arr = data;//JSON.parse(data);
+            alert("size=" + index_arr.length);
+            $("#iIndex").val(0 + "/" + index_arr.length);
+            chart(index_arr[0], 500);
+        }).fail(function () {
+            alert('系统异常,请重试');
+        });
+    }
+
+
+    const TV = initTv();
+
+    function updateData(json) {
+
+        let {
+            m5,
+            m10,
+            m20,
+            m30,
+            m60,
+            m120,
+            m250,
+            mup2,
+            mdn2,
+            k,
+            v,
+            p,
+            bollUP,
+            bollMID,
+            bollDN,
+            vm
+        } = TV;
+
+        if (json.boll && json.boll.up && json.boll.dn && json.boll.mid) {
+            bollUP.setData(json.boll.up);
+            bollMID.setData(json.boll.mid);
+            bollDN.setData(json.boll.dn);
+        } else {
+            bollUP.setData([]);
+            bollMID.setData([]);
+            bollDN.setData([]);
+        }
+
+        if (json.ma5) {
+            m5.setData(json.ma5);
+        } else {
+            m5.setData([])
+        }
+        if (json.ma10) {
+            m10.setData(json.ma10);
+        } else {
+            m10.setData([])
+        }
+        if (json.ma20) {
+            m20.setData(json.ma20);
+        } else {
+            m20.setData([])
+        }
+        if (json.ma30) {
+            m30.setData(json.ma30);
+        } else {
+            m30.setData([])
+        }
+        if (json.ma60) {
+            m60.setData(json.ma60);
+        } else {
+            m60.setData([])
+        }
+        if (json.ma120) {
+            m120.setData(json.ma120);
+        } else {
+            m120.setData([])
+        }
+        if (json.ma250) {
+            m250.setData(json.ma250);
+        } else {
+            m250.setData([])
+        }
+
+
+        if (json.ma250) {
+            m250.setData(json.ma250);
+        } else {
+            m250.setData([])
+        }
+
+        if (json.mup2) {
+            mup2.setData(json.mup2);
+        } else {
+            mup2.setData([])
+        }
+
+
+        if (json.mdn2) {
+            mdn2.setData(json.mdn2);
+        } else {
+            mdn2.setData([])
+        }
+
+
+        if (json.k) {
+            k.setData(json.k);
+        } else {
+            k.setData([])
+        }
+
+        if (json.mks) {
+            k.setMarkers(json.mks);
+        } else {
+            k.setMarkers([])
+        }
+
+        if (json.v) {
+            v.setData(json.v);
+        } else {
+            v.setData([])
+        }
+
+        if (json.vm) {
+            vm.setData(json.vm);
+        } else {
+            vm.setData([])
+        }
+
+        if (json.p) {
+            p.setData(json.p);
+        } else {
+            p.setData([])
+        }
+
+        $("#iCode").val(json.code);
+        $("#iName").val(json.name);
+
+        $("#iCC").val(json.cc);
+
+
+        document.querySelector(".legend").firstChild.innerText = $('#iCode').val() + '-' + $('#iName').val()
+            + "\n" + cc();
+    }
+
+    function cc() {
+        let c = "";
+        let cc_arr = $("#iCC").val().split(",");
+        if (cc_arr.length > 0) {
+            for (let i = 0; i < cc_arr.length; i++) {
+                c += cc_arr[i] + " "
+                if (i + 1 % 10 === 0) {
+                    c += "\n";
+                }
+            }
+        }
+        return c;
+    }
+
+
+    function legend() {
+
+        document.body.style.position = 'relative';
+
+        let legend = document.createElement('div');
+        legend.classList.add('legend');
+        document.body.appendChild(legend);
+
+        let firstRow = document.createElement('div');
+        firstRow.innerText = $('#iCode').val() + '-' + $('#iName').val();
+        firstRow.style.color = 'white';
+        legend.appendChild(firstRow);
+
+        let {m5, m10, m20, m30, m60, m120, m250, k, v, p} = TV;
+
+        getChart("chart").subscribeCrosshairMove((param) => {
+            if (param.time) {
+                const ma5 = param.seriesPrices.get(m5);
+                const ma10 = param.seriesPrices.get(m10);
+                const ma20 = param.seriesPrices.get(m20);
+                const ma30 = param.seriesPrices.get(m30);
+                const ma60 = param.seriesPrices.get(m60);
+                const ma120 = param.seriesPrices.get(m120);
+                const ma250 = param.seriesPrices.get(m250);
+                const kk = param.seriesPrices.get(k);
+                let vv = param.seriesPrices.get(v);
+                let pp = param.seriesPrices.get(p);
+
+                const Y = 10000 * 10000 / 1000;
+                const W = 10000
+                if (vv) {
+                    if (vv > Y) {
+                        vv = (vv / Y).toFixed(2) + "亿";
+                    } else if (vv > W) {
+                        vv = (vv / (W)).toFixed(2) + "千万";
+                    }
+                }
+
+                firstRow.innerText = param.time.year + "/" + param.time.month + "/" + param.time.day + '-' + $('#iCode').val() + '-' + $('#iName').val();
+                firstRow.innerText += "\n" + cc();
+
+                firstRow.innerText +=
+                    "\n"
+                    + 'ma5: ' + ma5
+                    + ' ma10: ' + ma10
+                    + ' ma20: ' + ma20
+                    + ' ma30: ' + ma30
+                    + ' ma60: ' + ma60
+                    + ' ma120: ' + ma120
+                    + ' ma250: ' + ma250
+
+                if (kk) {
+
+                    firstRow.innerText += ' 开: ' + kk.open
+                        + ' 收: ' + kk.close
+                        + ' 高: ' + kk.high
+                        + ' 底: ' + kk.low;
+
+                    firstRow.innerText +=
+                        ' 成交额: ' + vv
+                        + ' 涨幅: ' + pp
+                    ;
+                }
+
+
+            } else {
+                firstRow.innerText = $('#iCode').val() + '-' + $('#iName').val()
+                    + "\n" + cc();
+            }
+        });
+    }
+
+    //https://www.toptal.com/developers/keycode/for/191
+    $(document).keydown(function (e) {
+
+        if (75 === e.keyCode) {//k
+            $('input[name=swK]').click();
+        }
+
+
+        if (77 === e.keyCode) {//m
+            $('input[name=swMA]').click();
+        }
+
+        if (188 === e.keyCode) {//,
+            $('input[name=swMAupdn]').click();
+        }
+
+
+        if (221 === e.keyCode) {//]
+            $('#iBtnChart').click();
+        }
+
+
+        if (219 === e.keyCode) {
+            $('#iBtnChartPre').click();
+        }
+
+        //keyCode 79 = o
+        if (79 === e.keyCode) {
+            document.querySelector('#iBtnXueqiu').querySelector('a').click();
+            name = $('#iName').val();
+            code = $('#iCode').val();
+            openTap(name, code);
+        }
+
+        if (81 === e.keyCode) {
+            document.querySelector('#iBtnFenshi').querySelector('a').click();
+        }
+
+        if (76 === e.keyCode) {//l
+            mock();
+        }
+
+        if (84 === e.keyCode) {//t
+            filter();
+        }
+
+        if (191 === e.keyCode) {// code = / ?
+            singleStockChart();
+        }
+
+    });
+
+    $('input[name=swK]').change(function () {
+        if ($(this).is(':checked')) {
+            toggleVisibilityK('show');
+        } else {
+            toggleVisibilityK('hide');
+        }
+    });
+
+
+    function toggleVisibilityK(visibility) {
+        let {k} = TV;
+
+        k.applyOptions({
+            visible: visibility === 'show'
+        });
+    }
+
+    $('input[name=swBOLL]').change(function () {
+        if ($(this).is(':checked')) {
+            toggleVisibilityBOLL('show');
+            toggleVisibilityMa('hide');
+        } else {
+            toggleVisibilityBOLL('hide');
+        }
+    });
+
+    $('input[name=swMA]').change(function () {
+        if ($(this).is(':checked')) {
+            toggleVisibilityMa('show');
+            toggleVisibilityBOLL('hide')
+        } else {
+            toggleVisibilityMa('hide');
+        }
+    });
+    $('input[name=swMAupdn]').change(function () {
+        if ($(this).is(':checked')) {
+            toggleVisibilityMaUpDn('show');
+        } else {
+            toggleVisibilityMaUpDn('hide');
+        }
+    });
+
+
+    function toggleVisibilityMaUpDn(visibility) {
+        let {mup2, mdn2} = TV;
+
+        mup2.applyOptions({
+            visible: visibility === 'show'
+        });
+        mdn2.applyOptions({
+            visible: visibility === 'show'
+        });
+
+
+    }
+
+    function toggleVisibilityMa(visibility) {
+        let {m5, m10, m20, m30, m60, m120, m250, mup2, mdn2} = TV;
+
+        m5.applyOptions({
+            visible: visibility === 'show'
+        });
+        m10.applyOptions({
+            visible: visibility === 'show'
+        });
+        m20.applyOptions({
+            visible: visibility === 'show'
+        });
+        m30.applyOptions({
+            visible: visibility === 'show'
+        });
+        m60.applyOptions({
+            visible: visibility === 'show'
+        });
+        m120.applyOptions({
+            visible: visibility === 'show'
+        });
+        m250.applyOptions({
+            visible: visibility === 'show'
+        });
+        mup2.applyOptions({
+            visible: visibility === 'show'
+        });
+        mdn2.applyOptions({
+            visible: visibility === 'show'
+        });
+
+
+    }
+
+    function toggleVisibilityBOLL(visibility) {
+        let {bollUP, bollDN, bollMID} = TV;
+
+        bollUP.applyOptions({
+            visible: visibility === 'show'
+        });
+        bollDN.applyOptions({
+            visible: visibility === 'show'
+        });
+        bollMID.applyOptions({
+            visible: visibility === 'show'
+        });
+
+    }
+
+
+    function mock() {
+
+        let url = "/stock/mock";
+        let code = $('#iCode').val();
+        let params = {
+            "code": code
+        };
+
+
+        $("#iBtnChart").addClass("is-loading");
+        $.get(url, params, function (data) {
+            $("#iBtnChart").removeClass("is-loading");
+            updateDataMore(data);
+
+        }).fail(function () {
+            $("#iBtnChart").removeClass("is-loading");
+            alert('系统异常,请重试');
+        });
+    }
+
+    function updateDataMore(json) {
+        let {k, v, p} = TV;
+
+        if (json.k) {
+            json.k.forEach(item => {
+                k.update(item);
+            })
+        }
+
+        if (json.v) {
+            json.v.forEach(item => {
+                v.update(item);
+            })
+        }
+
+        if (json.p) {
+            json.p.forEach(item => {
+                p.update(item);
+            })
+        }
+    }
+
+
+    function selectType() {
+        let options = $("#iSelectType option:selected");
+        let type = options.val();
+        // console.log("type",type);
+        index_count = 0;
+        return type;
+    }
+
+    //单个stock
+
+    //弹出一个输入框，输入一段文字，可以提交
+    function singleStockChart() {
+        let code = prompt("请输入code 如:[000001]", ""); //将输入的内容赋给变量 name ，
+
+        //这里需要注意的是，prompt有两个参数，前面是提示的话，后面是当对话框出来后，在对话框里的默认值
+        if (code)//如果返回的有内容
+        {
+            chart(code, 500);
+        }
+
+    }
+
+
+    function openTap(name, code) {
+        if (name + code === '') {
+            return;
+        }
+        let iTag = $("#iTag");
+        /*
+            <div class="control">
+                <div class="tags has-addons">
+                    <span class="tag is-dark">chat</span>
+                    <span class="tag is-primary">on gitter</span>
+                </div>
+            </div>
+         */
+
+        let html = '<div class="control"><div class="tags has-addons"><span class="tag is-dark">' + name + '</span><span class="tag">' + code + '</span></div></div>';
+        iTag.append(html);
+        //对此html div 元素绑定 点击事件 chart(code, 500);
+        iTag.find("div:last").click(function () {
+            chart(code, 500);
+        });
+    }
+
+    // 添加保存截图功能
+    const saveButton = document.getElementById('saveButton');
+    saveButton.addEventListener('click', () => {
+        // let s = CHART.takeScreenshot();
+        let s = getChart("chart").takeScreenshot();
+        const dataUrl = s.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        //文件名 日期+时间+name+code
+        let fileName = getDate() + $("#iName").val() + "-" + $("#iCode").val() + '.png';
+        link.download = fileName;
+        link.click();
+    });
+
+    function getDate() {
+        //日期+时间+name+code
+        const currentDate = new Date();
+        const year = currentDate.getFullYear();
+        const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+        const day = currentDate.getDate().toString().padStart(2, '0');
+        return year + "-" + month + "-" + day;
+    }
+
+    //对iBtnCalc 绑定点击事件 计算 id="iHigh" id="iLow" 的差值 比 iHigh 的值 计算百分比
+    $("#iBtnCalc").click(function () {
+        let high = $("#iHigh").val();
+        let low = $("#iLow").val();
+        let diff = high - low;
+        let percent = (diff / high) * 100;
+        $("#iRes").val(percent.toFixed(2) + "%");
+    });
+    //id="iLow" 失去焦点的时候 触发点击("#iBtnCalc").click
+    $("#iLow").blur(function () {
+        $("#iBtnCalc").click();
+    });
+    //iSelectType 选择的时候 触发filter();
+    $("#iSelectType").change(function () {
+        filter();
+    });
+</script>
+</body>
+
+</html>
