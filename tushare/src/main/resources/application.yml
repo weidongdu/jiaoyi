@@ -8,5 +8,10 @@ okhttp4:
   writeTimeout: 3000
 
 tushare:
-  token: example
+  token: 1176f5f365d3584c2dbeced67b4bdc7f4385a97c0f2c6f9b31012966
   baseUrl: http://api.tushare.pro
+
+logging:
+  level:
+    pro:
+      jiaoyi: DEBUG
