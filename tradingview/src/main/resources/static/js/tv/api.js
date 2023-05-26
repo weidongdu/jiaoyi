@@ -10,3 +10,13 @@ function getTvChart(code,cb) {
         cb(data);
     });
 }
+
+
+function getStockList(cb) {
+    let url = baseUrl + "/tv/stockList";
+    //通过jquery get 获取 json
+    $.get(url, function (data) {
+        console.log(data);
+        cb(data);
+    });
+}

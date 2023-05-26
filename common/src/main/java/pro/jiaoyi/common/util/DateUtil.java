@@ -6,6 +6,7 @@ import java.util.Date;
 
 public class DateUtil {
     public static final String PATTERN_yyyyMMdd = "yyyyMMdd";
+    public static final String PATTERN_yyyyMMdd_HHmm = "yyyyMMdd_HHmm";
     public static final String PATTERN_yyyy_MM_dd = "yyyy-MM-dd";
 
     public static LocalDateTime strToLocalDateTime(String str, String pattern) {

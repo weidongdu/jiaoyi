@@ -56,8 +56,6 @@
                     <option value="longMostRecent">一年内最大涨幅(今日收盘)</option>
                     <option value="shortMost">一年内最大跌幅</option>
                     <option value="shortMostRecent">一年内最大跌幅(今日收盘)</option>
-
-
                     <option value="icyb">创业成分</option>
                     <option value="i300">沪深300</option>
                     <option value="i500">中证500</option>
@@ -296,6 +294,16 @@
             ma60OscSeries,
         })
     });
+
+
+    let STOCK_LIST = {};
+    //初始化股票列表
+    getStockList(function (data){
+        STOCK_LIST = data;
+
+    })
+
+
 
 
 

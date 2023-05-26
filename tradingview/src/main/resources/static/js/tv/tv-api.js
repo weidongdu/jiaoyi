@@ -41,20 +41,9 @@ function initChart(chart) {
     setPctSeriesOption(pctSeries);
 
     //设置hsl
-    const hslSeries = chart.addHistogramSeries({
-        //color 通过 后台数据给出
-        overlay: true,
-        priceFormat: {
-            type: 'percent',
-        },
-        priceScaleId: 'left',
-
-    });
+    const hslSeries = chart.addHistogramSeries();
     hslSeries.setData([]);
     setHslSeriesOption(hslSeries)
-    // const hslSeries = chart.addHistogramSeries();
-    // hslSeries.setData([]);
-    // setHslSeriesOption(hslSeries)
 
     //设置hsl ma
     const ma5HslSeries = initMa(chart);

@@ -3,17 +3,24 @@ package pro.jiaoyi.eastm.api;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pro.jiaoyi.common.model.KPeriod;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
+import pro.jiaoyi.eastm.config.IndexEnum;
 import pro.jiaoyi.eastm.model.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+import static pro.jiaoyi.eastm.util.ExcelUtil.simpleRead;
 
 @Component
 @Slf4j
@@ -117,43 +124,49 @@ public class EmClient {
      */
 
     private List<EmCList> getClist(int page, int pageSize) {
-        String url = "http://9.push2.eastmoney.com/api/qt/clist/get?pn=" + page + "&pz=" + pageSize + "&po=0&np=1&fltt=2&invt=2&wbp2u=6502094531899276|0|1|0|web&fid=f12&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048&fields=f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f14,f15,f16,f17,f18,f22,f23";
+        String url = "http://9.push2.eastmoney.com/api/qt/clist/get?pn=" + page + "&pz=" + pageSize + "&po=0&np=1&fltt=2&invt=2&wbp2u=6502094531899276|0|1|0|web&fid=f12&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048&fields=f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f14,f15,f16,f17,f18,f22,f23,f100";
         byte[] bytes = okHttpUtil.getForBytes(url, headerMap);
         if (bytes.length > 0) {
-            EmResult<EmDataCList> emResult = JSONObject.parseObject(new String(bytes), new TypeReference<>() {
-            });
-            EmDataCList data = emResult.getData();
-            List<JSONObject> diff = data.getDiff();
-            List<EmCList> list = new ArrayList<>(diff.size());
-            for (JSONObject f : diff) {
-                EmCList cList = new EmCList();
-                cList.setF2Close(f.getBigDecimal("f2"));
-                cList.setF3Pct(f.getBigDecimal("f3"));
-                cList.setF4Chg(f.getBigDecimal("f4"));
-                cList.setF5Vol(f.getBigDecimal("f5"));
-                cList.setF6Amt(f.getBigDecimal("f6"));
-                cList.setF7Amp(f.getBigDecimal("f7"));
-                cList.setF8Turnover(f.getBigDecimal("f8"));
-                cList.setF9Pe(f.getBigDecimal("f9"));
-                cList.setF10VolRatio(f.getBigDecimal("f10"));
-                cList.setF12Code(f.getString("f12"));
-                cList.setF14Name(f.getString("f14"));
-                cList.setF15High(f.getBigDecimal("f15"));
-                cList.setF16Low(f.getBigDecimal("f16"));
-                cList.setF17Open(f.getBigDecimal("f17"));
-                cList.setF18Close(f.getBigDecimal("f18"));
-                cList.setF22Speed(f.getBigDecimal("f22"));
-                cList.setF23Pb(f.getBigDecimal("f23"));
-                list.add(cList);
-            }
-
-            log.info("获取当日市场全部股票代码以及数据 size={}", list.size());
-            return list;
+            return parseEmCLists(bytes);
         }
         return Collections.emptyList();
     }
 
-    public List<EmCList> getClistDefault(boolean force) {
+    @NotNull
+    private static List<EmCList> parseEmCLists(byte[] bytes) {
+        EmResult<EmDataCList> emResult = JSONObject.parseObject(new String(bytes), new TypeReference<>() {
+        });
+        EmDataCList data = emResult.getData();
+        List<JSONObject> diff = data.getDiff();
+        List<EmCList> list = new ArrayList<>(diff.size());
+        for (JSONObject f : diff) {
+            EmCList cList = new EmCList();
+            cList.setF2Close(f.getBigDecimal("f2"));
+            cList.setF3Pct(f.getBigDecimal("f3"));
+            cList.setF4Chg(f.getBigDecimal("f4"));
+            cList.setF5Vol(f.getBigDecimal("f5"));
+            cList.setF6Amt(f.getBigDecimal("f6"));
+            cList.setF7Amp(f.getBigDecimal("f7"));
+            cList.setF8Turnover(f.getBigDecimal("f8"));
+            cList.setF9Pe(f.getBigDecimal("f9"));
+            cList.setF10VolRatio(f.getBigDecimal("f10"));
+            cList.setF12Code(f.getString("f12"));
+            cList.setF14Name(f.getString("f14"));
+            cList.setF15High(f.getBigDecimal("f15"));
+            cList.setF16Low(f.getBigDecimal("f16"));
+            cList.setF17Open(f.getBigDecimal("f17"));
+            cList.setF18Close(f.getBigDecimal("f18"));
+            cList.setF22Speed(f.getBigDecimal("f22"));
+            cList.setF23Pb(f.getBigDecimal("f23"));
+            cList.setF100bk(f.getString("f100"));
+            list.add(cList);
+        }
+
+        log.info("获取当日市场全部股票代码以及数据 size={}", list.size());
+        return list;
+    }
+
+    public List<EmCList> getClistDefaultSize(boolean force) {
         //从本地缓存先加载
         if (!force) {
             List<EmCList> list = DATE_LIST_MAP.get(DateUtil.today());
@@ -185,7 +198,7 @@ public class EmClient {
             }
         }
 
-        List<EmCList> clistDefault = getClistDefault(force);
+        List<EmCList> clistDefault = getClistDefaultSize(force);
         Map<String, String> cnMap = new HashMap<>();
         for (EmCList cList : clistDefault) {
             cnMap.put(cList.getF12Code(), cList.getF14Name());
@@ -211,7 +224,7 @@ public class EmClient {
                 return ncMap;
             }
         }
-        List<EmCList> clistDefault = getClistDefault(force);
+        List<EmCList> clistDefault = getClistDefaultSize(force);
         Map<String, String> ncMap = new HashMap<>();
         for (EmCList cList : clistDefault) {
             ncMap.put(cList.getF14Name(), cList.getF12Code());
@@ -220,6 +233,76 @@ public class EmClient {
         removeOldCache(ncMap, 7);
         DATE_CODE_NAME_MAP.put(key, ncMap);
         return ncMap;
+    }
+
+    /**
+     * 获取成分股 沪深300
+     *
+     * @return
+     */
+    public List<EmCList> getIndex(IndexEnum type) {
+        switch (type) {
+
+            case ALL:
+                return getClistDefaultSize(false);
+            case HS300:
+                return getIndex(IndexEnum.HS300.getUrl());
+            case CYCF:
+                return getIndex(IndexEnum.CYCF.getUrl());
+            case ZZ500:
+                return getIndex(IndexEnum.ZZ500.getUrl());
+            case ZZ1000:
+                return getIndex1000();
+            case O_TP7:
+                return getIndexTp7();
+            case O_TP02:
+                return getIndexTp02();
+
+            case O_TAMT60:
+            default:
+                return Collections.emptyList();
+        }
+    }
+
+    private List<EmCList> getIndexTp02() {
+        List<EmCList> list = getClistDefaultSize(false);
+        BigDecimal B = new BigDecimal("-2");
+        return list.stream().filter(c -> c.getF3Pct().compareTo(B) > 0).collect(Collectors.toList());
+    }
+
+    private List<EmCList> getIndexTp7() {
+        List<EmCList> list = getClistDefaultSize(false);
+        BigDecimal B = new BigDecimal("7");
+        return list.stream().filter(c -> c.getF3Pct().compareTo(B) > 0).collect(Collectors.toList());
+    }
+
+
+    private List<EmCList> getIndex(String url) {
+        byte[] bytes = okHttpUtil.getForBytes(url, headerMap);
+        if (bytes.length > 0) {
+            return parseEmCLists(bytes);
+        }
+        return Collections.emptyList();
+    }
+
+    /**
+     * 中证1000 从文件获取
+     * 官网
+     * <a href="https://www.csindex.com.cn/zh-CN/indices/index-detail/000852#/indices/family/detail?indexCode=000852">...</a>
+     * 文件
+     * <a href="https://csi-web-dev.oss-cn-shanghai-finance-1-pub.aliyuncs.com/static/html/csindex/public/uploads/file/autofile/cons/000852cons.xls">...</a>
+     *
+     * @return
+     */
+    private List<EmCList> getIndex1000() {
+        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateUtil.PATTERN_yyyyMMdd_HHmm));
+        String filePath = "zz1000_" + time + ".xls";
+        if (okHttpUtil.downloadFile(IndexEnum.ZZ1000.getUrl(), null, filePath)) {
+            List<EmCList> list = new ArrayList<>();
+            simpleRead(filePath, list, getClistDefaultSize(false));
+            return list;
+        }
+        return Collections.emptyList();
     }
 
 

@@ -6,7 +6,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -106,6 +109,7 @@ public class OkHttpUtil {
         Request request = buildRequest(url, headers);
         return send(request);
     }
+
     public byte[] getForBytes(String url, Map<String, String> headers) {
         Request request = buildRequest(url, headers);
         return sendDefault(request);
@@ -141,4 +145,29 @@ public class OkHttpUtil {
         return sendDefault(req);
     }
 
+    public boolean downloadFile(String url, Map<String, String> headers, String destPath) {
+        Request request = buildRequest(url, headers);
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()){
+                return false;
+            }
+
+            assert response.body() != null;
+            InputStream inputStream = response.body().byteStream();
+            File file = new File(destPath);
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = inputStream.read(buffer)) != -1) {
+                fileOutputStream.write(buffer, 0, len);
+            }
+            fileOutputStream.close();
+            inputStream.close();
+            return true;
+        } catch (Exception e) {
+            log.error("下载失败,请求异常，url:{}", url, e);
+        }
+        return false;
+    }
 }

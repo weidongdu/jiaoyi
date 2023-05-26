@@ -108,13 +108,21 @@ function setVolumeSeriesOption(series) {
 
 }
 function setHslSeriesOption(series) {
-    series.priceScale('right').applyOptions({
+
+    series.applyOptions({
+        overlay: true,
+        priceFormat: {
+            type: 'percent',
+        },
+        priceScaleId: 'left',
+    });
+
+    series.priceScale('left').applyOptions({
         scaleMargins: {
             top: 0.8, // highest point of the series will be 80% away from the top
             bottom: 0, // lowest point will be at the very bottom.
         },
     });
-
 }
 
 
@@ -131,7 +139,7 @@ function setPctSeriesOption(pctSeries) {
     pctSeries.priceScale('left').applyOptions({
         scaleMargins: {
             top: 0.1, // highest point of the series will be 80% away from the top
-            bottom: 0.25, // lowest point will be at the very bottom.
+            bottom: 0.75, // lowest point will be at the very bottom.
         },
     });
 }

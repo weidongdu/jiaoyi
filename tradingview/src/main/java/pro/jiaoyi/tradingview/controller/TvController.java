@@ -10,6 +10,8 @@ import pro.jiaoyi.tradingview.model.TvChart;
 import pro.jiaoyi.tradingview.service.TvService;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
@@ -20,8 +22,15 @@ public class TvController {
     private TvService tvService;
 
     @GetMapping("/chart")
-    public TvChart tvChart(@RequestParam String code){
+    public TvChart tvChart(@RequestParam String code) {
         TvChart tvChart = tvService.getTvChart(code, LocalDate.now(), 500);
         return tvChart;
+    }
+
+    @GetMapping("/stockList")
+    public Map<String, List<String>> getLists() {
+        Map<String, List<String>> allIndex =
+                tvService.getAllIndex();
+        return allIndex;
     }
 }

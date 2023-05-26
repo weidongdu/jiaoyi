@@ -18,6 +18,7 @@ public enum FMean {
     f18("昨收"),
     f22("涨速"),
     f23("市净率"),
+    f100("行业板块"),
     ;
 
     private String mean;
