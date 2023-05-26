@@ -1,8 +1,3 @@
-const ZISE = '#71649C';//("#71649C","紫色"),
-const ZISE_L = '#9B7DFF';//亮紫色
-const GREY_SHADOW = '#C3BCDB44';//灰色阴影
-const RED = '#DE5E57';//("#DE5E57","红色"),
-const GREEN = '#52A49A';//("52A49A","绿色");
 
 window.addEventListener('resize', () => {
     resize(chart);
@@ -13,86 +8,6 @@ function resize(chart) {
     chart.resize(w, w * 6 / 15, true);
 }
 
-function getOption() {
-    return {
-        height: window.innerWidth * 6 / 15,
-        width: window.innerWidth,
-
-        layout: {
-            background: {color: '#222'},
-            textColor: '#DDD',
-        },
-        grid: {
-            vertLines: {color: '#444'},
-            horzLines: {color: '#444'},
-        },
-    }
-}
-
-
-function getKColorOption() {
-    return {
-        wickUpColor: RED,
-        upColor: RED,
-        wickDownColor: GREEN,
-        downColor: GREEN,
-        borderVisible: false,
-    }
-
-}
-
-function getVolOption(){
-    return {
-        priceFormat: {
-            type: 'volume',
-        },
-        priceScaleId: '', // set as an overlay by setting a blank priceScaleId
-    }
-}
-
-function setOptionExt(chart) {
-
-    chart.priceScale().applyOptions({
-        borderColor: ZISE,
-    });
-
-    // Setting the border color for the horizontal axis
-    chart.timeScale().applyOptions({
-        borderColor: ZISE,
-    });
-
-    chart.priceScale('right').applyOptions({
-        mode: 1,//• Logarithmic = 1
-        scaleMargins: {
-            top: 0.1,
-            bottom: 0.25,
-        },
-    });
-
-    // Customizing the Crosshair
-    chart.applyOptions({
-        crosshair: {
-            // Change mode from default 'magnet' to 'normal'.
-            // Allows the crosshair to move freely without snapping to datapoints
-            mode: LightweightCharts.CrosshairMode.Normal,
-
-            // Vertical crosshair line (showing Date in Label)
-            vertLine: {
-                width: 1,
-                color: GREY_SHADOW,
-                style: LightweightCharts.LineStyle.Solid,
-                labelBackgroundColor: ZISE_L,
-            },
-
-            // Horizontal crosshair line (showing Price in Label)
-            horzLine: {
-                color: ZISE_L,
-                labelBackgroundColor: ZISE_L,
-            },
-        },
-    });
-
-}
 
 function initChart(chart) {
 
@@ -100,8 +15,8 @@ function initChart(chart) {
 
     //设置k线主图数据
     const kSeries = chart.addCandlestickSeries();
-    kSeries.applyOptions(getKColorOption());
     kSeries.setData([]);
+    kSeries.applyOptions(getKColorOption());
 
 
     //设置均线数据
@@ -116,21 +31,15 @@ function initChart(chart) {
     //设置成交量数据
     const volumeSeries = chart.addHistogramSeries(getVolOption());
     volumeSeries.setData([]);
-    volumeSeries.priceScale('right').applyOptions({
-        scaleMargins: {
-            top: 0.8, // highest point of the series will be 70% away from the top
-            bottom: 0, // lowest point will be at the very bottom.
-        },
-    });
-
-
+    setVolumeSeriesOption(volumeSeries)
 
     const ma5VolumeSeries = initMa(chart);
     const ma60VolumeSeries = initMa(chart);
 
     //设置涨跌幅
-    const changeSeries = chart.addHistogramSeries();
-    changeSeries.setData([]);
+    const pctSeries = chart.addHistogramSeries();
+    pctSeries.setData([]);
+    setPctSeriesOption(pctSeries);
 
     //设置hsl
     const hslSeries = chart.addHistogramSeries();
@@ -159,7 +68,7 @@ function initChart(chart) {
         volumeSeries,
         ma5VolumeSeries,
         ma60VolumeSeries,
-        changeSeries,
+        pctSeries,
         hslSeries,
         ma5HslSeries,
         ma60HslSeries,
@@ -190,7 +99,7 @@ function updateChartData(data, series) {
         volumeSeries,
         ma5VolumeSeries,
         ma60VolumeSeries,
-        changeSeries,
+        pctSeries,
         hslSeries,
         ma5HslSeries,
         ma60HslSeries,
@@ -202,6 +111,6 @@ function updateChartData(data, series) {
     //设置k线主图数据
     kSeries.setData(data.k);
     volumeSeries.setData(data.v);
-
+    pctSeries.setData(data.p);
 
 }
