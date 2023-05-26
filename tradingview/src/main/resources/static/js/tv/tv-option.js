@@ -111,7 +111,9 @@ function setPctSeriesOption(pctSeries) {
     pctSeries.applyOptions({
         overlay: true, priceFormat: {
             type: 'percent',
-        }, priceScaleId: 'left', color: GREY_SHADOW
+        },
+        priceScaleId: 'left',
+        color: GREY_SHADOW
     });
 
     pctSeries.priceScale('left').applyOptions({
