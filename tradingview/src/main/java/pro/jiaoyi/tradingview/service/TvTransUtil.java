@@ -154,6 +154,10 @@ public class TvTransUtil {
     private void ma(List<TvK> k, HashMap<String, List<TvTimeValue>> vMaMap, int ma, BigDecimal[] maLine) {
         List<TvTimeValue> maList = new ArrayList<>();
         for (int i = 0; i < maLine.length; i++) {
+            if (maLine[i].compareTo(BigDecimal.ZERO) <=0){
+                //均线为0的不显示
+                continue;
+            }
             TvTimeValue tvTimeValue = new TvTimeValue();
             tvTimeValue.setTime(k.get(i).getTime());
             tvTimeValue.setValue(maLine[i]);

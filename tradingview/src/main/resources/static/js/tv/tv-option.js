@@ -1,35 +1,47 @@
 const ZISE = '#71649C';//("#71649C","紫色"),
 const ZISE_L = '#9B7DFF';//亮紫色
 const GREY_SHADOW = '#C3BCDB44';//灰色阴影
-const RED = '#DE5E57';//("#DE5E57","红色"),
-const GREEN = '#52A49A';//("52A49A","绿色");
+const RED = '#EA463C';//("#DE5E57","红色"),
+const GREEN = '#76D770';//("52A49A","绿色");
+const Color_BG = "#1C1F26"
+const Color_GRID = "rgba(68,68,68,0.8)"
+
+//白色 透明度0.7
+const WHITE_MA5 = '#FFFFFF';
+// 黄色
+const YELLOW_MA10 = '#F9D56E';
+// 紫色
+const PURPLE_MA20 = '#71649C';
+// 绿色
+const GREEN_MA30 = '#1af62e';
+// 灰色
+const GREY_MA60 = '#C3BCDB';
+// 蓝色
+const BLUE_MA120 = '#4E86E4';
+// 浅蓝色
+const LIGHT_BLUE_MA250 = '#6EC1EA';
 
 
 function getChartOption() {
     return {
-        height: window.innerWidth * 6 / 15,
-        width: window.innerWidth,
+        height: window.innerWidth * 6 / 15, width: window.innerWidth,
 
         layout: {
-            background: {color: '#222'},
-            textColor: '#DDD',
-        },
-        grid: {
-            vertLines: {color: '#444'},
-            horzLines: {color: '#444'},
+            background: {color: Color_BG}, textColor: WHITE_MA5,
+        }, grid: {
+            vertLines: {color: Color_GRID}, horzLines: {color: Color_GRID},
         },
 
         rightPriceScale: {
             visible: true,
-        },
-        leftPriceScale: {
+        }, leftPriceScale: {
             visible: true,
         },
 
 
-
     }
 }
+
 function setOptionExt(chart) {
 
     chart.priceScale().applyOptions({
@@ -42,32 +54,25 @@ function setOptionExt(chart) {
     });
 
     chart.priceScale('right').applyOptions({
-        mode: 1,//• Logarithmic = 1
+        mode: 1,//• Logarithmic = 1 对数坐标
         scaleMargins: {
-            top: 0.1,
-            bottom: 0.3,
+            top: 0.1, bottom: 0.3,
         },
     });
 
     // Customizing the Crosshair
     chart.applyOptions({
         crosshair: {
-            // Change mode from default 'magnet' to 'normal'.
-            // Allows the crosshair to move freely without snapping to datapoints
-            mode: LightweightCharts.CrosshairMode.Normal,
+            mode: LightweightCharts.CrosshairMode.Normal,//可以自由移动
 
             // Vertical crosshair line (showing Date in Label)
             vertLine: {
-                width: 1,
-                color: GREY_SHADOW,
-                style: LightweightCharts.LineStyle.Solid,
-                labelBackgroundColor: ZISE_L,
+                width: 1, color: GREY_SHADOW, style: LightweightCharts.LineStyle.Solid, labelBackgroundColor: ZISE_L,
             },
 
             // Horizontal crosshair line (showing Price in Label)
             horzLine: {
-                color: ZISE_L,
-                labelBackgroundColor: ZISE_L,
+                color: ZISE_L, labelBackgroundColor: ZISE_L,
             },
         },
     });
@@ -77,32 +82,16 @@ function setOptionExt(chart) {
 
 function getKColorOption() {
     return {
-        wickUpColor: RED,
-        upColor: RED,
-        wickDownColor: GREEN,
-        downColor: GREEN,
-        borderVisible: false,
+        wickUpColor: RED, upColor: RED, wickDownColor: GREEN, downColor: GREEN, borderVisible: false,
     }
-
 }
 
-function getVolOption(){
+function getVolOption() {
     return {
-        // overlay: true,
-        // priceFormat: {
-        //     type: 'custom',
-        //     formatter: (price) => {
-        //         if (price > 10000 * 10000){
-        //             return price / (10000*10000) + '亿';
-        //         }else {
-        //             return price / 10000 + '万';
-        //         }
-        //     }
-        // },
+        //color 通过 后台数据给出
         priceFormat: {
             type: 'volume',
-        },
-        priceScaleId: '', // set as an overlay by setting a blank priceScaleId
+        }, priceScaleId: '', // set as an overlay by setting a blank priceScaleId
     }
 }
 
@@ -118,14 +107,11 @@ function setVolumeSeriesOption(series) {
 }
 
 
-function setPctSeriesOption(pctSeries){
+function setPctSeriesOption(pctSeries) {
     pctSeries.applyOptions({
-        overlay: true,
-        priceFormat: {
+        overlay: true, priceFormat: {
             type: 'percent',
-        },
-        priceScaleId: 'left',
-        color: GREY_SHADOW
+        }, priceScaleId: 'left', color: GREY_SHADOW
     });
 
     pctSeries.priceScale('left').applyOptions({

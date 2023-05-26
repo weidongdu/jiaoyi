@@ -1,4 +1,3 @@
-
 window.addEventListener('resize', () => {
     resize(chart);
 });
@@ -20,21 +19,21 @@ function initChart(chart) {
 
 
     //设置均线数据
-    const ma5Series = initMa(chart);
-    const ma10Series = initMa(chart);
-    const ma20Series = initMa(chart);
-    const ma30Series = initMa(chart);
-    const ma60Series = initMa(chart);
-    const ma120Series = initMa(chart);
-    const ma250Series = initMa(chart);
+    const ma5Series = initMa(chart, WHITE_MA5);
+    const ma10Series = initMa(chart, YELLOW_MA10);
+    const ma20Series = initMa(chart, PURPLE_MA20);
+    const ma30Series = initMa(chart, GREEN_MA30);
+    const ma60Series = initMa(chart, GREY_MA60);
+    const ma120Series = initMa(chart, BLUE_MA120);
+    const ma250Series = initMa(chart, LIGHT_BLUE_MA250);
 
     //设置成交量数据
     const volumeSeries = chart.addHistogramSeries(getVolOption());
     volumeSeries.setData([]);
     setVolumeSeriesOption(volumeSeries)
 
-    const ma5VolumeSeries = initMa(chart);
-    const ma60VolumeSeries = initMa(chart);
+    const ma5VolumeSeries = initMa(chart, WHITE_MA5, getVolOption());
+    const ma60VolumeSeries = initMa(chart, GREY_MA60, getVolOption());
 
     //设置涨跌幅
     const pctSeries = chart.addHistogramSeries();
@@ -79,8 +78,23 @@ function initChart(chart) {
 
 }
 
-function initMa(chart) {
-    let ma = chart.addLineSeries();
+function initMa(chart, color, option) {
+
+    let o = {
+        color: color,
+        lineWidth: 1,
+        lastValueVisible: false,//标签
+        priceLineVisible: false,//价格线
+    };
+    console.log(o);
+
+    if (option) {
+        Object.assign(o, o, option);
+    }
+
+    console.log(o);
+
+    let ma = chart.addLineSeries(o);
     ma.setData([]);
     return ma;
 }
@@ -112,5 +126,14 @@ function updateChartData(data, series) {
     kSeries.setData(data.k);
     volumeSeries.setData(data.v);
     pctSeries.setData(data.p);
+    ma5Series.setData(data.kmaLines.ma5);
+    ma10Series.setData(data.kmaLines.ma10);
+    ma20Series.setData(data.kmaLines.ma20);
+    ma30Series.setData(data.kmaLines.ma30);
+    ma60Series.setData(data.kmaLines.ma60);
+    ma120Series.setData(data.kmaLines.ma120);
+    ma250Series.setData(data.kmaLines.ma250);
 
+    ma5VolumeSeries.setData(data.vmaLines.ma5);
+    ma60VolumeSeries.setData(data.vmaLines.ma60);
 }
