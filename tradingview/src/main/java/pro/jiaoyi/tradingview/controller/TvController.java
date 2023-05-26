@@ -29,8 +29,7 @@ public class TvController {
 
     @GetMapping("/stockList")
     public Map<String, List<String>> getLists() {
-        Map<String, List<String>> allIndex =
-                tvService.getAllIndex();
+        Map<String, List<String>> allIndex = tvService.getAllIndex();
         return allIndex;
     }
 }

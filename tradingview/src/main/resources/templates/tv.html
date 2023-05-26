@@ -108,7 +108,7 @@
                     </div>
                     <div class="field ">
                         <p class="control">
-                            <button class="button has-tooltip-right" onclick="index()" data-tooltip="快捷键[n]"
+                            <button class="button has-tooltip-right" onclick="next()" data-tooltip="快捷键[n]"
                                     id="iBtnChart">
                                 后
                             </button>
@@ -266,45 +266,9 @@
     } = initChart(chart);
 
 
-
-    //生成主图
-
-    // Set the data for the Main Series
-    let code = '000001';
-    getTvChart(code, (data) => {
-        console.log(data.k);
-        updateChartData(data,{
-            kSeries,
-            ma5Series,
-            ma10Series,
-            ma20Series,
-            ma30Series,
-            ma60Series,
-            ma120Series,
-            ma250Series,
-            volumeSeries,
-            ma5VolumeSeries,
-            ma60VolumeSeries,
-            pctSeries,
-            hslSeries,
-            ma5HslSeries,
-            ma60HslSeries,
-            oscSeries,
-            ma5OscSeries,
-            ma60OscSeries,
-        })
-    });
-
-
-    let STOCK_LIST = {};
-    //初始化股票列表
-    getStockList(function (data){
+    getStockList(function (data) {
         STOCK_LIST = data;
-
     })
-
-
-
 
 
 </script>
