@@ -56,7 +56,8 @@ function setOptionExt(chart) {
     chart.priceScale('right').applyOptions({
         mode: 1,//• Logarithmic = 1 对数坐标
         scaleMargins: {
-            top: 0.1, bottom: 0.3,
+            top: 0.1,
+            bottom: 0.5,
         },
     });
 
@@ -98,6 +99,16 @@ function getVolOption() {
 
 function setVolumeSeriesOption(series) {
     series.priceScale('right').applyOptions({
+        // overlay: true, //会 跑到主图上面
+        scaleMargins: {
+            top: 0.55, // highest point of the series will be 80% away from the top
+            bottom: 0.25, // lowest point will be at the very bottom.
+        },
+    });
+
+}
+function setHslSeriesOption(series) {
+    series.priceScale('right').applyOptions({
         scaleMargins: {
             top: 0.8, // highest point of the series will be 80% away from the top
             bottom: 0, // lowest point will be at the very bottom.
@@ -109,7 +120,8 @@ function setVolumeSeriesOption(series) {
 
 function setPctSeriesOption(pctSeries) {
     pctSeries.applyOptions({
-        overlay: true, priceFormat: {
+        overlay: true,
+        priceFormat: {
             type: 'percent',
         },
         priceScaleId: 'left',

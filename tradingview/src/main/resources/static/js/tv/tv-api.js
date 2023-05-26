@@ -41,8 +41,21 @@ function initChart(chart) {
     setPctSeriesOption(pctSeries);
 
     //设置hsl
-    const hslSeries = chart.addHistogramSeries();
+    const hslSeries = chart.addHistogramSeries({
+        //color 通过 后台数据给出
+        overlay: true,
+        priceFormat: {
+            type: 'percent',
+        },
+        priceScaleId: 'left',
+
+    });
     hslSeries.setData([]);
+    setHslSeriesOption(hslSeries)
+    // const hslSeries = chart.addHistogramSeries();
+    // hslSeries.setData([]);
+    // setHslSeriesOption(hslSeries)
+
     //设置hsl ma
     const ma5HslSeries = initMa(chart);
     const ma60HslSeries = initMa(chart);
@@ -86,14 +99,9 @@ function initMa(chart, color, option) {
         lastValueVisible: false,//标签
         priceLineVisible: false,//价格线
     };
-    console.log(o);
-
     if (option) {
         Object.assign(o, o, option);
     }
-
-    console.log(o);
-
     let ma = chart.addLineSeries(o);
     ma.setData([]);
     return ma;
@@ -133,7 +141,7 @@ function updateChartData(data, series) {
     ma60Series.setData(data.kmaLines.ma60);
     ma120Series.setData(data.kmaLines.ma120);
     ma250Series.setData(data.kmaLines.ma250);
-
     ma5VolumeSeries.setData(data.vmaLines.ma5);
     ma60VolumeSeries.setData(data.vmaLines.ma60);
+    hslSeries.setData(data.hsl);
 }
