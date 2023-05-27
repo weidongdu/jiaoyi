@@ -16,4 +16,6 @@ public class EmDailyK extends K {
     private BigDecimal hsl;
     private String tradeDate;
 
+    private String bk;
+
 }

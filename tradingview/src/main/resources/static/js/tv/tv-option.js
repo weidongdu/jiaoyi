@@ -21,6 +21,11 @@ const BLUE_MA120 = '#4E86E4';
 // 浅蓝色
 const LIGHT_BLUE_MA250 = '#6EC1EA';
 
+//黄色
+const YELLOW_UP = '#fff203B3';
+//蓝色
+const BLUE_DN = '#00c2ffB3';
+
 
 function getChartOption() {
     return {
@@ -57,7 +62,7 @@ function setOptionExt(chart) {
         mode: 1,//• Logarithmic = 1 对数坐标
         scaleMargins: {
             top: 0.1,
-            bottom: 0.3,
+            bottom: 0.2,
         },
     });
 
@@ -101,7 +106,7 @@ function setVolumeSeriesOption(series) {
     series.priceScale('right').applyOptions({
         // overlay: true, //会 跑到主图上面
         scaleMargins: {
-            top: 0.75, // highest point of the series will be 80% away from the top
+            top: 0.8, // highest point of the series will be 80% away from the top
             bottom: 0, // lowest point will be at the very bottom.
         },
     });
@@ -139,7 +144,7 @@ function setPctSeriesOption(pctSeries) {
     pctSeries.priceScale('left').applyOptions({
         scaleMargins: {
             top: 0.1, // highest point of the series will be 80% away from the top
-            bottom: 0.3, // lowest point will be at the very bottom.
+            bottom: 0.2, // lowest point will be at the very bottom.
         },
     });
 }

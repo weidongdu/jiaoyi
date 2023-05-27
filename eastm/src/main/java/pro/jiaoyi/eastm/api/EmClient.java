@@ -178,6 +178,23 @@ public class EmClient {
         return clist;
     }
 
+    public String getCodeBk(String code){
+
+        Map<String, String> map = DATE_CODE_BK_MAP.get(DateUtil.today());
+        if (map !=null && map.size() > 0){
+            return map.get(code);
+        }
+
+        List<EmCList> list = getClistDefaultSize(false);
+        HashMap<String, String> codeBk = new HashMap<>();
+        for (EmCList emCList : list) {
+            codeBk.put(emCList.getF12Code(),emCList.getF100bk());
+        }
+        removeOldCache(DATE_CODE_BK_MAP,7);
+        DATE_CODE_BK_MAP.put(DateUtil.today(),codeBk);
+        return codeBk.get(code);
+    }
+
     /**
      * code name map
      *
@@ -305,7 +322,7 @@ public class EmClient {
     private static void removeOldCache(Map map, int daysBefore) {
         ArrayList<String> oldList = new ArrayList<>();
         //移除前面15天的缓存
-        if (DATE_CODE_NAME_MAP.size() > daysBefore * 2) {
+        if (map.size() > daysBefore * 2) {
             for (Object s : map.keySet()) {
                 LocalDate localDate = DateUtil.strToLocalDate((String) s, DateUtil.PATTERN_yyyyMMdd);
                 if (localDate.isBefore(LocalDate.now().minusDays(daysBefore))) {
@@ -314,7 +331,7 @@ public class EmClient {
             }
             if (oldList.size() > 0) {
                 for (String s : oldList) {
-                    DATE_CODE_NAME_MAP.remove(s);
+                    map.remove(s);
                 }
             }
         }
@@ -334,6 +351,7 @@ public class EmClient {
 
     public static final Map<String, Map<String, String>> DATE_CODE_NAME_MAP = new ConcurrentHashMap<>();
     public static final Map<String, Map<String, String>> DATE_NAME_CODE_MAP = new ConcurrentHashMap<>();
+    public static final Map<String, Map<String, String>> DATE_CODE_BK_MAP = new ConcurrentHashMap<>();
     public static final Map<String, List<EmCList>> DATE_LIST_MAP = new ConcurrentHashMap<>();
     public static final Map<String, List<EmDailyK>> DATE_KLINE_MAP = new ConcurrentHashMap<>();
 

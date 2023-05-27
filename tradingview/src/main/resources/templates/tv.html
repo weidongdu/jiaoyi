@@ -22,9 +22,10 @@
             top: 100px;
             text-align: right;
             z-index: 1;
-            font-size: 12px;
+            font-size: 16px;
             line-height: 18px;
             font-weight: 300;
+            font-family: "Courier New", Courier, monospace;
         }
 
         .section {
@@ -38,29 +39,29 @@
     <div class="columns">
         <div class="column is-1">
             <div id="iSelectType" class="control select is-danger">
-                <select id="iStockTypeOption">
-<!--                    <option value="p7">p7</option>-->
-<!--                    <option value="zp7">zp7</option>-->
-<!--                    <option value="all_index">all指数</option>-->
-<!--                    <option value="all_index_v60">all指数(v60<1.5亿)</option>-->
-<!--                    <option value="all">all</option>-->
-<!--                    <option value="all_v60">all(v60<1.5亿)</option>-->
-<!--                    <option value="zuijin">最近</option>-->
-<!--                    <option value="other">其他</option>-->
-<!--                    <option value="ZT">涨停板</option>-->
-<!--                    <option value="hk">hk</option>-->
-<!--                    <option value="amtMa60">5倍AmtMa60</option>-->
-<!--                    <option value="Tshadow">上影线</option>-->
-<!--                    <option value="Kcross">穿越均线</option>-->
-<!--                    <option value="longMost">一年内最大涨幅</option>-->
-<!--                    <option value="longMostRecent">一年内最大涨幅(今日收盘)</option>-->
-<!--                    <option value="shortMost">一年内最大跌幅</option>-->
-<!--                    <option value="shortMostRecent">一年内最大跌幅(今日收盘)</option>-->
-<!--                    <option value="icyb">创业成分</option>-->
-<!--                    <option value="i300">沪深300</option>-->
-<!--                    <option value="i500">中证500</option>-->
-<!--                    <option value="i1000">中证1000</option>-->
-                    <option value="kc50">科创50</option>
+                <select id="iStockTypeOption" onchange="selectType()">
+                    <!--                    <option value="p7">p7</option>-->
+                    <!--                    <option value="zp7">zp7</option>-->
+                    <!--                    <option value="all_index">all指数</option>-->
+                    <!--                    <option value="all_index_v60">all指数(v60<1.5亿)</option>-->
+                    <!--                    <option value="all">all</option>-->
+                    <!--                    <option value="all_v60">all(v60<1.5亿)</option>-->
+                    <!--                    <option value="zuijin">最近</option>-->
+                    <!--                    <option value="other">其他</option>-->
+                    <!--                    <option value="ZT">涨停板</option>-->
+                    <!--                    <option value="hk">hk</option>-->
+                    <!--                    <option value="amtMa60">5倍AmtMa60</option>-->
+                    <!--                    <option value="Tshadow">上影线</option>-->
+                    <!--                    <option value="Kcross">穿越均线</option>-->
+                    <!--                    <option value="longMost">一年内最大涨幅</option>-->
+                    <!--                    <option value="longMostRecent">一年内最大涨幅(今日收盘)</option>-->
+                    <!--                    <option value="shortMost">一年内最大跌幅</option>-->
+                    <!--                    <option value="shortMostRecent">一年内最大跌幅(今日收盘)</option>-->
+                    <!--                    <option value="icyb">创业成分</option>-->
+                    <!--                    <option value="i300">沪深300</option>-->
+                    <!--                    <option value="i500">中证500</option>-->
+                    <!--                    <option value="i1000">中证1000</option>-->
+<!--                    <option value="kc50">科创50</option>-->
                 </select>
             </div>
         </div>
@@ -238,13 +239,17 @@
 
 <script type="text/javascript">
     <!--    初始化tv chart     -->
+    const W = 10000;
+    const Y = W * W;
     let STOCK_LIST = {};
     let SELECT_LIST = [];
     let index = 0;
 
+
     const chart = LightweightCharts.createChart(
         document.getElementById('charts'), getChartOption()
     );
+
 
     //析构数据 initChart(chart);
     const {
@@ -256,6 +261,8 @@
         ma60Series,
         ma120Series,
         ma250Series,
+        upSeries,
+        dnSeries,
         volumeSeries,
         ma5VolumeSeries,
         ma60VolumeSeries,
@@ -281,8 +288,31 @@
             option.innerText = value;
             $('#iStockTypeOption').append(option)
         }
+
+        // 获取select元素
+        let select = document.getElementById("iStockTypeOption");
+        // 获取所有Option元素
+        let options = select.options;
+        // 将Option元素的innerText存储在一个数组中
+        let optionTexts = [];
+
+        for (let i = 0; i < options.length; i++) {
+            optionTexts.push(options[i].innerText + "#" +options[i].value);
+        }
+        // 对数组进行排序
+        optionTexts.sort();
+        // 将排序后的Option元素重新插入到select元素中
+        select.innerHTML = "";
+        for (let i = 0; i < optionTexts.length; i++) {
+            let option = document.createElement("option");
+            let ss = optionTexts[i].split("#");
+            option.innerText = ss[0];
+            option.value = ss[1];
+            select.appendChild(option);
+        }
     });
 
+    legend();
 
 
 </script>

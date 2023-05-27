@@ -28,6 +28,11 @@ public class TvController {
         TvChart tvChart = tvService.getTvChart(code, LocalDate.now(), 500);
         return tvChart;
     }
+//    @GetMapping("/chart/mock")
+//    public TvChart tvChartMock(@RequestParam String code) {
+//        TvChart tvChart = tvService.getTvChart(code, LocalDate.now(), 500);
+//
+//    }
 
     @GetMapping("/stockList")
     public Map<String, List<String>> getLists() {
