@@ -1,26 +1,32 @@
-let STOCK_LIST = {};
-let SELECT_LIST = [];
-let index = 0;
+
 
 //初始化股票列表
 
 function next() {
-    if (index === SELECT_LIST.length - 1) {
+    // console.log('next',SELECT_LIST)
+    // console.log('next',SELECT_LIST.length)
+
+    let SELECT_LIST_ = getList();
+    if (index >= SELECT_LIST_.length - 1) {
         alert("最后一个")
         return;
     }
     index++;
-    let code = STOCK_LIST[index];
+    let code = SELECT_LIST_[index];
+    console.log(index,code)
     update(code);
 }
 
 function pre() {
-    if (index === 0) {
+    let SELECT_LIST_ = getList();
+    console.log('pre',SELECT_LIST_.length)
+    if (index <= 0) {
         alert("第一个")
         return;
     }
     index--;
-    let code = STOCK_LIST[index];
+    let code = SELECT_LIST_[index];
+    console.log(index,code)
     update(code);
 }
 
@@ -30,6 +36,7 @@ function selectType() {
     let options = $("#iSelectType option:selected");
     let type = options.val();
     let SELECT_LIST = STOCK_LIST[type];
+    console.log("type:",type,"STOCK_LIST",STOCK_LIST,"SELECT_LIST",SELECT_LIST)
     if (SELECT_LIST && SELECT_LIST.length > 0) {
         alert(type + "=" + SELECT_LIST.length);
         index = 0;
@@ -39,9 +46,16 @@ function selectType() {
     }
 }
 
+function getList(){
+    let options = $("#iSelectType option:selected");
+    let type = options.val();
+    return  STOCK_LIST[type];
+}
 
 function update(code) {
-
+    if (!code){
+        alert("code为空");return;
+    }
     getTvChart(code, (data) => {
         console.log(data.k);
         updateChartData(data, {
@@ -85,11 +99,9 @@ $(document).keydown(function (e) {
         $('input[name=swMAupdn]').click();
     }
 
-
     if (221 === e.keyCode) {//]
         $('#iBtnChart').click();
     }
-
 
     if (219 === e.keyCode) {
         $('#iBtnChartPre').click();
@@ -112,7 +124,7 @@ $(document).keydown(function (e) {
     }
 
     if (84 === e.keyCode) {//t
-        filter();
+        selectType();
     }
 
     if (191 === e.keyCode) {// code = / ?

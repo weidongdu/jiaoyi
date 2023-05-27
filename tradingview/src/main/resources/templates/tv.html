@@ -38,28 +38,28 @@
     <div class="columns">
         <div class="column is-1">
             <div id="iSelectType" class="control select is-danger">
-                <select>
-                    <option value="p7">p7</option>
-                    <option value="zp7">zp7</option>
-                    <option value="all_index">all指数</option>
-                    <option value="all_index_v60">all指数(v60<1.5亿)</option>
-                    <option value="all">all</option>
-                    <option value="all_v60">all(v60<1.5亿)</option>
-                    <option value="zuijin">最近</option>
-                    <option value="other">其他</option>
-                    <option value="ZT">涨停板</option>
-                    <option value="hk">hk</option>
-                    <option value="amtMa60">5倍AmtMa60</option>
-                    <option value="Tshadow">上影线</option>
-                    <option value="Kcross">穿越均线</option>
-                    <option value="longMost">一年内最大涨幅</option>
-                    <option value="longMostRecent">一年内最大涨幅(今日收盘)</option>
-                    <option value="shortMost">一年内最大跌幅</option>
-                    <option value="shortMostRecent">一年内最大跌幅(今日收盘)</option>
-                    <option value="icyb">创业成分</option>
-                    <option value="i300">沪深300</option>
-                    <option value="i500">中证500</option>
-                    <option value="i1000">中证1000</option>
+                <select id="iStockTypeOption">
+<!--                    <option value="p7">p7</option>-->
+<!--                    <option value="zp7">zp7</option>-->
+<!--                    <option value="all_index">all指数</option>-->
+<!--                    <option value="all_index_v60">all指数(v60<1.5亿)</option>-->
+<!--                    <option value="all">all</option>-->
+<!--                    <option value="all_v60">all(v60<1.5亿)</option>-->
+<!--                    <option value="zuijin">最近</option>-->
+<!--                    <option value="other">其他</option>-->
+<!--                    <option value="ZT">涨停板</option>-->
+<!--                    <option value="hk">hk</option>-->
+<!--                    <option value="amtMa60">5倍AmtMa60</option>-->
+<!--                    <option value="Tshadow">上影线</option>-->
+<!--                    <option value="Kcross">穿越均线</option>-->
+<!--                    <option value="longMost">一年内最大涨幅</option>-->
+<!--                    <option value="longMostRecent">一年内最大涨幅(今日收盘)</option>-->
+<!--                    <option value="shortMost">一年内最大跌幅</option>-->
+<!--                    <option value="shortMostRecent">一年内最大跌幅(今日收盘)</option>-->
+<!--                    <option value="icyb">创业成分</option>-->
+<!--                    <option value="i300">沪深300</option>-->
+<!--                    <option value="i500">中证500</option>-->
+<!--                    <option value="i1000">中证1000</option>-->
                     <option value="kc50">科创50</option>
                 </select>
             </div>
@@ -238,6 +238,9 @@
 
 <script type="text/javascript">
     <!--    初始化tv chart     -->
+    let STOCK_LIST = {};
+    let SELECT_LIST = [];
+    let index = 0;
 
     const chart = LightweightCharts.createChart(
         document.getElementById('charts'), getChartOption()
@@ -269,6 +272,17 @@
     getStockList(function (data) {
         STOCK_LIST = data;
     })
+
+    getStockType(function (data) {
+        //渲染 option 列表
+        for (const [key, value] of Object.entries(data)) {
+            const option = document.createElement('option');
+            option.value = key;
+            option.innerText = value;
+            $('#iStockTypeOption').append(option)
+        }
+    });
+
 
 
 </script>

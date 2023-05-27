@@ -20,3 +20,11 @@ function getStockList(cb) {
         cb(data);
     });
 }
+function getStockType(cb) {
+    let url = baseUrl + "/tv/stockType";
+    //通过jquery get 获取 json
+    $.get(url, function (data) {
+        console.log(data);
+        cb(data);
+    });
+}

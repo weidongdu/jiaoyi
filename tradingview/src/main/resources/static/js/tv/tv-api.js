@@ -43,7 +43,7 @@ function initChart(chart) {
     //设置hsl
     const hslSeries = chart.addHistogramSeries();
     hslSeries.setData([]);
-    setHslSeriesOption(hslSeries)
+    // setHslSeriesOption(hslSeries)
 
     //设置hsl ma
     const ma5HslSeries = initMa(chart);
@@ -87,6 +87,7 @@ function initMa(chart, color, option) {
         lineWidth: 1,
         lastValueVisible: false,//标签
         priceLineVisible: false,//价格线
+        crosshairMarkerVisible:false,//鼠标交叉点
     };
     if (option) {
         Object.assign(o, o, option);
@@ -123,6 +124,7 @@ function updateChartData(data, series) {
     kSeries.setData(data.k);
     volumeSeries.setData(data.v);
     pctSeries.setData(data.p);
+
     ma5Series.setData(data.kmaLines.ma5);
     ma10Series.setData(data.kmaLines.ma10);
     ma20Series.setData(data.kmaLines.ma20);
@@ -132,5 +134,5 @@ function updateChartData(data, series) {
     ma250Series.setData(data.kmaLines.ma250);
     ma5VolumeSeries.setData(data.vmaLines.ma5);
     ma60VolumeSeries.setData(data.vmaLines.ma60);
-    hslSeries.setData(data.hsl);
+    // hslSeries.setData(data.hsl);
 }

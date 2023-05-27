@@ -14,13 +14,9 @@ import pro.jiaoyi.eastm.model.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-
-import static pro.jiaoyi.eastm.util.ExcelUtil.simpleRead;
 
 @Component
 @Slf4j
@@ -251,8 +247,8 @@ public class EmClient {
                 return getIndex(IndexEnum.CYCF.getUrl());
             case ZZ500:
                 return getIndex(IndexEnum.ZZ500.getUrl());
-            case ZZ1000:
-                return getIndex1000();
+//            case ZZ1000:
+//                return getIndex1000();
             case O_TP7:
                 return getIndexTp7();
             case O_TP02:
@@ -294,16 +290,16 @@ public class EmClient {
      *
      * @return
      */
-    private List<EmCList> getIndex1000() {
-        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateUtil.PATTERN_yyyyMMdd_HHmm));
-        String filePath = "zz1000_" + time + ".xls";
-        if (okHttpUtil.downloadFile(IndexEnum.ZZ1000.getUrl(), null, filePath)) {
-            List<EmCList> list = new ArrayList<>();
-            simpleRead(filePath, list, getClistDefaultSize(false));
-            return list;
-        }
-        return Collections.emptyList();
-    }
+//    private List<EmCList> getIndex1000() {
+//        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateUtil.PATTERN_yyyyMMdd_HHmm));
+//        String filePath = "zz1000_" + time + ".xls";
+//        if (okHttpUtil.downloadFile(IndexEnum.ZZ1000.getUrl(), null, filePath)) {
+//            List<EmCList> list = new ArrayList<>();
+//            simpleRead(filePath, list, getClistDefaultSize(false));
+//            return list;
+//        }
+//        return Collections.emptyList();
+//    }
 
 
     private static void removeOldCache(Map map, int daysBefore) {
