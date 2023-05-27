@@ -14,9 +14,13 @@ import pro.jiaoyi.eastm.model.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
+import static pro.jiaoyi.eastm.util.ExcelUtil.simpleRead;
 
 @Component
 @Slf4j
@@ -178,20 +182,20 @@ public class EmClient {
         return clist;
     }
 
-    public String getCodeBk(String code){
+    public String getCodeBk(String code) {
 
         Map<String, String> map = DATE_CODE_BK_MAP.get(DateUtil.today());
-        if (map !=null && map.size() > 0){
+        if (map != null && map.size() > 0) {
             return map.get(code);
         }
 
         List<EmCList> list = getClistDefaultSize(false);
         HashMap<String, String> codeBk = new HashMap<>();
         for (EmCList emCList : list) {
-            codeBk.put(emCList.getF12Code(),emCList.getF100bk());
+            codeBk.put(emCList.getF12Code(), emCList.getF100bk());
         }
-        removeOldCache(DATE_CODE_BK_MAP,7);
-        DATE_CODE_BK_MAP.put(DateUtil.today(),codeBk);
+        removeOldCache(DATE_CODE_BK_MAP, 7);
+        DATE_CODE_BK_MAP.put(DateUtil.today(), codeBk);
         return codeBk.get(code);
     }
 
@@ -264,8 +268,8 @@ public class EmClient {
                 return getIndex(IndexEnum.CYCF.getUrl());
             case ZZ500:
                 return getIndex(IndexEnum.ZZ500.getUrl());
-//            case ZZ1000:
-//                return getIndex1000();
+            case ZZ1000:
+                return getIndex1000();
             case O_TP7:
                 return getIndexTp7();
             case O_TP02:
@@ -280,7 +284,10 @@ public class EmClient {
     private List<EmCList> getIndexTp02() {
         List<EmCList> list = getClistDefaultSize(false);
         BigDecimal B = new BigDecimal("-2");
-        return list.stream().filter(c -> c.getF3Pct().compareTo(B) > 0).collect(Collectors.toList());
+        BigDecimal B7 = new BigDecimal("7");
+        return list.stream()
+                .filter(c -> c.getF3Pct().compareTo(B) > 0 && c.getF3Pct().compareTo(B7) < 0)
+                .collect(Collectors.toList());
     }
 
     private List<EmCList> getIndexTp7() {
@@ -307,16 +314,16 @@ public class EmClient {
      *
      * @return
      */
-//    private List<EmCList> getIndex1000() {
-//        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateUtil.PATTERN_yyyyMMdd_HHmm));
-//        String filePath = "zz1000_" + time + ".xls";
-//        if (okHttpUtil.downloadFile(IndexEnum.ZZ1000.getUrl(), null, filePath)) {
-//            List<EmCList> list = new ArrayList<>();
-//            simpleRead(filePath, list, getClistDefaultSize(false));
-//            return list;
-//        }
-//        return Collections.emptyList();
-//    }
+    private List<EmCList> getIndex1000() {
+        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateUtil.PATTERN_yyyyMMdd_HHmm));
+        String filePath = "zz1000_" + time + ".xls";
+        if (okHttpUtil.downloadFile(IndexEnum.ZZ1000.getUrl(), null, filePath)) {
+            List<EmCList> list = new ArrayList<>();
+            simpleRead(filePath, list, getClistDefaultSize(false));
+            return list;
+        }
+        return Collections.emptyList();
+    }
 
 
     private static void removeOldCache(Map map, int daysBefore) {
