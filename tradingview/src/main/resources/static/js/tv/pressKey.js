@@ -31,7 +31,7 @@ function next() {
     }
     index++;
 
-    $("#iIndex").val(index + 1);
+    $("#iIndex").val((index + 1) + "/" + SELECT_LIST_.length);
     let code = SELECT_LIST_[index];
     console.log(index, code)
     update(code);
@@ -45,7 +45,7 @@ function pre() {
         return;
     }
     index--;
-    $("#iIndex").val(index + 1);
+    $("#iIndex").val((index + 1) + "/" + SELECT_LIST_.length);
     let code = SELECT_LIST_[index];
     console.log(index, code)
     update(code);
