@@ -136,8 +136,8 @@ function updateChartData(data, series) {
 
     //设置k线主图数据
     kSeries.setData(data.k);
-    if (data.mks){
-        series.setMarkers(data.mks);
+    if (data.mks && data.mks.length > 0) {
+        kSeries.setMarkers(data.mks);
     }
     volumeSeries.setData(data.v);
     pctSeries.setData(data.p);

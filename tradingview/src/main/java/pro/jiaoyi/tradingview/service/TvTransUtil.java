@@ -215,7 +215,7 @@ public class TvTransUtil {
             TvK tvK = k.get(i);
             int highCount = 0;
             //find high
-            for (int j = 1; j < gap; j++) {
+            for (int j = 1; j <= gap; j++) {
                 if (i - j >= 0) {
                     TvK lk = k.get(i - j);
                     if (tvK.getHigh().compareTo(lk.getHigh()) < 0) {
@@ -236,7 +236,7 @@ public class TvTransUtil {
                 TvMarker tvMarker = new TvMarker();
                 tvMarker.setTime(tvK.getTime());
                 tvMarker.setText(tvK.getHigh().toString());
-                tvMarker.setColor(Colors.RED.getColor());
+                tvMarker.setColor(Colors.YELLOW.getColor());
                 tvMarker.setPosition(Constants.MARKER_POSITION_ABOVEBAR);
                 tvMarker.setShape(Constants.MARKER_SHAPE_ARROW_DOWN);
                 mks.add(tvMarker);
@@ -245,7 +245,7 @@ public class TvTransUtil {
 
             int lowCount = 0;
             //find low
-            for (int j = 1; j < gap; j++) {
+            for (int j = 1; j <= gap; j++) {
                 if (i - j >= 0) {
                     TvK lk = k.get(i - j);
                     if (tvK.getLow().compareTo(lk.getLow()) > 0) {
@@ -266,7 +266,7 @@ public class TvTransUtil {
                 TvMarker tvMarker = new TvMarker();
                 tvMarker.setTime(tvK.getTime());
                 tvMarker.setText(tvK.getLow().toString());
-                tvMarker.setColor(Colors.GREEN.getColor());
+                tvMarker.setColor(Colors.BLUE.getColor());
                 tvMarker.setPosition(Constants.MARKER_POSITION_BELOWBAR);
                 tvMarker.setShape(Constants.MARKER_SHAPE_ARROW_UP);
                 mks.add(tvMarker);
