@@ -14,8 +14,6 @@ import pro.jiaoyi.eastm.model.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -283,10 +281,16 @@ public class EmClient {
 
     private List<EmCList> getIndexTp02() {
         List<EmCList> list = getClistDefaultSize(false);
-        BigDecimal B = new BigDecimal("-2");
+        BigDecimal B_2 = new BigDecimal("-2");
         BigDecimal B7 = new BigDecimal("7");
+        BigDecimal B5000_0000 = new BigDecimal("50000000");
         return list.stream()
-                .filter(c -> c.getF3Pct().compareTo(B) > 0 && c.getF3Pct().compareTo(B7) < 0)
+                .filter(c -> c.getF3Pct().compareTo(B_2) > 0
+                        && c.getF3Pct().compareTo(B7) < 0
+                        && !c.getF14Name().contains("退")
+                        //成交额大于 5000万
+                        && c.getF6Amt().compareTo(B5000_0000) > 0
+                )
                 .collect(Collectors.toList());
     }
 
@@ -315,8 +319,8 @@ public class EmClient {
      * @return
      */
     private List<EmCList> getIndex1000() {
-        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateUtil.PATTERN_yyyyMMdd_HHmm));
-        String filePath = "zz1000_" + time + ".xls";
+//        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateUtil.PATTERN_yyyyMMdd_HHmm));
+        String filePath = "zz1000_" + DateUtil.today() + ".xls";
         if (okHttpUtil.downloadFile(IndexEnum.ZZ1000.getUrl(), null, filePath)) {
             List<EmCList> list = new ArrayList<>();
             simpleRead(filePath, list, getClistDefaultSize(false));

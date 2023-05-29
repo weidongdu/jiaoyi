@@ -2,6 +2,7 @@ package pro.jiaoyi.tradingview.model;
 
 import lombok.Data;
 import pro.jiaoyi.tradingview.model.chart.TvK;
+import pro.jiaoyi.tradingview.model.chart.TvMarker;
 import pro.jiaoyi.tradingview.model.chart.TvTimeValue;
 import pro.jiaoyi.tradingview.model.chart.TvVol;
 
@@ -26,4 +27,6 @@ public class TvChart {
     private Map<String, List<TvTimeValue>> hslMaLines;//成交量均线
     private List<TvTimeValue> osc;//振幅
     private Map<String, List<TvTimeValue>> oscMaLines;//成交量均线
+
+    private List<TvMarker> mks;
 }

@@ -9,9 +9,7 @@ import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.model.EmDailyK;
 import pro.jiaoyi.tradingview.config.Colors;
 import pro.jiaoyi.tradingview.model.TvChart;
-import pro.jiaoyi.tradingview.model.chart.TvK;
-import pro.jiaoyi.tradingview.model.chart.TvTimeValue;
-import pro.jiaoyi.tradingview.model.chart.TvVol;
+import pro.jiaoyi.tradingview.model.chart.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -164,7 +162,7 @@ public class TvTransUtil {
 
         //设置k线均线
         for (int ma : kma) {
-            BigDecimal[] maLine = MaUtil.ma(ma, closeArr, 2);
+            BigDecimal[] maLine = MaUtil.ma(ma, closeArr, 3);
             ma(kList, kMaMap, ma, maLine);
         }
         kMaMap.put("up", limitUpList);
@@ -193,9 +191,90 @@ public class TvTransUtil {
             ma(kList, oscMaMap, ma, maLine);
         }
 
-
+        //设置 高低点
+        highLowMarker(tvChart, 5);
         return tvChart;
     }
+
+    /**
+     * 设置高低点数据
+     */
+    public void highLowMarker(TvChart tvChart, int gap) {
+        List<TvMarker> mks = new ArrayList<>();
+        tvChart.setMks(mks);
+        List<TvK> k = tvChart.getK();
+        if (k == null || k.size() < 2 * gap + 1) {
+            return;
+        }
+
+//        Map<String, BigDecimal> highMap = new HashMap<>();
+//        Map<String, BigDecimal> lowMap = new HashMap<>();
+
+        for (int i = 0; i < k.size(); i++) {
+
+            TvK tvK = k.get(i);
+            int highCount = 0;
+            //find high
+            for (int j = 1; j < gap; j++) {
+                if (i - j >= 0) {
+                    TvK lk = k.get(i - j);
+                    if (tvK.getHigh().compareTo(lk.getHigh()) < 0) {
+                        break;
+                    }
+                }
+                if (i + j < k.size()) {
+                    TvK rk = k.get(i + j);
+                    if (tvK.getHigh().compareTo(rk.getHigh()) < 0) {
+                        break;
+                    }
+                }
+                highCount++;
+            }
+            if (highCount == gap) {
+//                highMap.put(tvK.getTime(), tvK.getHigh());
+
+                TvMarker tvMarker = new TvMarker();
+                tvMarker.setTime(tvK.getTime());
+                tvMarker.setText(tvK.getHigh().toString());
+                tvMarker.setColor(Colors.RED.getColor());
+                tvMarker.setPosition(Constants.MARKER_POSITION_ABOVEBAR);
+                tvMarker.setShape(Constants.MARKER_SHAPE_ARROW_DOWN);
+                mks.add(tvMarker);
+            }
+
+
+            int lowCount = 0;
+            //find low
+            for (int j = 1; j < gap; j++) {
+                if (i - j >= 0) {
+                    TvK lk = k.get(i - j);
+                    if (tvK.getLow().compareTo(lk.getLow()) > 0) {
+                        break;
+                    }
+                }
+                if (i + j < k.size()) {
+                    TvK rk = k.get(i + j);
+                    if (tvK.getLow().compareTo(rk.getLow()) > 0) {
+                        break;
+                    }
+                }
+                lowCount++;
+            }
+            if (lowCount == gap) {
+//                lowMap.put(tvK.getTime(), tvK.getLow());
+
+                TvMarker tvMarker = new TvMarker();
+                tvMarker.setTime(tvK.getTime());
+                tvMarker.setText(tvK.getLow().toString());
+                tvMarker.setColor(Colors.GREEN.getColor());
+                tvMarker.setPosition(Constants.MARKER_POSITION_BELOWBAR);
+                tvMarker.setShape(Constants.MARKER_SHAPE_ARROW_UP);
+                mks.add(tvMarker);
+            }
+        }
+
+    }
+
 
     private void ma(List<TvK> k, HashMap<String, List<TvTimeValue>> vMaMap, int ma, BigDecimal[] maLine) {
         List<TvTimeValue> maList = new ArrayList<>();

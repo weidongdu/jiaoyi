@@ -13,7 +13,9 @@ function initChart(chart) {
     //设置k线主图数据
     const kSeries = chart.addCandlestickSeries();
     kSeries.setData([]);
+    kSeries.setMarkers([]);
     kSeries.applyOptions(getKColorOption());
+
     //设置均线数据
     const ma5Series = initMa(chart, 1, WHITE_MA5);
     const ma10Series = initMa(chart, 1, YELLOW_MA10);
@@ -134,6 +136,9 @@ function updateChartData(data, series) {
 
     //设置k线主图数据
     kSeries.setData(data.k);
+    if (data.mks){
+        series.setMarkers(data.mks);
+    }
     volumeSeries.setData(data.v);
     pctSeries.setData(data.p);
 

@@ -5,6 +5,7 @@ import okhttp3.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
+import pro.jiaoyi.common.util.FileUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -146,10 +147,15 @@ public class OkHttpUtil {
     }
 
     public boolean downloadFile(String url, Map<String, String> headers, String destPath) {
+        //check file 是否存在
+        if (FileUtil.fileCheck(destPath)) {
+            log.info("file {} exist", destPath);
+            return true;
+        }
         Request request = buildRequest(url, headers);
 
         try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()){
+            if (!response.isSuccessful()) {
                 return false;
             }
 
