@@ -4,9 +4,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import pro.jiaoyi.eastm.api.EmClient;
+import pro.jiaoyi.tradingview.model.TvChart;
 import pro.jiaoyi.tradingview.service.TvService;
 import pro.jiaoyi.tradingview.service.TvTransUtil;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -42,5 +44,19 @@ class TradingviewApplicationTests {
         });
     }
 
+
+    /**
+     * 回测数据 指定之日 指定向前数量
+     */
+
+    public void backTest(){
+        String code = "600283";
+        String date = "20230525";
+
+        int preDays = 60;
+
+        TvChart tvChart = tvService.getTvChart(code, LocalDate.now(), 500);
+
+    }
 
 }

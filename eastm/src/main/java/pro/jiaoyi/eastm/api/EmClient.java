@@ -380,26 +380,28 @@ public class EmClient {
             }
 
             List<EmDailyK> ks = getDailyKs(emCList.getF12Code(), LocalDate.now(), 500, false);
-            if (ks != null && ks.size() > 60) {
-                EmDailyK k = ks.get(ks.size() - 1);
-                //过滤 均线之上
-                BigDecimal[] priceArr = ks.stream().map(EmDailyK::getClose).toList().toArray(new BigDecimal[0]);
+            if (ks.size() < 120) {
+                continue;
+            }
 
-                BigDecimal[] ma5 = MaUtil.ma(5, priceArr, 3);
-                BigDecimal[] ma10 = MaUtil.ma(10, priceArr, 3);
-                BigDecimal[] ma20 = MaUtil.ma(20, priceArr, 3);
-                BigDecimal[] ma30 = MaUtil.ma(30, priceArr, 3);
-                BigDecimal[] ma60 = MaUtil.ma(60, priceArr, 3);
+            EmDailyK k = ks.get(ks.size() - 1);
+            //过滤 均线之上
+            BigDecimal[] priceArr = ks.stream().map(EmDailyK::getClose).toList().toArray(new BigDecimal[0]);
 
-                if (k.getClose().compareTo(ma5[ma5.length - 1]) <= 0
-                        || k.getClose().compareTo(ma10[ma10.length - 1]) <= 0
-                        || k.getClose().compareTo(ma20[ma20.length - 1]) <= 0
-                        || k.getClose().compareTo(ma30[ma30.length - 1]) <= 0
-                        || k.getClose().compareTo(ma60[ma60.length - 1]) <= 0) {
-                    continue;
-                } else {
-                    filterList.add(emCList);
-                }
+            BigDecimal[] ma5 = MaUtil.ma(5, priceArr, 3);
+            BigDecimal[] ma10 = MaUtil.ma(10, priceArr, 3);
+            BigDecimal[] ma20 = MaUtil.ma(20, priceArr, 3);
+            BigDecimal[] ma30 = MaUtil.ma(30, priceArr, 3);
+            BigDecimal[] ma60 = MaUtil.ma(60, priceArr, 3);
+
+            if (k.getClose().compareTo(ma5[ma5.length - 1]) <= 0
+                    || k.getClose().compareTo(ma10[ma10.length - 1]) <= 0
+                    || k.getClose().compareTo(ma20[ma20.length - 1]) <= 0
+                    || k.getClose().compareTo(ma30[ma30.length - 1]) <= 0
+                    || k.getClose().compareTo(ma60[ma60.length - 1]) <= 0) {
+
+            } else {
+                filterList.add(emCList);
             }
         }
         return filterList;

@@ -8,6 +8,9 @@ public class DateUtil {
     public static final String PATTERN_yyyyMMdd = "yyyyMMdd";
     public static final String PATTERN_yyyyMMdd_HHmm = "yyyyMMdd_HHmm";
     public static final String PATTERN_yyyy_MM_dd = "yyyy-MM-dd";
+    public static final String PATTERN_HH_mm_ss = "HH:mm:ss";
+
+
 
     public static LocalDateTime strToLocalDateTime(String str, String pattern) {
         return LocalDateTime.parse(str, DateTimeFormatter.ofPattern(pattern));
@@ -40,5 +43,10 @@ public class DateUtil {
         return LocalDate.now().toString().replace("-", "");
     }
 
+    public static void main(String[] args) {
+        LocalDateTime now = LocalDateTime.now();
+        System.out.println(now.toString());
+        System.out.println(LocalDateTime.now().toString().substring(0,16));
+    }
 
 }
