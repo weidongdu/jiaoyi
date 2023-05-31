@@ -38,6 +38,8 @@ public class JobAlert {
 
     @Scheduled(fixedRate = 1000 * 10L)
     public void run() {
+        if (!EmRealTimeClient.tradeTime()) return;
+
         List<EastSpeedInfo> tops = emRealTimeClient.getSpeedTop(50);
         if (tops.size() > 0) {
             for (EastSpeedInfo top : tops) {

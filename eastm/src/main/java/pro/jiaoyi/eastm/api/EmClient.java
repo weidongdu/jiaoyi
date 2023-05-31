@@ -376,6 +376,7 @@ public class EmClient {
         for (EmCList emCList : list) {
 
             if (count.addAndGet(1) % 5 == 0) {
+                log.info("run {} / {}", count.get(), list.size());
                 Thread.sleep(1000);
             }
 
