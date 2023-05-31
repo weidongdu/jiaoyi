@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.model.KPeriod;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
@@ -16,6 +17,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static pro.jiaoyi.eastm.util.ExcelUtil.simpleRead;
@@ -32,6 +34,11 @@ public class EmClient {
 
     //获取日线行情数据
     public List<EmDailyK> getDailyKs(String code, LocalDate end, int lmt, boolean force) {
+        if (code == null) return Collections.emptyList();
+
+        if (code.startsWith("BK")) {
+            code = "90." + code;
+        }
         if (!force) {
             //查本地缓存
             String key = DateUtil.today() + "-" + code;
@@ -43,11 +50,24 @@ public class EmClient {
         }
 
 
-        String secid = code.startsWith("6") ? "1." + code : "0." + code;
+        String secid = "0." + code;
+        if (code.startsWith("6")) {
+            secid = "1." + code;
+        }
+
         String url = "http://push2his.eastmoney.com/api/qt/stock/kline/get?secid=" + secid
                 + "&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6"
                 + "&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61"
                 + "&klt=101&fqt=1" + "&end=" + end.toString().replace("-", "") + "&lmt=" + lmt;
+
+        //bk行情处理
+        if (code.startsWith("90")) {
+            url = "http://71.push2his.eastmoney.com/api/qt/stock/kline/get?secid=" + code
+                    + "&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6" +
+                    "&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61" +
+                    "&klt=101&fqt=1&end=20500101&lmt=1000000";
+        }
+
 
         byte[] bytes = okHttpUtil.getForBytes(url, headerMap);
         if (bytes.length > 0) {
@@ -84,6 +104,11 @@ public class EmClient {
                 dk.setLow(new BigDecimal(low));
                 dk.setVol(new BigDecimal(vol));
                 dk.setAmt(new BigDecimal(amt));
+                //针对板块处理
+                if (code.startsWith("90")) {
+                    dk.setBk(data.getName());
+                }
+                dk.setBk(getBkValueByStockCode(code));
 
                 if (i == 0) {
                     //第一天的开盘价就是前收盘价 假定
@@ -180,9 +205,9 @@ public class EmClient {
         return clist;
     }
 
-    public String getCodeBk(String code) {
+    public String getBkValueByStockCode(String code) {
 
-        Map<String, String> map = DATE_CODE_BK_MAP.get(DateUtil.today());
+        Map<String, String> map = DATE_STOCK_CODE_BK_MAP.get(DateUtil.today());
         if (map != null && map.size() > 0) {
             return map.get(code);
         }
@@ -192,9 +217,33 @@ public class EmClient {
         for (EmCList emCList : list) {
             codeBk.put(emCList.getF12Code(), emCList.getF100bk());
         }
-        removeOldCache(DATE_CODE_BK_MAP, 7);
-        DATE_CODE_BK_MAP.put(DateUtil.today(), codeBk);
+        removeOldCache(DATE_STOCK_CODE_BK_MAP, 7);
+        DATE_STOCK_CODE_BK_MAP.put(DateUtil.today(), codeBk);
         return codeBk.get(code);
+    }
+
+    public void initBkMap(List<EmCList> list) {
+        if (list.size() > 0) {
+            BK_MAP.clear();
+            for (EmCList bk : list) {
+                BK_MAP.put(bk.getF12Code(), bk.getF14Name());
+            }
+        }
+    }
+
+    public String getBkValueByBkCode(String code) {
+        return BK_MAP.get(code);
+    }
+
+    public String getBkCodeByBkValue(String value) {
+        String code = "";
+        for (String bkCode : BK_MAP.keySet()) {
+            if (BK_MAP.get(bkCode).equals(value)) {
+                code = bkCode;
+                break;
+            }
+        }
+        return code;
     }
 
     /**
@@ -273,6 +322,11 @@ public class EmClient {
             case O_TP02:
                 return getIndexTp02();
 
+            case O_BK:
+                List<EmCList> bkList = getIndex(IndexEnum.O_BK.getUrl());
+                initBkMap(bkList);
+                return bkList;
+
             case O_TAMT60:
             default:
                 return Collections.emptyList();
@@ -281,17 +335,74 @@ public class EmClient {
 
     private List<EmCList> getIndexTp02() {
         List<EmCList> list = getClistDefaultSize(false);
+        //@TODO去除 cycf
+        //去除 HS300
+        //去除 ZZ500
+        //去除 ZZ1000
+
+
+        HashSet<String> filterSet = new HashSet<>();
+        filterSet.addAll(getIndex1000().stream().map(EmCList::getF12Code).toList());
+        filterSet.addAll(getIndex(IndexEnum.ZZ500.getUrl()).stream().map(EmCList::getF12Code).toList());
+        filterSet.addAll(getIndex(IndexEnum.HS300.getUrl()).stream().map(EmCList::getF12Code).toList());
+        filterSet.addAll(getIndex(IndexEnum.CYCF.getUrl()).stream().map(EmCList::getF12Code).toList());
+
         BigDecimal B_2 = new BigDecimal("-2");
         BigDecimal B7 = new BigDecimal("7");
         BigDecimal B5000_0000 = new BigDecimal("50000000");
-        return list.stream()
+        List<EmCList> filterList = list.stream()
                 .filter(c -> c.getF3Pct().compareTo(B_2) > 0
                         && c.getF3Pct().compareTo(B7) < 0
                         && !c.getF14Name().contains("退")
                         //成交额大于 5000万
                         && c.getF6Amt().compareTo(B5000_0000) > 0
+                        && !filterSet.contains(c.getF12Code())
                 )
                 .collect(Collectors.toList());
+        List<EmCList> emCLists = null;
+        try {
+            emCLists = filterIndexTp02(filterList);
+        } catch (InterruptedException e) {
+            return Collections.emptyList();
+        }
+        return emCLists;
+        //过滤 均线之上
+//        return filterList;
+    }
+
+    public List<EmCList> filterIndexTp02(List<EmCList> list) throws InterruptedException {
+        ArrayList<EmCList> filterList = new ArrayList<>();
+        AtomicInteger count = new AtomicInteger(0);
+        for (EmCList emCList : list) {
+
+            if (count.addAndGet(1) % 5 == 0) {
+                Thread.sleep(1000);
+            }
+
+            List<EmDailyK> ks = getDailyKs(emCList.getF12Code(), LocalDate.now(), 500, false);
+            if (ks != null && ks.size() > 60) {
+                EmDailyK k = ks.get(ks.size() - 1);
+                //过滤 均线之上
+                BigDecimal[] priceArr = ks.stream().map(EmDailyK::getClose).toList().toArray(new BigDecimal[0]);
+
+                BigDecimal[] ma5 = MaUtil.ma(5, priceArr, 3);
+                BigDecimal[] ma10 = MaUtil.ma(10, priceArr, 3);
+                BigDecimal[] ma20 = MaUtil.ma(20, priceArr, 3);
+                BigDecimal[] ma30 = MaUtil.ma(30, priceArr, 3);
+                BigDecimal[] ma60 = MaUtil.ma(60, priceArr, 3);
+
+                if (k.getClose().compareTo(ma5[ma5.length - 1]) <= 0
+                        || k.getClose().compareTo(ma10[ma10.length - 1]) <= 0
+                        || k.getClose().compareTo(ma20[ma20.length - 1]) <= 0
+                        || k.getClose().compareTo(ma30[ma30.length - 1]) <= 0
+                        || k.getClose().compareTo(ma60[ma60.length - 1]) <= 0) {
+                    continue;
+                } else {
+                    filterList.add(emCList);
+                }
+            }
+        }
+        return filterList;
     }
 
     private List<EmCList> getIndexTp7() {
@@ -362,7 +473,8 @@ public class EmClient {
 
     public static final Map<String, Map<String, String>> DATE_CODE_NAME_MAP = new ConcurrentHashMap<>();
     public static final Map<String, Map<String, String>> DATE_NAME_CODE_MAP = new ConcurrentHashMap<>();
-    public static final Map<String, Map<String, String>> DATE_CODE_BK_MAP = new ConcurrentHashMap<>();
+    public static final Map<String, Map<String, String>> DATE_STOCK_CODE_BK_MAP = new ConcurrentHashMap<>();
+    public static final Map<String, String> BK_MAP = new ConcurrentHashMap<>();
     public static final Map<String, List<EmCList>> DATE_LIST_MAP = new ConcurrentHashMap<>();
     public static final Map<String, List<EmDailyK>> DATE_KLINE_MAP = new ConcurrentHashMap<>();
 

@@ -3,7 +3,8 @@ let k = {};
 let p = {};
 let v = {};
 let lastDay = '';
-let lastcode = ''
+let lastCode = '';
+let lastBk = '';
 
 function dayAdd(dateString, num) {
 
@@ -86,31 +87,64 @@ function update(code) {
             v = data.v[data.v.length - 1];
             p = data.p[data.p.length - 1];
             lastDay = k.time;
-            lastcode = data.code;
+            lastCode = data.code;
+            //判断是否切换了板块bk
+            if (lastBk !== data.bk) {
+                alert(lastBk + " -> " + data.bk);
+                lastBk = data.bk;
+                //获取板块图
+                getTvChart(data.bk + "&codeType=BkValue", (data) => {
+                    updateChartData(data, {
+                        kSeries,
+                        ma5Series,
+                        ma10Series,
+                        ma20Series,
+                        ma30Series,
+                        ma60Series,
+                        ma120Series,
+                        ma250Series,
+                        upSeries,
+                        dnSeries,
+                        volumeSeries,
+                        // ma5VolumeSeries,
+                        ma60VolumeSeries,
+                        pctSeries,
+                        hslSeries,
+                        ma5HslSeries,
+                        ma60HslSeries,
+                        oscSeries,
+                        ma5OscSeries,
+                        ma60OscSeries,
+                    })
+                })
+
+            } else {
+                updateChartData(data, {
+                    kSeries,
+                    ma5Series,
+                    ma10Series,
+                    ma20Series,
+                    ma30Series,
+                    ma60Series,
+                    ma120Series,
+                    ma250Series,
+                    upSeries,
+                    dnSeries,
+                    volumeSeries,
+                    // ma5VolumeSeries,
+                    ma60VolumeSeries,
+                    pctSeries,
+                    hslSeries,
+                    ma5HslSeries,
+                    ma60HslSeries,
+                    oscSeries,
+                    ma5OscSeries,
+                    ma60OscSeries,
+                })
+            }
         }
 
-        updateChartData(data, {
-            kSeries,
-            ma5Series,
-            ma10Series,
-            ma20Series,
-            ma30Series,
-            ma60Series,
-            ma120Series,
-            ma250Series,
-            upSeries,
-            dnSeries,
-            volumeSeries,
-            // ma5VolumeSeries,
-            ma60VolumeSeries,
-            pctSeries,
-            hslSeries,
-            ma5HslSeries,
-            ma60HslSeries,
-            oscSeries,
-            ma5OscSeries,
-            ma60OscSeries,
-        })
+
     });
 }
 
@@ -214,7 +248,7 @@ function mock() {
     console.log('time', lastDay);
 
     let factor = 1.2;
-    if (lastcode.startsWith("60") || lastcode.startsWith("0")) {
+    if (lastCode.startsWith("60") || lastCode.startsWith("0")) {
         factor = 1.1;
     }
     //跟新最新k

@@ -96,13 +96,14 @@ function initMa(chart, lineWidth, color, option) {
 function updateChartData(data, series) {
 
     $("#iCode").val(data.code);
-
-    let name = data.name;
-    if (data.ccList && data.ccList.length > 0) {
-        for (let i = 0; i < data.ccList.length; i++) {
-            name += " " + data.ccList[i];
-        }
-    }
+    let bk = data.bk;
+    // if (data.ccList && data.ccList.length > 0) {
+    //     for (let i = 0; i < data.ccList.length; i++) {
+    //         if (i > 0) bk += " ";
+    //         bk += data.ccList[i]
+    //     }
+    // }
+    let name = data.name +" "+ bk;
     $("#iName").val(name);
 
     let row = $("#iLegendRow");
@@ -134,6 +135,7 @@ function updateChartData(data, series) {
         ma60OscSeries,
     } = series;
 
+
     //设置k线主图数据
     kSeries.setData(data.k);
     if (data.mks && data.mks.length > 0) {
@@ -141,8 +143,6 @@ function updateChartData(data, series) {
     }
     volumeSeries.setData(data.v);
     pctSeries.setData(data.p);
-
-
     ma5Series.setData(data.kmaLines.ma5);
     ma10Series.setData(data.kmaLines.ma10);
     ma20Series.setData(data.kmaLines.ma20);
@@ -152,7 +152,6 @@ function updateChartData(data, series) {
     ma250Series.setData(data.kmaLines.ma250);
     upSeries.setData(data.kmaLines.up);
     dnSeries.setData(data.kmaLines.dn);
-
     // ma5VolumeSeries.setData(data.vmaLines.ma5);
     ma60VolumeSeries.setData(data.vmaLines.ma60);
     // hslSeries.setData(data.hsl);

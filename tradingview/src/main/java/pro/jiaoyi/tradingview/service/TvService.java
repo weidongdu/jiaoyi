@@ -29,6 +29,13 @@ public class TvService {
      * @param limit
      * @return //"002422", LocalDate.now(), 500
      */
+    public TvChart getTvChart(String code,String codeType, LocalDate date, Integer limit) {
+        if ("BkValue".equalsIgnoreCase(codeType)){
+            code = emClient.getBkCodeByBkValue(code);
+        }
+        return getTvChart(code, date, limit);
+    }
+
     public TvChart getTvChart(String code, LocalDate date, Integer limit) {
         List<EmDailyK> dailyKs = emClient.getDailyKs(code, date, limit, false);
         return tvTransUtil.tranEmDailyKLineToTv(dailyKs);
@@ -41,22 +48,23 @@ public class TvService {
         }
 
         List<EmCList> index = emClient.getIndex(indexEnum);
-        if (sort){
+        if (sort) {
             index.sort(Comparator.comparing(EmCList::getF100bk));
         }
         return index;
     }
+
     public Map<String, List<String>> getAllIndex() {
         HashMap<String, List<String>> map = new HashMap<>();
         IndexEnum[] values = IndexEnum.values();
         for (IndexEnum value : values) {
-            List<EmCList> lists = getIndex(value.getType(),true);
+            List<EmCList> lists = getIndex(value.getType(), true);
 
             ArrayList<String> codeList = new ArrayList<>();
             for (EmCList list : lists) {
                 codeList.add(list.getF12Code());
             }
-            map.put(value.getType(),codeList);
+            map.put(value.getType(), codeList);
 
         }
         return map;

@@ -24,27 +24,24 @@ public class TvController {
     private TvService tvService;
 
     @GetMapping("/chart")
-    public TvChart tvChart(@RequestParam String code) {
-        TvChart tvChart = tvService.getTvChart(code, LocalDate.now(), 500);
+    public TvChart tvChart(@RequestParam String code, String codeType) {
+        log.info("tvChart code={} codeType={}", code, codeType);
+        TvChart tvChart = tvService.getTvChart(code, codeType, LocalDate.now(), 500);
         return tvChart;
     }
-//    @GetMapping("/chart/mock")
-//    public TvChart tvChartMock(@RequestParam String code) {
-//        TvChart tvChart = tvService.getTvChart(code, LocalDate.now(), 500);
-//
-//    }
 
     @GetMapping("/stockList")
     public Map<String, List<String>> getLists() {
         Map<String, List<String>> allIndex = tvService.getAllIndex();
         return allIndex;
     }
+
     @GetMapping("/stockType")
     public Map<String, String> getStockType() {
         HashMap<String, String> map = new HashMap<>();
         IndexEnum[] values = IndexEnum.values();
         for (IndexEnum indexEnum : values) {
-            map.put(indexEnum.getType(),indexEnum.getName());
+            map.put(indexEnum.getType(), indexEnum.getName());
         }
         return map;
     }

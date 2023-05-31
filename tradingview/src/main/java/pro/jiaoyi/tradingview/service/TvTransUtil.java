@@ -65,7 +65,8 @@ public class TvTransUtil {
             if (i == 0) {
                 tvChart.setCode(k.getCode());
                 tvChart.setName(k.getName());
-                tvChart.setCcList(Collections.singletonList(emClient.getCodeBk(k.getCode())));
+                tvChart.setCcList(Collections.singletonList(emClient.getBkValueByStockCode(k.getCode())));
+                tvChart.setBk(k.getBk());
             }
 
             String time = DateUtil.strToLocalDate(k.getTradeDate(), DateUtil.PATTERN_yyyyMMdd).toString();
@@ -218,13 +219,13 @@ public class TvTransUtil {
             for (int j = 1; j <= gap; j++) {
                 if (i - j >= 0) {
                     TvK lk = k.get(i - j);
-                    if (tvK.getHigh().compareTo(lk.getHigh()) < 0) {
+                    if (tvK.getHigh().compareTo(lk.getHigh()) <= 0) {
                         break;
                     }
                 }
                 if (i + j < k.size()) {
                     TvK rk = k.get(i + j);
-                    if (tvK.getHigh().compareTo(rk.getHigh()) < 0) {
+                    if (tvK.getHigh().compareTo(rk.getHigh()) <= 0) {
                         break;
                     }
                 }

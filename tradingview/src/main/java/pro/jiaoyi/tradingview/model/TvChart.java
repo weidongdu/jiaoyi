@@ -13,6 +13,7 @@ import java.util.Map;
 public class TvChart {
     private String code;
     private String name;
+    private String bk;
     private List<String> ccList;//概念
 
     private List<TvK> k;//K线
