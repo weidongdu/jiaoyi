@@ -68,12 +68,14 @@ public class JobAlert {
                     }
                     log.info("价格突破成功 code={} name={} 分时量{}", code, name, amtStr);
                     String content = code + name + amtStr + "<br>" + LocalDateTime.now().toString().substring(0, 16);
+                    wxUtil.send("test");
                     wxUtil.send(content);
                 }
             }
         }
 
     }
+
 
     public BigDecimal amtTop10p(List<EmDailyK> dailyKs) {
         ArrayList<BigDecimal> amts = new ArrayList<>();

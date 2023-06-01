@@ -7,10 +7,12 @@ import org.springframework.stereotype.Component;
 import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
+import pro.jiaoyi.eastm.model.EastGetStockFenShiVo;
 import pro.jiaoyi.eastm.model.EastSpeedInfo;
 import pro.jiaoyi.eastm.model.EmDailyK;
 
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,6 +28,9 @@ public class EmRealTimeClient {
     private OkHttpUtil okHttpUtil;
 
     private static final String BASE_URL = "http://12.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=%d&po=1&fltt=2&invt=2&fid=f22&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048&fields=f2,f3,f12,f14,f22";
+    public static final String base = "http://push2ex.eastmoney.com/getStockFenShi";
+    public static String ut = "7eea3edcaed734bea9cbfc24409ed989";
+    public static String dpt = "wzfscj";
     private static final HashMap<String, String> hMap = new HashMap<String, String>();
 
     static {
@@ -162,5 +167,47 @@ public class EmRealTimeClient {
         }
 
         return false;
+    }
+
+    public String url(String code) {
+        int market = 0;
+        if (code.startsWith("6")) {
+            market = 1;
+        }
+
+        String url = base
+                + "?"
+                + "ut=" + ut
+                + "&dpt=" + dpt
+                + "&pagesize=6000"
+                + "&pageindex=0"
+                + "&sort=1"
+                + "&ft=1"
+                + "&id=0"
+                + "&code=" + code
+                + "&market=" + market;
+
+        return url;
+    }
+
+    public EastGetStockFenShiVo getByCode(String code) {
+
+        try {
+            byte[] bytes = okHttpUtil.getForBytes(url(code), hMap);
+            String body = new String(bytes, Charset.defaultCharset());
+            JSONObject data = JSONObject.parseObject(body).getJSONObject("data");
+            log.info("body length={}", body.length());
+
+
+            if (data != null) {
+                EastGetStockFenShiVo vo = data.toJavaObject(EastGetStockFenShiVo.class);
+                return vo;
+            }
+
+        } catch (Exception e) {
+            log.warn("get fenshi exception {} {}", e.getMessage(), e);
+        }
+
+        return null;
     }
 }

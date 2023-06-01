@@ -317,6 +317,12 @@ public class EmClient {
                 return getIndex(IndexEnum.ZZ500.getUrl());
             case ZZ1000:
                 return getIndex1000();
+            case IndexAll:
+                List<EmCList> index = getIndex(IndexEnum.CYCF.getUrl());
+                index.addAll(getIndex(IndexEnum.HS300.getUrl()));
+                index.addAll(getIndex(IndexEnum.ZZ500.getUrl()));
+                index.addAll(getIndex1000());
+                return index;
             case O_TP7:
                 return getIndexTp7();
             case O_TP02:

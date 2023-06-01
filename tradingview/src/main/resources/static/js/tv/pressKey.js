@@ -94,6 +94,7 @@ function update(code) {
                 lastBk = data.bk;
                 //获取板块图
                 getTvChart(data.bk + "&codeType=BkValue", (data) => {
+                    index--;
                     updateChartData(data, {
                         kSeries,
                         ma5Series,
@@ -205,7 +206,7 @@ $(document).keydown(function (e) {
         $('input[name=swMAupdn]').click();
     }
 
-    if (221 === e.keyCode) {//]
+    if (221 === e.keyCode || 13 === e.keyCode) {//]
         $('#iBtnChart').click();
     }
 
