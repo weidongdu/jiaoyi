@@ -115,7 +115,7 @@ public class EmRealTimeClient {
 
     //箱体突破判定
     public boolean tu(List<EmDailyK> dailyKs, int daysHigh, int boxDays, double boxDaysFactor) {
-        if (dailyKs.size() < 120) return false;
+        if (dailyKs.size() < 60) return false;
 
         BigDecimal[] closeArr = dailyKs.stream().map(EmDailyK::getClose).toList().toArray(new BigDecimal[0]);
         BigDecimal[] ma5 = MaUtil.ma(5, closeArr, 3);
@@ -129,7 +129,8 @@ public class EmRealTimeClient {
 
         EmDailyK k = dailyKs.get(size - 1);
 
-        if (k.getClose().compareTo(ma5[index]) > 0
+        if (k.getPct().compareTo(BigDecimal.ZERO) > 0
+                && k.getClose().compareTo(ma5[index]) > 0
                 && k.getClose().compareTo(ma10[index]) > 0
                 && k.getClose().compareTo(ma20[index]) > 0
                 && k.getClose().compareTo(ma30[index]) > 0
@@ -165,7 +166,7 @@ public class EmRealTimeClient {
             log.info("over box high , count = {} high", countBox);
 
             if (count > daysHigh && countBox > boxDays * boxDaysFactor) {
-                log.error("满足条件箱体突破");
+                log.error("满足条件箱体突破 {}", k);
                 return true;
             }
         }

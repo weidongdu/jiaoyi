@@ -17,11 +17,9 @@ import pro.jiaoyi.eastm.model.EmDailyK;
 import pro.jiaoyi.eastm.model.excel.Index1000XlsData;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @SpringBootTest
 @Slf4j
@@ -184,10 +182,64 @@ class EastmApplicationTests {
     private EmRealTimeClient emRealTimeClient;
 
     @Test
-    public void test1(){
+    public void test1() {
         List<EastSpeedInfo> speedTop = emRealTimeClient.getSpeedTop(50);
         for (EastSpeedInfo eastSpeedInfo : speedTop) {
             System.out.println(eastSpeedInfo);
         }
+    }
+
+
+    @Test
+    public void tu() throws InterruptedException {
+        List<EmCList> list = emClient.getClistDefaultSize(false);
+        for (int i = 0; i < list.size(); i++) {
+            Thread.sleep(2000);
+            List<EmDailyK> dailyKs = emClient.getDailyKs(list.get(i).getF12Code(), LocalDate.now(), 500, false);
+
+            if (dailyKs.size() < 70) {
+                continue;
+            }
+
+            for (int j = 1; j < dailyKs.size() - 70; j++) {
+                int end = dailyKs.size() - 1 - j;
+                boolean tu = emRealTimeClient.tu(dailyKs.subList(0, end), 60, 60, 0.4d);
+                if (tu) {
+                    BigDecimal bHigh = (dailyKs.get(end).getHigh().subtract(dailyKs.get(end - 1).getClose()))
+                            .divide(dailyKs.get(end - 1).getClose(), 4, RoundingMode.HALF_UP)
+                            .multiply(new BigDecimal(100)).setScale(2, RoundingMode.HALF_UP);
+
+                    BigDecimal bOpen = (dailyKs.get(end).getOpen().subtract(dailyKs.get(end - 1).getClose()))
+                            .divide(dailyKs.get(end - 1).getClose(), 4, RoundingMode.HALF_UP)
+                            .multiply(new BigDecimal(100)).setScale(2, RoundingMode.HALF_UP);
+
+
+
+                    //结论 就是 开盘价
+                    // >0 可以
+                    // <0 扔掉
+                    log.info("突破日 {} 次日={} 开盘={} 最高={}", dailyKs.get(end - 1).getTradeDate() +
+                            " " + dailyKs.get(end - 1).getName() + dailyKs.get(end - 1).getCode() +
+                            " " + dailyKs.get(end - 1).getPct(),
+                            dailyKs.get(end).getPct(),
+                            bOpen,
+                            bHigh
+                    );
+                }
+            }
+
+        }
+
+    }
+
+    public static void main(String[] args) {
+        ArrayList<Integer> integers = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            integers.add(i + 1);
+        }
+
+        System.out.println(integers.subList(0, integers.size() - 1));
+
+
     }
 }

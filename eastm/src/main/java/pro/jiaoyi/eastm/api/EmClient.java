@@ -128,6 +128,9 @@ public class EmClient {
                 list.add(dk);
 
             }
+            if (list.size() == 0) {
+                return Collections.emptyList();
+            }
 
             String s1 = list.get(0).getTradeDate() + "-" + list.get(0).getCode() + "-" + list.get(0).getName() + "-" + list.get(0).getPct();
             String s2 = list.get(size - 1).getTradeDate() + "-" + list.get(size - 1).getCode() + "-" + list.get(size - 1).getName() + "-" + list.get(size - 1).getPct();
