@@ -41,6 +41,7 @@ public class JobAlert {
         if (!EmRealTimeClient.tradeTime()) return;
 
         List<EastSpeedInfo> tops = emRealTimeClient.getSpeedTop(50);
+        log.info("speed list {}", tops.size());
         if (tops.size() > 0) {
             for (EastSpeedInfo top : tops) {
                 String code = top.getCode_f12();

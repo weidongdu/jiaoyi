@@ -136,13 +136,13 @@ public class EmRealTimeClient {
 
             for (int j = 1; j < index - 1; j++) {
                 if (index - j == 1) {
-                    log.info("遍历所有, 持续新高 {} {}", j, dailyKs.get(index - j));
+                    log.info("遍历所有, 持续新高 {}天 {}", j, dailyKs.get(index - j));
                     count = j;
                     break;
                 }
                 BigDecimal high = dailyKs.get(index - j).getHigh();
                 if (high.compareTo(k.getClose()) >= 0) {
-                    log.info("新高截止 {} {}", j, dailyKs.get(index - j));
+                    log.info("打破新高截止, {}天 {}", j, dailyKs.get(index - j));
                     count = j;
                     break;
                 }
