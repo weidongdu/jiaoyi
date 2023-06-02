@@ -45,15 +45,18 @@ public class JobAlert {
             for (EastSpeedInfo top : tops) {
                 String code = top.getCode_f12();
                 String name = top.getName_f14();
+                if (code.startsWith("8")) continue;
 
-                List<EmDailyK> dailyKs = emClient.getDailyKs(code, LocalDate.now(), 100, true);
+                log.info("run speed {} {} {}", code, name, top.getSpeed_f22());
+
+                List<EmDailyK> dailyKs = emClient.getDailyKs(code, LocalDate.now(), 200, true);
                 if (dailyKs.size() < 120) {
                     log.info("k size {} < 120", dailyKs.size());
                     continue;
                 }
 
 
-                boolean tu = emRealTimeClient.tu(dailyKs, 60, 60, 0.5d);
+                boolean tu = emRealTimeClient.tu(dailyKs, 60, 60, 0.4d);
                 if (tu) {
                     log.info("run {} {}", code, name);
                     BigDecimal dayAmtTop10 = amtTop10p(dailyKs);

@@ -126,8 +126,6 @@ public class EmRealTimeClient {
 
         EmDailyK k = dailyKs.get(size - 1);
 
-        log.info("match k {} ", k.toString());
-
         if (k.getClose().compareTo(ma5[index]) > 0
                 && k.getClose().compareTo(ma10[index]) > 0
                 && k.getClose().compareTo(ma20[index]) > 0
@@ -135,6 +133,7 @@ public class EmRealTimeClient {
                 && k.getClose().compareTo(ma60[index]) > 0) {
 
             int count = 0;
+
             for (int j = 1; j < index - 1; j++) {
                 if (index - j == 1) {
                     count = j;
@@ -145,8 +144,10 @@ public class EmRealTimeClient {
                     count = j;
                     break;
                 }
+
+
             }
-            log.info("seek for some days high , count = {} high", count);
+            log.info("over days high , count = {} high", count);
 
             int countBox = 0;//箱体计数
             for (int j = 1; j < count; j++) {

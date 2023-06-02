@@ -129,7 +129,9 @@ public class EmClient {
 
             }
 
-            log.info("获取日线行情数据 size={}\nstart=\t{}\nend=\t{}", size, size > 0 ? list.get(0) : "", size > 0 ? list.get(size - 1) : "");
+            String s1 = list.get(0).getTradeDate() + "-" + list.get(0).getCode() + "-" + list.get(0).getName() + "-" + list.get(0).getPct();
+            String s2 = list.get(size - 1).getTradeDate() + "-" + list.get(size - 1).getCode() + "-" + list.get(size - 1).getName() + "-" + list.get(size - 1).getPct();
+            log.info("获取日线行情数据 size={} start={} end={}", size, s1, s2);
             DATE_KLINE_MAP.put(DateUtil.today() + "-" + code, list);
             return list;
         }
