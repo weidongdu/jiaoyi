@@ -45,6 +45,11 @@ public class EmRealTimeClient {
     }
 
     public static boolean tradeTime() {
+        //判断现在是不是星期六或者星期日
+        if (LocalDate.now().getDayOfWeek().getValue() == 6 || LocalDate.now().getDayOfWeek().getValue() == 7) {
+            return false;
+        }
+
         LocalDateTime now = LocalDateTime.now();
 
         String amStart = LocalDate.now() + "09:30:00";
