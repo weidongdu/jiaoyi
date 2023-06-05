@@ -83,17 +83,12 @@ public class JobAlert {
                     }
 
 
-                    String amtStr = "";
-                    if (fAmt.compareTo(B_Y) > 0) {
-                        amtStr = fAmt.divide(B_Y, 2, RoundingMode.HALF_UP) + "亿";
-                    } else {
-                        amtStr = fAmt.divide(B_W, 0, RoundingMode.HALF_UP) + "万";
-                    }
+                    String amtStr = amtStr(fAmt);
+                    String fenshiAmtStr = amtStr(fenshiAmt);
                     EmDailyK k = dailyKs.get(dailyKs.size() - 1);
                     log.info("价格突破成功 code={} name={} 分时量{}", code, name, amtStr);
-                    String content = code + "_" + name + "_" + k.getBk()
-                            + "<br>" + amtStr + "_ m1=" + fx
-                            + "<br>" + k.getClose() + "_" + k.getPct()
+                    String content = code + " " + name + " " + k.getBk()
+                            + "<br>" + amtStr + ",M1=" + fx + "(" + fenshiAmtStr + ")" + k.getClose() + "_" + k.getPct()
                             + "<br>" + LocalDateTime.now().toString().substring(0, 16);
                     wxUtil.send(content);
                 }
@@ -102,5 +97,17 @@ public class JobAlert {
 
     }
 
+
+    public String amtStr(BigDecimal fAmt) {
+        String str = "";
+
+        if (fAmt.compareTo(B_Y) > 0) {
+            str = fAmt.divide(B_Y, 2, RoundingMode.HALF_UP) + "亿";
+        } else {
+            str = fAmt.divide(B_W, 0, RoundingMode.HALF_UP) + "万";
+        }
+
+        return str;
+    }
 
 }
