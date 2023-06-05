@@ -14,9 +14,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -35,10 +33,25 @@ public class JobAlert {
     public static final BigDecimal B_Y = new BigDecimal("100000000");
     public static final BigDecimal B_W = new BigDecimal("10000");
 
+    public static final Map<String, Integer> DAY_COUNT_MAP = new HashMap<>();
+    public static final String AM = "AM";
+    public static final String PM = "PM";
 
     @Scheduled(fixedRate = 1000 * 10L)
     public void run() {
         if (!EmRealTimeClient.tradeTime()) return;
+
+        Integer am = DAY_COUNT_MAP.get(LocalDate.now() + AM);
+        if (am == null) {
+            wxUtil.send("监控启动" + LocalDateTime.now());
+            DAY_COUNT_MAP.put(LocalDate.now() + AM, 1);
+        }
+
+        Integer pm = DAY_COUNT_MAP.get(LocalDate.now() + PM);
+        if (pm == null) {
+            wxUtil.send("监控启动" + LocalDateTime.now());
+            DAY_COUNT_MAP.put(LocalDate.now() + PM, 1);
+        }
 
         List<EastSpeedInfo> tops = emRealTimeClient.getSpeedTop(50);
         log.info("speed list {}", tops.size());
