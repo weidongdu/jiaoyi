@@ -83,8 +83,11 @@ public class JobAlert {
                     } else {
                         amtStr = fAmt.divide(B_W, 0, RoundingMode.HALF_UP) + "万";
                     }
+                    EmDailyK k = dailyKs.get(dailyKs.size() - 1);
                     log.info("价格突破成功 code={} name={} 分时量{}", code, name, amtStr);
-                    String content = code + name + amtStr + "_" + dailyKs.get(dailyKs.size() - 1).getPct() + "<br>" + LocalDateTime.now().toString().substring(0, 16);
+                    String content = code + name + "_" + k.getBk()
+                            + "<br>" + amtStr + "_" + k.getPct()
+                            + "<br>" + LocalDateTime.now().toString().substring(0, 16);
                     wxUtil.send(content);
                 }
             }
