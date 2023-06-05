@@ -63,8 +63,8 @@ public class JobAlert {
 
                 log.info("run speed {} {} {}", code, name, top.getSpeed_f22());
 
-                List<EmDailyK> dailyKs = emClient.getDailyKs(code, LocalDate.now(), 200, true);
-                if (dailyKs.size() < 120) {
+                List<EmDailyK> dailyKs = emClient.getDailyKs(code, LocalDate.now(), 100, true);
+                if (dailyKs.size() < 70) {
                     log.info("k size {} < 120", dailyKs.size());
                     continue;
                 }
