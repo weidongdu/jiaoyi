@@ -3,6 +3,7 @@ package pro.jiaoyi.eastm;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.read.listener.ReadListener;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -214,13 +215,12 @@ class EastmApplicationTests {
                             .multiply(new BigDecimal(100)).setScale(2, RoundingMode.HALF_UP);
 
 
-
                     //结论 就是 开盘价
                     // >0 可以
                     // <0 扔掉
                     log.info("突破日 {} 次日={} 开盘={} 最高={}", dailyKs.get(end - 1).getTradeDate() +
-                            " " + dailyKs.get(end - 1).getName() + dailyKs.get(end - 1).getCode() +
-                            " " + dailyKs.get(end - 1).getPct(),
+                                    " " + dailyKs.get(end - 1).getName() + dailyKs.get(end - 1).getCode() +
+                                    " " + dailyKs.get(end - 1).getPct(),
                             dailyKs.get(end).getPct(),
                             bOpen,
                             bHigh
@@ -240,6 +240,50 @@ class EastmApplicationTests {
 
         System.out.println(integers.subList(0, integers.size() - 1));
 
+
+    }
+
+
+    @Test
+    public void vol() {
+        String[] codes = {"300025","600212","600597","600458","300856","300573","301153","603038","300580","002028"};
+        vol(codes);
+    }
+
+    public void vol(String[] codes) {
+
+        JSONObject map = new JSONObject();
+        for (int i = 0; i < codes.length; i++) {
+            String code = codes[i];
+            List<EmDailyK> dailyKs = emClient.getDailyKs(code, LocalDate.now(), 100, false);
+            List<BigDecimal> volList = new ArrayList<>(dailyKs.stream().map(EmDailyK::getAmt).toList());
+            Collections.sort(volList);
+            BigDecimal volTop10 = BigDecimal.ZERO;
+            for (int j = 0; j < 7; j++) {
+                int index = volList.size() - 1 - j;
+                volTop10 = volTop10.add(volList.get(index));
+            }
+            volTop10 = volTop10.divide(new BigDecimal(7), 0, RoundingMode.HALF_UP);
+            BigDecimal volAvgHour = volTop10.divide(new BigDecimal(4), 0, RoundingMode.HALF_UP);
+
+            log.info("code {} vol one hour {}", code, volAvgHour);
+            if (code.length() == 5) {
+                code += " HK";
+            }
+            map.put(code, volAvgHour);
+        }
+
+        String base = "http://8.142.9.14:20808";
+        String url = base + "/stock/vol/avg/code/set";
+        try {
+            byte[] bytes = okHttpUtil.postJsonForBytes(url, null, map.toJSONString());
+            String s = new String(bytes);
+            JSONObject js = JSONObject.parseObject(s);
+            log.info("js {}", js);
+        } catch (Exception e) {
+
+            log.error("exception {} {}", e.getMessage(), e);
+        }
 
     }
 }
