@@ -61,6 +61,7 @@ public class EmRealTimeClient {
         String p = DateUtil.PATTERN_yyyy_MM_dd + DateUtil.PATTERN_HH_mm_ss;
         if (now.isAfter(DateUtil.strToLocalDateTime(amStart, p))
                 && now.isBefore(DateUtil.strToLocalDateTime(amEnd, p))) {
+
             return true;
         }
 

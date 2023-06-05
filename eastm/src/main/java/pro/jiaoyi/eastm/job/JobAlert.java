@@ -47,11 +47,6 @@ public class JobAlert {
             DAY_COUNT_MAP.put(LocalDate.now() + AM, 1);
         }
 
-        Integer pm = DAY_COUNT_MAP.get(LocalDate.now() + PM);
-        if (pm == null) {
-            wxUtil.send("监控启动" + LocalDateTime.now());
-            DAY_COUNT_MAP.put(LocalDate.now() + PM, 1);
-        }
 
         List<EastSpeedInfo> tops = emRealTimeClient.getSpeedTop(50);
         log.info("speed list {}", tops.size());
