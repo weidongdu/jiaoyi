@@ -14,6 +14,7 @@ import pro.jiaoyi.eastm.config.IndexEnum;
 import pro.jiaoyi.eastm.model.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -471,6 +472,25 @@ public class EmClient {
                 }
             }
         }
+    }
+
+
+    public BigDecimal amtTop10p(List<EmDailyK> dailyKs) {
+        ArrayList<BigDecimal> amts = new ArrayList<>();
+        int size = dailyKs.size();
+        for (int i = 1; i <= 60; i++) {
+            EmDailyK k = dailyKs.get(size - 1 - i);
+            amts.add(k.getAmt());
+        }
+        Collections.sort(amts);
+
+        int avg = 6;
+        BigDecimal total = BigDecimal.ZERO;
+        for (int i = 0; i < avg; i++) {
+            BigDecimal amt = amts.get(amts.size() - 1 - i);
+            total = total.add(amt);
+        }
+        return total.divide(BigDecimal.valueOf(avg), 0, RoundingMode.HALF_UP);
     }
 
     public static final Map<String, String> headerMap = new HashMap<>();

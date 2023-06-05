@@ -1,4 +1,4 @@
-package pro.jiaoyi.eastm.model;
+package pro.jiaoyi.eastm.model.fenshi;
 
 import java.util.List;
 

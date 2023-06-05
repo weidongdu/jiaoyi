@@ -246,7 +246,7 @@ class EastmApplicationTests {
 
     @Test
     public void vol() {
-        String[] codes = {"300025","600212","600597","600458","300856","300573","301153","603038","300580","002028"};
+        String[] codes = {"300025", "600212", "600597", "600458", "300856", "300573", "301153", "603038", "300580", "002028"};
         vol(codes);
     }
 
@@ -284,6 +284,19 @@ class EastmApplicationTests {
 
             log.error("exception {} {}", e.getMessage(), e);
         }
+
+    }
+
+    @Test
+    public void fenshi() {
+        String code = "300928";
+        List<EmDailyK> ks = emClient.getDailyKs(code, LocalDate.now(), 100, false);
+        BigDecimal bigDecimal = emClient.amtTop10p(ks);
+        BigDecimal amtHour = bigDecimal.divide(new BigDecimal(4), 0, RoundingMode.HALF_UP);
+        BigDecimal a60 = emRealTimeClient.getFenshiAmt(code, 60);
+        BigDecimal a70 = emRealTimeClient.getFenshiAmt(code, 70);
+        System.out.println(a60 + " " + a60.divide(amtHour, 3, RoundingMode.HALF_UP));
+        System.out.println(a70 + " " + a70.divide(amtHour, 3, RoundingMode.HALF_UP));
 
     }
 }

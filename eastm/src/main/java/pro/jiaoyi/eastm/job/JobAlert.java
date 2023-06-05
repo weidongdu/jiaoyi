@@ -14,7 +14,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -68,11 +70,20 @@ public class JobAlert {
                 boolean tu = emRealTimeClient.tu(dailyKs, 60, 60, 0.4d);
                 if (tu) {
                     log.info("run {} {}", code, name);
-                    BigDecimal dayAmtTop10 = amtTop10p(dailyKs);
+                    BigDecimal dayAmtTop10 = emClient.amtTop10p(dailyKs);
                     BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
                     BigDecimal fAmt = new BigDecimal("0.1").multiply(hourAmt);
-                    String amtStr = "";
+                    //判断70s 内 是否大于 0.1 fAmt
+                    BigDecimal fenshiAmt = emRealTimeClient.getFenshiAmt(code, 70);
+                    //成交量放大倍数
+                    BigDecimal fx = fenshiAmt.divide(hourAmt, 2, RoundingMode.HALF_UP);
+                    if (fx.compareTo(new BigDecimal("0.1")) < 0) {
+                        log.info("成交量不满足条件");
+                        continue;
+                    }
 
+
+                    String amtStr = "";
                     if (fAmt.compareTo(B_Y) > 0) {
                         amtStr = fAmt.divide(B_Y, 2, RoundingMode.HALF_UP) + "亿";
                     } else {
@@ -81,7 +92,8 @@ public class JobAlert {
                     EmDailyK k = dailyKs.get(dailyKs.size() - 1);
                     log.info("价格突破成功 code={} name={} 分时量{}", code, name, amtStr);
                     String content = code + "_" + name + "_" + k.getBk()
-                            + "<br>" + amtStr + "_" + k.getPct()
+                            + "<br>" + amtStr + "_ m1=" + fx
+                            + "<br>" + k.getClose() + "_" + k.getPct()
                             + "<br>" + LocalDateTime.now().toString().substring(0, 16);
                     wxUtil.send(content);
                 }
@@ -91,21 +103,4 @@ public class JobAlert {
     }
 
 
-    public BigDecimal amtTop10p(List<EmDailyK> dailyKs) {
-        ArrayList<BigDecimal> amts = new ArrayList<>();
-        int size = dailyKs.size();
-        for (int i = 1; i <= 60; i++) {
-            EmDailyK k = dailyKs.get(size - 1 - i);
-            amts.add(k.getAmt());
-        }
-        Collections.sort(amts);
-
-        int avg = 6;
-        BigDecimal total = BigDecimal.ZERO;
-        for (int i = 0; i < avg; i++) {
-            BigDecimal amt = amts.get(amts.size() - 1 - i);
-            total = total.add(amt);
-        }
-        return total.divide(BigDecimal.valueOf(avg), 0, RoundingMode.HALF_UP);
-    }
 }

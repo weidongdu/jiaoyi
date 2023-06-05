@@ -7,9 +7,11 @@ import org.springframework.stereotype.Component;
 import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
-import pro.jiaoyi.eastm.model.EastGetStockFenShiVo;
 import pro.jiaoyi.eastm.model.EastSpeedInfo;
 import pro.jiaoyi.eastm.model.EmDailyK;
+import pro.jiaoyi.eastm.model.fenshi.DetailTrans;
+import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiTrans;
+import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiVo;
 
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
@@ -99,20 +101,6 @@ public class EmRealTimeClient {
         return list;
     }
 
-    //获取分时成交
-    public void getFenshiAmt(String code) {
-
-    }
-
-    //获取最近分时成交
-    public void getFenshiAmtTotal(int lastMin) {
-
-    }
-
-    //获取最近60天 最大成交量 10% 的平均值
-    public void daysAmt(String code, int days) {
-
-    }
 
     //箱体突破判定
     public boolean tu(List<EmDailyK> dailyKs, int daysHigh, int boxDays, double boxDaysFactor) {
@@ -196,14 +184,13 @@ public class EmRealTimeClient {
         return url;
     }
 
-    public EastGetStockFenShiVo getByCode(String code) {
+    public EastGetStockFenShiVo getFenshiByCode(String code) {
 
         try {
             byte[] bytes = okHttpUtil.getForBytes(url(code), hMap);
             String body = new String(bytes, Charset.defaultCharset());
             JSONObject data = JSONObject.parseObject(body).getJSONObject("data");
             log.info("body length={}", body.length());
-
 
             if (data != null) {
                 EastGetStockFenShiVo vo = data.toJavaObject(EastGetStockFenShiVo.class);
@@ -215,5 +202,32 @@ public class EmRealTimeClient {
         }
 
         return null;
+    }
+
+    public BigDecimal getFenshiAmt(String code, int second) {
+        EastGetStockFenShiVo f = this.getFenshiByCode(code);
+        if (f == null) {
+            return BigDecimal.ZERO;
+        }
+
+        EastGetStockFenShiTrans trans = EastGetStockFenShiTrans.trans(f);
+        if (trans == null) {
+            return BigDecimal.ZERO;
+        }
+
+        List<DetailTrans> list = trans.getData();
+        if (list == null || list.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
+        //累计计算最近90s 内的list 成交量
+        long start = second * 1000L;
+        List<DetailTrans> lastS = list.stream().filter(d -> d.getTs() >= (System.currentTimeMillis() - start)).toList();
+        BigDecimal sum = BigDecimal.ZERO;
+        for (DetailTrans detailTrans : lastS) {
+            sum = sum.add(detailTrans.amt());
+        }
+
+        return sum;
     }
 }
