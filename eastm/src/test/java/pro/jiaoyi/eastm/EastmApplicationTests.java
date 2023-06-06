@@ -246,7 +246,7 @@ class EastmApplicationTests {
 
     @Test
     public void vol() {
-        String[] codes = {"300025", "600212", "600597", "600458", "300856", "300573", "301153", "603038", "300580", "002028"};
+        String[] codes = {"601607", "688332", "600578", "600452", "600699", "002156", "002262", "300856", "300573", "301153"};
         vol(codes);
     }
 
@@ -298,5 +298,22 @@ class EastmApplicationTests {
         System.out.println(a60 + " " + a60.divide(amtHour, 3, RoundingMode.HALF_UP));
         System.out.println(a70 + " " + a70.divide(amtHour, 3, RoundingMode.HALF_UP));
 
+    }
+
+
+    @Test
+    public void app() {
+        long l = System.currentTimeMillis();
+        for (int i = 0; i < 50; i++) {
+
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("emailAddr", "test_" + new Date().getTime() + "@test.com");
+            String url = "http://localhost:8080/deviceManager/app/user/register";
+            byte[] bytes = okHttpUtil.postJsonForBytes(url, null, jsonObject.toJSONString());
+            String s = new String(bytes);
+            System.out.println(s);
+        }
+
+        System.out.println("use " + (System.currentTimeMillis() - l) + "ms");
     }
 }

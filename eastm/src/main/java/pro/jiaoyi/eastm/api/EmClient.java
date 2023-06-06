@@ -133,8 +133,8 @@ public class EmClient {
                 return Collections.emptyList();
             }
 
-            String s1 = list.get(0).getTradeDate() + "-" + list.get(0).getCode() + "-" + list.get(0).getName() + "-" + list.get(0).getPct();
-            String s2 = list.get(size - 1).getTradeDate() + "-" + list.get(size - 1).getCode() + "-" + list.get(size - 1).getName() + "-" + list.get(size - 1).getPct();
+            String s1 = list.get(0).getTradeDate() + " " + list.get(0).getCode() + " " + list.get(0).getName() + " " + list.get(0).getPct();
+            String s2 = list.get(size - 1).getTradeDate() + " " + list.get(size - 1).getCode() + " " + list.get(size - 1).getName() + " " + list.get(size - 1).getPct();
             log.info("获取日线行情数据 size={} start={} end={}", size, s1, s2);
             DATE_KLINE_MAP.put(DateUtil.today() + "-" + code, list);
             return list;
@@ -333,6 +333,7 @@ public class EmClient {
                 return getIndexTp7();
             case O_TP02:
                 return getIndexTp02();
+//                return Collections.emptyList();
 
             case O_BK:
                 List<EmCList> bkList = getIndex(IndexEnum.O_BK.getUrl());
@@ -347,11 +348,6 @@ public class EmClient {
 
     private List<EmCList> getIndexTp02() {
         List<EmCList> list = getClistDefaultSize(false);
-        //@TODO去除 cycf
-        //去除 HS300
-        //去除 ZZ500
-        //去除 ZZ1000
-
 
         HashSet<String> filterSet = new HashSet<>();
         filterSet.addAll(getIndex1000().stream().map(EmCList::getF12Code).toList());
@@ -377,9 +373,8 @@ public class EmClient {
         } catch (InterruptedException e) {
             return Collections.emptyList();
         }
-        return emCLists;
-        //过滤 均线之上
-//        return filterList;
+        return (emCLists);
+
     }
 
     public List<EmCList> filterIndexTp02(List<EmCList> list) throws InterruptedException {

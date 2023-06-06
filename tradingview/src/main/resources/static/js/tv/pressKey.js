@@ -58,6 +58,7 @@ function selectType() {
     let options = $("#iSelectType option:selected");
     let type = options.val();
     let SELECT_LIST = STOCK_LIST[type];
+
     console.log("type:", type, "STOCK_LIST", STOCK_LIST, "SELECT_LIST", SELECT_LIST)
     if (SELECT_LIST && SELECT_LIST.length > 0) {
         console.log(type + "=" + SELECT_LIST.length);
@@ -238,6 +239,15 @@ $(document).keydown(function (e) {
 
     if (191 === e.keyCode) {// code = / ?
         singleStockChart();
+    }
+
+    //f keycode = 70
+    if (70 === e.keyCode){
+        console.log("f");
+        //新开一个页面  专门用于这种耗时间的操作
+        let options = $("#iSelectType option:selected");
+        let type = options.val();
+        getStockListByType(type);
     }
 
 });

@@ -65,7 +65,6 @@ public class TvService {
                 codeList.add(list.getF12Code());
             }
             map.put(value.getType(), codeList);
-
         }
         return map;
     }
