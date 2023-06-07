@@ -17,6 +17,9 @@ import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
 import pro.jiaoyi.eastm.model.excel.Index1000XlsData;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -192,11 +195,32 @@ class EastmApplicationTests {
 
 
     @Test
+    public void codeName() {
+        List<EmCList> clistDefaultSize = emClient.getClistDefaultSize(false);
+        for (EmCList emCList : clistDefaultSize) {
+            String content = (emCList.getF12Code() + " " + emCList.getF14Name());
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter("code_name.txt", true))) {
+                writer.write(content);
+                writer.newLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Test
     public void tu() throws InterruptedException {
         List<EmCList> list = emClient.getClistDefaultSize(false);
+
+        String code = "601336";
         for (int i = 0; i < list.size(); i++) {
+            if (!list.get(i).getF12Code().equals(code)) {
+                continue;
+            }
+
             Thread.sleep(2000);
-            List<EmDailyK> dailyKs = emClient.getDailyKs(list.get(i).getF12Code(), LocalDate.now(), 500, false);
+
+            List<EmDailyK> dailyKs = emClient.getDailyKs(list.get(i).getF12Code(), LocalDate.now(), 5000, false);
 
             if (dailyKs.size() < 70) {
                 continue;
@@ -204,7 +228,7 @@ class EastmApplicationTests {
 
             for (int j = 1; j < dailyKs.size() - 70; j++) {
                 int end = dailyKs.size() - 1 - j;
-                boolean tu = emRealTimeClient.tu(dailyKs.subList(0, end), 60, 60, 0.4d);
+                boolean tu = emRealTimeClient.tu(dailyKs.subList(Math.max(0, end - 100), end), 60, 60, 0.4d);
                 if (tu) {
                     BigDecimal bHigh = (dailyKs.get(end).getHigh().subtract(dailyKs.get(end - 1).getClose()))
                             .divide(dailyKs.get(end - 1).getClose(), 4, RoundingMode.HALF_UP)
@@ -246,7 +270,7 @@ class EastmApplicationTests {
 
     @Test
     public void vol() {
-        String[] codes = {"601336", "301035","300573"};
+        String[] codes = {"601336", "301035", "300573"};
         vol(codes);
     }
 
@@ -299,24 +323,6 @@ class EastmApplicationTests {
         System.out.println(a70 + " " + a70.divide(amtHour, 3, RoundingMode.HALF_UP));
 
     }
-
-
-    @Test
-    public void app() {
-        long l = System.currentTimeMillis();
-        for (int i = 0; i < 50; i++) {
-
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("emailAddr", "test_" + new Date().getTime() + "@test.com");
-            String url = "http://localhost:8080/deviceManager/app/user/register";
-            byte[] bytes = okHttpUtil.postJsonForBytes(url, null, jsonObject.toJSONString());
-            String s = new String(bytes);
-            System.out.println(s);
-        }
-
-        System.out.println("use " + (System.currentTimeMillis() - l) + "ms");
-    }
-
 
 
 }

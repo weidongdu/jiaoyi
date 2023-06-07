@@ -3,7 +3,6 @@ package pro.jiaoyi.eastm.job;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.api.EmRealTimeClient;
 import pro.jiaoyi.eastm.config.WxUtil;
@@ -14,11 +13,12 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component
+//@Component
 @Slf4j
 public class JobAlert {
     //监控 放量有涨速
@@ -39,6 +39,8 @@ public class JobAlert {
     public static final String AM = "AM";
     public static final String PM = "PM";
 
+    public static final Map<LocalDate, List<String>> DAY_BLOCKLIST_MAP = new HashMap<>();
+
     @Scheduled(fixedRate = 1000 * 10L)
     public void run() {
         if (!EmRealTimeClient.tradeTime()) return;
@@ -57,6 +59,9 @@ public class JobAlert {
                 String code = top.getCode_f12();
                 String name = top.getName_f14();
                 if (code.startsWith("8")) continue;
+                //过滤 假设涨停也无法满足条件
+                List<String> blockList = DAY_BLOCKLIST_MAP.computeIfAbsent(LocalDate.now(), k -> new ArrayList<>());
+                if (blockList.contains(code)) continue;
 
                 log.info("run speed {} {} {}", code, name, top.getSpeed_f22());
 
@@ -91,7 +96,23 @@ public class JobAlert {
                             + "<br>" + amtStr + ",M1=" + fx + "(" + fenshiAmtStr + ")"
                             + "<br>" + LocalDateTime.now().toString().substring(0, 16) + k.getBk();
                     wxUtil.send(content);
+
+
+                } else {
+                    //设置 最高价, 如果还不满足 , 加入block list
+                    EmDailyK k = dailyKs.get(dailyKs.size() - 1);
+                    BigDecimal f = new BigDecimal("1.2");
+                    if (k.getCode().startsWith("60") || k.getCode().startsWith("0")) {
+                        f = new BigDecimal("1.1");
+                    }
+                    k.setHigh(f.multiply(k.getPreClose()).setScale(2, RoundingMode.HALF_UP));
+                    boolean tu2 = emRealTimeClient.tu(dailyKs, 60, 60, 0.4d);
+                    if (!tu2) {
+                        log.info("涨停价还不满足,加入block list,{}", k);
+                        blockList.add(code);
+                    }
                 }
+
             }
         }
 
