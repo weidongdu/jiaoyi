@@ -3,6 +3,7 @@ package pro.jiaoyi.eastm.job;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.api.EmRealTimeClient;
 import pro.jiaoyi.eastm.config.WxUtil;
@@ -18,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//@Component
+@Component
 @Slf4j
 public class JobAlert {
     //监控 放量有涨速

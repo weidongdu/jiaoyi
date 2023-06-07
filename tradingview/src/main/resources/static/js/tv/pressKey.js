@@ -306,20 +306,20 @@ function notify(content) {
 
 
     let c1 = "notification is-danger top-right"
-    let c2 = "notification is-info top-right"
-    let c3 = "notification is-warning top-right"
-
-    let mod = Date.now() % 3;
     let div = document.createElement("div");
-    if (mod === 0) {
-        div.setAttribute("class", c1);
-    }
-    if (mod === 1) {
-        div.setAttribute("class", c2);
-    }
-    if (mod === 2) {
-        div.setAttribute("class", c3);
-    }
+    div.setAttribute("class", c1);
+    //
+    // let mod = Date.now() % 3;
+    // let div = document.createElement("div");
+    // if (mod === 0) {
+    //     div.setAttribute("class", c1);
+    // }
+    // if (mod === 1) {
+    //     div.setAttribute("class", c2);
+    // }
+    // if (mod === 2) {
+    //     div.setAttribute("class", c3);
+    // }
     let p = document.createElement("p");
     p.innerText = content;
     div.appendChild(p);

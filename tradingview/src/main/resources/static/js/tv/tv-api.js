@@ -137,22 +137,47 @@ function updateChartData(data, series) {
 
 
     //设置k线主图数据
+    kSeries.setData([]);
     kSeries.setData(data.k);
     if (data.mks && data.mks.length > 0) {
+        kSeries.setMarkers([]);
         kSeries.setMarkers(data.mks);
     }
+    volumeSeries.setData([])
     volumeSeries.setData(data.v);
+
+    pctSeries.setData([])
     pctSeries.setData(data.p);
+
+    ma5Series.setData([])
     ma5Series.setData(data.kmaLines.ma5);
+
+    ma10Series.setData([])
     ma10Series.setData(data.kmaLines.ma10);
+
+    ma20Series.setData([])
     ma20Series.setData(data.kmaLines.ma20);
+
+    ma30Series.setData([])
     ma30Series.setData(data.kmaLines.ma30);
+
+    ma60Series.setData([])
     ma60Series.setData(data.kmaLines.ma60);
+
+    ma120Series.setData([])
     ma120Series.setData(data.kmaLines.ma120);
+
+    ma250Series.setData([])
     ma250Series.setData(data.kmaLines.ma250);
+
+    upSeries.setData([])
     upSeries.setData(data.kmaLines.up);
+
+    dnSeries.setData([])
     dnSeries.setData(data.kmaLines.dn);
+
     // ma5VolumeSeries.setData(data.vmaLines.ma5);
+    ma60VolumeSeries.setData([]);
     ma60VolumeSeries.setData(data.vmaLines.ma60);
     // hslSeries.setData(data.hsl);
 }
