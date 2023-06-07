@@ -332,8 +332,8 @@ public class EmClient {
             case O_TP7:
                 return getIndexTp7();
             case O_TP02:
-                return getIndexTp02();
-//                return Collections.emptyList();
+//                return getIndexTp02();
+                return Collections.emptyList();
 
             case O_BK:
                 List<EmCList> bkList = getIndex(IndexEnum.O_BK.getUrl());

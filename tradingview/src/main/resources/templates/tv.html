@@ -31,6 +31,12 @@
         .section {
             padding: 1rem;
         }
+
+        .top-right {
+            position: fixed;
+            top: 5px;
+            right: 20px;
+        }
     </style>
 </head>
 
@@ -61,7 +67,7 @@
                     <!--                    <option value="i300">沪深300</option>-->
                     <!--                    <option value="i500">中证500</option>-->
                     <!--                    <option value="i1000">中证1000</option>-->
-<!--                    <option value="kc50">科创50</option>-->
+                    <!--                    <option value="kc50">科创50</option>-->
                 </select>
             </div>
         </div>
@@ -222,7 +228,7 @@
 
 
 </section>
-<section>
+<section id="main">
     <div id="charts"></div>
 </section>
 
@@ -298,7 +304,7 @@
         let optionTexts = [];
 
         for (let i = 0; i < options.length; i++) {
-            optionTexts.push(options[i].innerText + "#" +options[i].value);
+            optionTexts.push(options[i].innerText + "#" + options[i].value);
         }
         // 对数组进行排序
         optionTexts.sort();
@@ -314,7 +320,6 @@
     });
 
     legend();
-
 
 </script>
 </body>

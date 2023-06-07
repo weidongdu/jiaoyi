@@ -91,7 +91,17 @@ function update(code) {
             lastCode = data.code;
             //判断是否切换了板块bk
             if (lastBk !== data.bk) {
-                alert(lastBk + " -> " + data.bk);
+                // alert(lastBk + " -> " + data.bk);
+
+                // <div class="notification is-danger is-light">
+                //   <button class="delete"></button>
+                //   Primar lorem ipsum dolor sit amet, consectetur
+                //   adipiscing elit lorem ipsum dolor. <strong>Pellentesque risus mi</strong>, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum <a>felis venenatis</a> efficitur.
+                // </div>
+
+                notify(data.bk);
+
+
                 lastBk = data.bk;
                 //获取板块图
                 getTvChart(data.bk + "&codeType=BkValue", (data) => {
@@ -242,7 +252,7 @@ $(document).keydown(function (e) {
     }
 
     //f keycode = 70
-    if (70 === e.keyCode){
+    if (70 === e.keyCode) {
         console.log("f");
         //新开一个页面  专门用于这种耗时间的操作
         let options = $("#iSelectType option:selected");
@@ -279,5 +289,45 @@ function mock() {
     v.value = toFix(v.value * 2, 2);
     v.color = '#EA463C';
     volumeSeries.update(v);
+
+}
+
+
+function notify(content) {
+    // <div class="notification is-danger is-light">
+    //   <button class="delete"></button>
+    //   Primar lorem ipsum dolor sit amet, consectetur
+    //   adipiscing elit lorem ipsum dolor. <strong>Pellentesque risus mi</strong>, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum <a>felis venenatis</a> efficitur.
+    // </div>
+
+    //    <div class="notification is-warning top-right ">
+    //         <p id="iNotify">互联网服务</p>
+    //     </div>
+
+
+    let c1 = "notification is-danger top-right"
+    let c2 = "notification is-info top-right"
+    let c3 = "notification is-warning top-right"
+
+    let mod = Date.now() % 3;
+    let div = document.createElement("div");
+    if (mod === 0) {
+        div.setAttribute("class", c1);
+    }
+    if (mod === 1) {
+        div.setAttribute("class", c2);
+    }
+    if (mod === 2) {
+        div.setAttribute("class", c3);
+    }
+    let p = document.createElement("p");
+    p.innerText = content;
+    div.appendChild(p);
+    $("#main").append(div);
+    // 使用jQuery删除元素
+    let sid = setInterval(function () {
+        $('.notification.top-right').remove();
+        clearInterval(sid);
+    }, 2000)
 
 }

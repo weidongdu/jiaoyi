@@ -246,7 +246,7 @@ class EastmApplicationTests {
 
     @Test
     public void vol() {
-        String[] codes = {"601607", "688332", "600578", "600452", "600699", "002156", "002262", "300856", "300573", "301153"};
+        String[] codes = {"601336", "301035","300573"};
         vol(codes);
     }
 
@@ -316,4 +316,7 @@ class EastmApplicationTests {
 
         System.out.println("use " + (System.currentTimeMillis() - l) + "ms");
     }
+
+
+
 }
