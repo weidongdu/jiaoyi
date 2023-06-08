@@ -43,6 +43,13 @@ public class JobAlert {
 
     public static final Map<LocalDate, List<String>> DAY_BLOCKLIST_MAP = new HashMap<>();
 
+    //cron 每天上午8点 清空
+    @Scheduled(cron = "0 0 8 * * ?")
+    public void clear() {
+        DAY_BLOCKLIST_MAP.clear();
+    }
+
+
     @Scheduled(fixedRate = 1000 * 10L)
     public void run() {
         if (!EmRealTimeClient.tradeTime()) return;
