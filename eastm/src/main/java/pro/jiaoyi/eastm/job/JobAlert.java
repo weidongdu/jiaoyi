@@ -62,7 +62,10 @@ public class JobAlert {
                 if (code.startsWith("8")) continue;
                 //过滤 假设涨停也无法满足条件
                 List<String> blockList = DAY_BLOCKLIST_MAP.computeIfAbsent(LocalDate.now(), k -> new ArrayList<>());
-                if (blockList.contains(code)) continue;
+                if (blockList.contains(code)) {
+                    log.info("block code {} {}", code, name);
+                    continue;
+                }
 
                 log.info("run speed {} {} {}", code, name, top.getSpeed_f22());
 
