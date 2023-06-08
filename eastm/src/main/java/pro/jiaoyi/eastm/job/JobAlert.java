@@ -93,8 +93,8 @@ public class JobAlert {
                     String fenshiAmtStr = amtStr(fenshiAmt);
                     EmDailyK k = dailyKs.get(dailyKs.size() - 1);
                     log.info("价格突破成功 code={} name={} 分时量{}", code, name, amtStr);
-                    String content = code + " " + name + " " + k.getClose() + "_" + k.getPct() + "%"
-                            + "<br>" + amtStr + ",M1=" + fx + "(" + fenshiAmtStr + ")"
+                    String content = code + "_" + name + "_" + k.getClose() + "_" + k.getPct()
+                            + "<br>" + amtStr + ",M1=" + fx + "_" + fenshiAmtStr
                             + "<br>" + LocalDateTime.now().toString().substring(0, 16) + k.getBk();
                     wxUtil.send(content);
 
