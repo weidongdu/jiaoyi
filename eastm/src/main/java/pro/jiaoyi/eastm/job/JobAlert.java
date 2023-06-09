@@ -15,10 +15,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -173,6 +170,42 @@ public class JobAlert {
         }
 
         return str;
+    }
+
+    public static void main(String[] args) {
+        HashSet<String> set = new HashSet<>();
+        set.add("apple");
+        set.add("banana");
+        set.add("orange");
+
+        // 打乱 HashSet 中元素的顺序
+        ArrayList<String> list = new ArrayList<>(set);
+        Collections.shuffle(list);
+
+        // 遍历 HashSet
+        for (String element : list) {
+            System.out.println(element);
+        }
+
+        System.out.println();
+
+
+        for (int i = 0; i < 5; i++) {
+
+            // 打乱 HashSet 中元素的顺序
+            Collections.shuffle(list);
+
+            // 遍历 HashSet
+            for (String element : list) {
+                System.out.println(element);
+            }
+
+            System.out.println();
+        }
+
+
+
+
     }
 
 }

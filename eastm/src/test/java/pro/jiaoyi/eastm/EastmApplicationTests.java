@@ -270,7 +270,7 @@ class EastmApplicationTests {
 
     @Test
     public void vol() {
-        String[] codes = {"601336", "301035", "300573"};
+        String[] codes = {"300161","301046","600739","600848"};
         vol(codes);
     }
 
