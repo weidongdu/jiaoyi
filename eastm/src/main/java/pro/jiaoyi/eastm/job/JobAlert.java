@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
+import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.api.EmRealTimeClient;
 import pro.jiaoyi.eastm.config.WxUtil;
@@ -16,6 +17,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Slf4j
@@ -136,7 +138,10 @@ public class JobAlert {
                             + "<br>" + "标准量=" + amtStr + ",M1=" + fx + "_" + fenshiAmtStr
                             + "<br>" + LocalDateTime.now().toString().substring(0, 16);
                     log.info("价格突破成功 {}", content.replaceAll("<br>", "\n"));
-                    wxUtil.send(content);
+                    boolean push = checkSendWxCount(code);
+                    if (push) {
+                        wxUtil.send(content);
+                    }
 
 
                 } else {
@@ -157,6 +162,27 @@ public class JobAlert {
             }
         }
 
+    }
+
+    public static final Map<String, Integer> SEND_WX_MAP = new ConcurrentHashMap<String, Integer>();
+
+    public boolean checkSendWxCount(String code) {
+        String key = DateUtil.today() + "-" + code;
+        Integer count = SEND_WX_MAP.get(key);
+        if (count == null) {
+            count = 0;
+        }
+        if (count > 2) {
+            return false;
+        }
+
+        if (SEND_WX_MAP.size() > 1000){
+            //清空 非today 开头在key
+            SEND_WX_MAP.entrySet().removeIf(entry -> !entry.getKey().startsWith(DateUtil.today()));
+        }
+
+        SEND_WX_MAP.put(key, count + 1);
+        return true;
     }
 
 
@@ -202,8 +228,6 @@ public class JobAlert {
 
             System.out.println();
         }
-
-
 
 
     }
