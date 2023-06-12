@@ -136,6 +136,11 @@ public class EmClient {
             String s1 = list.get(0).getTradeDate() + " " + list.get(0).getCode() + " " + list.get(0).getName() + " " + list.get(0).getPct();
             String s2 = list.get(size - 1).getTradeDate() + " " + list.get(size - 1).getCode() + " " + list.get(size - 1).getName() + " " + list.get(size - 1).getPct();
             log.info("获取日线行情数据 size={} start={} end={}", size, s1, s2);
+
+            if (DATE_KLINE_MAP.size() > 15) {
+                removeOldCache(DATE_KLINE_MAP, 7);
+            }
+
             DATE_KLINE_MAP.put(DateUtil.today() + "-" + code, list);
             return list;
         }
@@ -332,8 +337,8 @@ public class EmClient {
             case O_TP7:
                 return getIndexTp7();
             case O_TP02:
-                return getIndexTp02();
-//                return Collections.emptyList();
+//                return getIndexTp02();
+                return Collections.emptyList();
 
             case O_BK:
                 List<EmCList> bkList = getIndex(IndexEnum.O_BK.getUrl());
@@ -470,6 +475,12 @@ public class EmClient {
     }
 
 
+    /**
+     * 60日 成交额 前10% 的平均值(日成交额)
+     *
+     * @param dailyKs
+     * @return
+     */
     public BigDecimal amtTop10p(List<EmDailyK> dailyKs) {
         ArrayList<BigDecimal> amts = new ArrayList<>();
         int size = dailyKs.size();
