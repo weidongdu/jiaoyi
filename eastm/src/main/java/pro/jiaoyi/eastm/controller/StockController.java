@@ -1,5 +1,6 @@
 package pro.jiaoyi.eastm.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,11 +21,15 @@ public class StockController {
     private EmClient emClient;
 
     @GetMapping("/vol/hour")
-    public BigDecimal volHour(String code) {
+    public JSONObject volHour(String code) {
         List<EmDailyK> dailyKs =
                 emClient.getDailyKs(code, LocalDate.now(), 100, false);
         BigDecimal amtDay = emClient.amtTop10p(dailyKs);
-        return amtDay.divide(new BigDecimal(4), 2, RoundingMode.HALF_UP);
+
+        JSONObject jsonObject = new JSONObject();
+        BigDecimal amtHour = amtDay.divide(new BigDecimal(4), 2, RoundingMode.HALF_UP);
+        jsonObject.put("vol", amtHour);
+        return jsonObject;
     }
 }
 
