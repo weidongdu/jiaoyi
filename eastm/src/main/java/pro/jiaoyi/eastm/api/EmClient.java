@@ -137,10 +137,6 @@ public class EmClient {
             String s2 = list.get(size - 1).getTradeDate() + " " + list.get(size - 1).getCode() + " " + list.get(size - 1).getName() + " " + list.get(size - 1).getPct();
             log.info("获取日线行情数据 size={} start={} end={}", size, s1, s2);
 
-            if (DATE_KLINE_MAP.size() > 15) {
-                removeOldCache(DATE_KLINE_MAP, 7);
-            }
-
             DATE_KLINE_MAP.put(DateUtil.today() + "-" + code, list);
             return list;
         }
@@ -210,7 +206,6 @@ public class EmClient {
         }
         List<EmCList> clist = getClist(1, 10000);
         if (clist.size() > 0) {
-            removeOldCache(DATE_LIST_MAP, 7);
             DATE_LIST_MAP.put(DateUtil.today(), clist);
         }
         return clist;
@@ -228,7 +223,6 @@ public class EmClient {
         for (EmCList emCList : list) {
             codeBk.put(emCList.getF12Code(), emCList.getF100bk());
         }
-        removeOldCache(DATE_STOCK_CODE_BK_MAP, 7);
         DATE_STOCK_CODE_BK_MAP.put(DateUtil.today(), codeBk);
         return codeBk.get(code);
     }
@@ -279,7 +273,6 @@ public class EmClient {
             cnMap.put(cList.getF12Code(), cList.getF14Name());
         }
 
-        removeOldCache(cnMap, 7);
         DATE_CODE_NAME_MAP.put(key, cnMap);
         return cnMap;
     }
@@ -305,7 +298,6 @@ public class EmClient {
             ncMap.put(cList.getF14Name(), cList.getF12Code());
         }
 
-        removeOldCache(ncMap, 7);
         DATE_CODE_NAME_MAP.put(key, ncMap);
         return ncMap;
     }
@@ -456,23 +448,23 @@ public class EmClient {
     }
 
 
-    private static void removeOldCache(Map map, int daysBefore) {
-        ArrayList<String> oldList = new ArrayList<>();
-        //移除前面15天的缓存
-        if (map.size() > daysBefore * 2) {
-            for (Object s : map.keySet()) {
-                LocalDate localDate = DateUtil.strToLocalDate((String) s, DateUtil.PATTERN_yyyyMMdd);
-                if (localDate.isBefore(LocalDate.now().minusDays(daysBefore))) {
-                    oldList.add((String) s);
-                }
-            }
-            if (oldList.size() > 0) {
-                for (String s : oldList) {
-                    map.remove(s);
-                }
-            }
-        }
-    }
+//    private static void removeOldCache(Map map, int daysBefore) {
+//        ArrayList<String> oldList = new ArrayList<>();
+//        //移除前面15天的缓存
+//        if (map.size() > daysBefore * 2) {
+//            for (Object s : map.keySet()) {
+//                LocalDate localDate = DateUtil.strToLocalDate((String) s, DateUtil.PATTERN_yyyyMMdd);
+//                if (localDate.isBefore(LocalDate.now().minusDays(daysBefore))) {
+//                    oldList.add((String) s);
+//                }
+//            }
+//            if (oldList.size() > 0) {
+//                for (String s : oldList) {
+//                    map.remove(s);
+//                }
+//            }
+//        }
+//    }
 
 
     /**
@@ -517,5 +509,7 @@ public class EmClient {
     public static final Map<String, String> BK_MAP = new ConcurrentHashMap<>();
     public static final Map<String, List<EmCList>> DATE_LIST_MAP = new ConcurrentHashMap<>();
     public static final Map<String, List<EmDailyK>> DATE_KLINE_MAP = new ConcurrentHashMap<>();
+
+
 
 }

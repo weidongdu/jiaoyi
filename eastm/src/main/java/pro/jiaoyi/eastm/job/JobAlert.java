@@ -3,7 +3,6 @@ package pro.jiaoyi.eastm.job;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.eastm.api.EmClient;
@@ -19,7 +18,9 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
+import static pro.jiaoyi.eastm.api.EmClient.*;
+
+//@Component
 @Slf4j
 public class JobAlert {
     //监控 放量有涨速
@@ -43,9 +44,14 @@ public class JobAlert {
     public static final Map<LocalDate, List<String>> DAY_BLOCKLIST_MAP = new HashMap<>();
 
     //cron 每天上午8点 清空
-    @Scheduled(cron = "0 0 8 * * ?")
+    @Scheduled(cron = "0 0 9 * * ?")
     public void clear() {
-        DAY_BLOCKLIST_MAP.clear();
+        DATE_CODE_NAME_MAP.clear();
+        DATE_NAME_CODE_MAP.clear();
+        DATE_STOCK_CODE_BK_MAP.clear();
+        BK_MAP.clear();
+        DATE_LIST_MAP.clear();
+        DATE_KLINE_MAP.clear();
     }
 
 
