@@ -307,7 +307,7 @@ public class EmClient {
      *
      * @return
      */
-    public List<EmCList> getIndex(IndexEnum type) {
+    public List<EmCList> getIndex(IndexEnum type, boolean sync) {
         switch (type) {
 
             case ALL:
@@ -329,8 +329,12 @@ public class EmClient {
             case O_TP7:
                 return getIndexTp7();
             case O_TP02:
-//                return getIndexTp02();
-                return Collections.emptyList();
+                //遍历当天数据
+                if (sync) {
+                    return getIndexTp02();
+                } else {
+                    return Collections.emptyList();
+                }
 
             case O_BK:
                 List<EmCList> bkList = getIndex(IndexEnum.O_BK.getUrl());
@@ -344,8 +348,12 @@ public class EmClient {
     }
 
     private List<EmCList> getIndexTp02() {
-        List<EmCList> list = getClistDefaultSize(false);
+        //先拿到当天的缓存
+        String key = DateUtil.today();
+        List<EmCList> cacheList = DATE_INDEX_TP02_MAP.get(key);
+        if (cacheList != null && cacheList.size() > 0) return cacheList;
 
+        List<EmCList> list = getClistDefaultSize(false);
         HashSet<String> filterSet = new HashSet<>();
         filterSet.addAll(getIndex1000().stream().map(EmCList::getF12Code).toList());
         filterSet.addAll(getIndex(IndexEnum.ZZ500.getUrl()).stream().map(EmCList::getF12Code).toList());
@@ -376,6 +384,8 @@ public class EmClient {
 
     public List<EmCList> filterIndexTp02(List<EmCList> list) throws InterruptedException {
         ArrayList<EmCList> filterList = new ArrayList<>();
+        DATE_INDEX_TP02_MAP.putIfAbsent(DateUtil.today(), filterList);
+
         AtomicInteger count = new AtomicInteger(0);
         for (EmCList emCList : list) {
 
@@ -509,7 +519,7 @@ public class EmClient {
     public static final Map<String, String> BK_MAP = new ConcurrentHashMap<>();
     public static final Map<String, List<EmCList>> DATE_LIST_MAP = new ConcurrentHashMap<>();
     public static final Map<String, List<EmDailyK>> DATE_KLINE_MAP = new ConcurrentHashMap<>();
-
+    public static final Map<String, List<EmCList>> DATE_INDEX_TP02_MAP = new ConcurrentHashMap<>();
 
 
 }

@@ -1,5 +1,4 @@
 //根据code 获取 tv chart
-
 const baseUrl = "http://localhost:8890";
 
 function getTvChart(code, cb) {
@@ -15,6 +14,11 @@ function getTvChart(code, cb) {
 function getStockList(cb) {
     let url = baseUrl + "/tv/stockList";
     //通过jquery get 获取 json
+
+    //获取当前 window.location.href 参数async
+    if (getQueryString("sync")) {
+        url += "?sync=" + true;
+    }
     $.get(url, function (data) {
         console.log(data);
         cb(data);
@@ -38,4 +42,9 @@ function getStockType(cb) {
         console.log(data);
         cb(data);
     });
+}
+
+function getQueryString(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
 }

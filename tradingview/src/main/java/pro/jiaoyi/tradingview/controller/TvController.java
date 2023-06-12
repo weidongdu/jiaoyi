@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pro.jiaoyi.eastm.config.IndexEnum;
-import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.tradingview.model.TvChart;
 import pro.jiaoyi.tradingview.service.TvService;
 
@@ -15,7 +14,6 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
@@ -33,17 +31,22 @@ public class TvController {
     }
 
     @GetMapping("/stockList")
-    public Map<String, List<String>> getLists() {
-        Map<String, List<String>> allIndex = tvService.getAllIndex();
+    public Map<String, List<String>> getLists(Boolean sync) {
+        if (sync == null) {
+            sync = false;
+        }
+        Map<String, List<String>> allIndex = tvService.getAllIndex(sync);
         return allIndex;
     }
-    @GetMapping("/stockList/byType")
-    public List<String> getList(String type) {
 
-        List<EmCList> lists = tvService.getIndex(type, true);
-        return lists.stream().map(EmCList::getF12Code).collect(Collectors.toList());
-
-    }
+//
+//    @GetMapping("/stockList/byType")
+//    public List<String> getList(String type, boolean async) {
+//
+//        List<EmCList> lists = tvService.getIndex(type, true, async);
+//        return lists.stream().map(EmCList::getF12Code).collect(Collectors.toList());
+//
+//    }
 
     @GetMapping("/stockType")
     public Map<String, String> getStockType() {

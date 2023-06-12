@@ -37,7 +37,7 @@ class TradingviewApplicationTests {
 //        tvService.getLists("hs300",false).forEach(System.out::println);
 
         Map<String, List<String>> allIndex =
-                tvService.getAllIndex();
+                tvService.getAllIndex(false);
 
         allIndex.forEach((t,list)->{
             System.out.println(t + " "+ list);
