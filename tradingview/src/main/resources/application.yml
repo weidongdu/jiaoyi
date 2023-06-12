@@ -1,5 +1,5 @@
 server:
-  port: 8890
+  port: 28890
 
 okhttp4:
   enabled: true
