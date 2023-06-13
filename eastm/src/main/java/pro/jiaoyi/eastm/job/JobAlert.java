@@ -91,7 +91,8 @@ public class JobAlert {
 
                 EmDailyK k = dailyKs.get(dailyKs.size() - 1);
 
-                boolean tu = emRealTimeClient.tu(dailyKs, 30, 30, 0.4d);
+
+                boolean tu = emRealTimeClient.tu(dailyKs, 60, 60, 0.4d);
                 if (tu) {
                     BigDecimal[] closeArr = dailyKs.stream().map(EmDailyK::getClose).toList().toArray(new BigDecimal[0]);
 

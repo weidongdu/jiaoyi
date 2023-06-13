@@ -168,7 +168,7 @@ public class EmRealTimeClient {
                 log.error("满足条件箱体突破 {}", k);
                 return true;
             }
-            if (count > daysHigh && countCurve > boxDays * boxDaysFactor * 1.2) {
+            if (count > daysHigh && countCurve > boxDays * boxDaysFactor * 1.5) {
                 log.error("满足曲线条件突破 {}", k);
                 return true;
             }
