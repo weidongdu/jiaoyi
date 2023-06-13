@@ -1,5 +1,5 @@
 //根据code 获取 tv chart
-const baseUrl = "http://localhost:8890";
+const baseUrl = "http://localhost:28890";
 
 function getTvChart(code, cb) {
     let url = baseUrl + "/tv/chart?code=" + code;

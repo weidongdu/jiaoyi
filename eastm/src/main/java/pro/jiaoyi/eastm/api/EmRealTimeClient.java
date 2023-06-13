@@ -127,7 +127,6 @@ public class EmRealTimeClient {
                 && k.getClose().compareTo(ma60[index]) > 0) {
 
             int count = 0;
-
             for (int j = 1; j < index - 1; j++) {
                 if (index - j == 1) {
                     log.info("遍历所有, 持续新高 {}天 {}", j, dailyKs.get(index - j));
@@ -144,19 +143,33 @@ public class EmRealTimeClient {
             log.info("over days high , count = {} high", count);
 
             int countBox = 0;//箱体计数
+            int countCurve = 0;//曲线计数
             for (int j = 1; j < count; j++) {
                 //1, 高点超过高点
                 //2, 低点低于高点
                 int tmpIndex = index - j;
-                BigDecimal high = dailyKs.get(tmpIndex).getHigh();
-                if (k.getLow().compareTo(high) < 0 && k.getHigh().compareTo(high) > 0) {
+                EmDailyK dk = dailyKs.get(tmpIndex);
+
+                ;
+                if (k.getLow().compareTo(dk.getHigh()) < 0 && k.getHigh().compareTo(dk.getHigh()) > 0) {
                     countBox++;
+                }
+
+                //计算曲线天数
+                //最低不小30%
+                if (dk.getLow().compareTo(new BigDecimal("0.7").multiply(k.getHigh())) > 0
+                        && k.getHigh().compareTo(dk.getHigh()) > 0) {
+                    countCurve++;
                 }
             }
             log.info("over box high , count = {} high", countBox);
 
             if (count > daysHigh && countBox > boxDays * boxDaysFactor) {
                 log.error("满足条件箱体突破 {}", k);
+                return true;
+            }
+            if (count > daysHigh && countCurve > boxDays * boxDaysFactor * 1.2) {
+                log.error("满足曲线条件突破 {}", k);
                 return true;
             }
         }
