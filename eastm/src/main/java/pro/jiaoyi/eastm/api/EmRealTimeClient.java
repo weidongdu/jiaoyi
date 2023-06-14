@@ -118,7 +118,10 @@ public class EmRealTimeClient {
         int index = size - 1;
 
         EmDailyK k = dailyKs.get(size - 1);
-
+        if (k.getClose().compareTo(k.getOpen()) < 0){
+            log.info("今日开盘价低于收盘价, 不符合条件");
+            return false;
+        }
         if (k.getPct().compareTo(BigDecimal.ZERO) > 0
                 && k.getClose().compareTo(ma5[index]) > 0
                 && k.getClose().compareTo(ma10[index]) > 0
