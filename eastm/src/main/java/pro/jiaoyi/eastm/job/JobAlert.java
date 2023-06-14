@@ -163,7 +163,7 @@ public class JobAlert {
                         f = new BigDecimal("1.1");
                     }
                     k.setHigh(f.multiply(k.getPreClose()).setScale(2, RoundingMode.HALF_UP));
-                    boolean tu2 = emRealTimeClient.tu(dailyKs, 30, 30, 0.4d);
+                    boolean tu2 = emRealTimeClient.tu(dailyKs, 60, 60, 0.4d);
                     if (!tu2) {
                         log.info("涨停价还不满足,加入block list,{}", k);
                         blockList.add(code);

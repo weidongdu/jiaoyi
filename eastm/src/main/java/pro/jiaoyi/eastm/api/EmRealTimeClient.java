@@ -122,7 +122,7 @@ public class EmRealTimeClient {
         EmDailyK k = dailyKs.get(size - 1);
         if (k.getClose().compareTo(k.getOpen()) < 0
                 || k.getClose().compareTo(BigDecimal.valueOf(40)) > 0) {
-            log.info("今日开盘价低于收盘价, 不符合条件");
+            log.info("今日开盘价{} > 最新价{}, 不符合条件",k.getOpen(), k.getClose());
             return false;
         }
         if (k.getPct().compareTo(BigDecimal.ZERO) > 0
