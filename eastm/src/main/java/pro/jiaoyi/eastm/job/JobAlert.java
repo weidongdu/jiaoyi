@@ -128,6 +128,9 @@ public class JobAlert {
                     BigDecimal dayAmtTop10 = emClient.amtTop10p(dailyKs);
                     BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
                     BigDecimal fAmt = new BigDecimal("0.1").multiply(hourAmt);
+                    if (fAmt.compareTo(new BigDecimal("2500000")) < 0) {
+                        continue;
+                    }
                     //判断70s 内 是否大于 0.1 fAmt
                     BigDecimal fenshiAmt = emRealTimeClient.getFenshiAmt(code, 70);
                     //成交量放大倍数
