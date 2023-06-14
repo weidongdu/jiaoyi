@@ -14,11 +14,13 @@ import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiTrans;
 import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiVo;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -146,38 +148,51 @@ public class EmRealTimeClient {
             }
             log.info("over days high , count = {} high", count);
 
+            ArrayList<BigDecimal> highList = new ArrayList<>();
+            ArrayList<BigDecimal> lowList = new ArrayList<>();
+
             int countBox = 0;//箱体计数
-            int countCurve = 0;//曲线计数
             for (int j = 1; j < count; j++) {
                 //1, 高点超过高点
                 //2, 低点低于高点
                 int tmpIndex = index - j;
                 EmDailyK dk = dailyKs.get(tmpIndex);
-
-                ;
                 if (k.getLow().compareTo(dk.getHigh()) < 0 && k.getHigh().compareTo(dk.getHigh()) > 0) {
                     countBox++;
                 }
-
-                //计算曲线天数
-                //最低不小30%
-                if (dk.getLow().compareTo(new BigDecimal("0.7").multiply(k.getHigh())) > 0
-                        && k.getHigh().compareTo(dk.getHigh()) > 0) {
-                    countCurve++;
-                }
+                highList.add(dk.getHigh());
+                lowList.add(dk.getLow());
             }
+
             log.info("over box high , count = {} high", countBox);
 
             if (count > daysHigh && countBox > boxDays * boxDaysFactor) {
                 log.error("满足条件箱体突破 {}", k);
                 return true;
             }
-            if (count > daysHigh && countCurve > boxDays * boxDaysFactor * 1.5) {
-                log.error("满足曲线条件突破 {}", k);
-                return true;
+
+            if (count > daysHigh) {
+                log.info("开始判断曲线");
+                highList.add(k.getClose());
+
+                Collections.sort(highList);
+                Collections.sort(lowList);
+
+                int location = highList.indexOf(k.getClose());
+                BigDecimal locationPct = BigDecimal.valueOf(location).divide(BigDecimal.valueOf(highList.size()), 3, RoundingMode.HALF_UP);
+                log.info("最新价 location pct = {}", locationPct);
+
+                if (locationPct.compareTo(new BigDecimal("0.9")) > 0) {
+                    log.info("最新价在高点90%以上, 开始判断曲线");
+                    BigDecimal ll = lowList.get(0);
+                    BigDecimal hh = highList.get(highList.size() - 1);
+                    if (ll.compareTo(new BigDecimal("0.7").multiply(hh)) > 0) {
+                        log.info("最低点 > 最高点 * 0.7, 开始判断曲线");
+                        return true;
+                    }
+                }
             }
         }
-
         return false;
     }
 
