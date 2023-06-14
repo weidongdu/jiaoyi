@@ -122,7 +122,7 @@ public class EmRealTimeClient {
         EmDailyK k = dailyKs.get(size - 1);
         if (k.getClose().compareTo(k.getOpen()) < 0
                 || k.getClose().compareTo(BigDecimal.valueOf(40)) > 0) {
-            log.info("今日开盘价{} > 最新价{}, 不符合条件",k.getOpen(), k.getClose());
+            log.info("今日开盘价{} > 最新价{}, 不符合条件", k.getOpen(), k.getClose());
             return false;
         }
         if (k.getPct().compareTo(BigDecimal.ZERO) > 0
@@ -174,22 +174,28 @@ public class EmRealTimeClient {
             if (count > daysHigh) {
                 log.info("开始判断曲线");
                 highList.add(k.getClose());
-
                 Collections.sort(highList);
-                Collections.sort(lowList);
+                int locationHigh = highList.indexOf(k.getClose());
+                BigDecimal locationHighPct = BigDecimal.valueOf(locationHigh).divide(BigDecimal.valueOf(highList.size()), 3, RoundingMode.HALF_UP);
+                log.info("最新价 location pct = {}", locationHighPct);
+                if (locationHighPct.compareTo(new BigDecimal("0.9")) < 0) {
+                    return false;
+                }
 
-                int location = highList.indexOf(k.getClose());
-                BigDecimal locationPct = BigDecimal.valueOf(location).divide(BigDecimal.valueOf(highList.size()), 3, RoundingMode.HALF_UP);
-                log.info("最新价 location pct = {}", locationPct);
+                //获取lowList 最低价
+                BigDecimal lowest = lowList.stream().min(BigDecimal::compareTo).get();
+                log.info("最低价 = {}", lowest);
+                int locationLow = lowList.indexOf(lowest);
+                BigDecimal locationLowPct = BigDecimal.valueOf(locationLow).divide(BigDecimal.valueOf(lowList.size()), 3, RoundingMode.HALF_UP);
+                if ((locationLowPct.compareTo(new BigDecimal("0.4")) < 0
+                        || locationLowPct.compareTo(new BigDecimal("0.6")) > 0)) {
+                    return false;
+                }
 
-                if (locationPct.compareTo(new BigDecimal("0.9")) > 0) {
-                    log.info("最新价在高点90%以上, 开始判断曲线");
-                    BigDecimal ll = lowList.get(0);
-                    BigDecimal hh = highList.get(highList.size() - 1);
-                    if (ll.compareTo(new BigDecimal("0.7").multiply(hh)) > 0) {
-                        log.info("最低点 > 最高点 * 0.7, 开始判断曲线");
-                        return true;
-                    }
+                BigDecimal hh = highList.get(highList.size() - 1);
+                if (lowest.compareTo(new BigDecimal("0.7").multiply(hh)) > 0) {
+                    log.info("最低点 > 最高点 * 0.7, 开始判断曲线");
+                    return true;
                 }
             }
         }
