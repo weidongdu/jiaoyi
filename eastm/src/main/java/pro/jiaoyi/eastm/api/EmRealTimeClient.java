@@ -194,7 +194,8 @@ public class EmRealTimeClient {
 
                 BigDecimal hh = highList.get(highList.size() - 1);
                 if (lowest.compareTo(new BigDecimal("0.7").multiply(hh)) > 0) {
-                    log.info("最低点 > 最高点 * 0.7, 开始判断曲线");
+                    EmDailyK fk = dailyKs.get(size - count);
+                    log.info("曲线成功{}k [{}] from {} to {}", count, fk.getName(), fk.getTradeDate() + "=" + fk.getClose(), k.getTradeDate() + "=" + k.getClose());
                     return true;
                 }
             }
