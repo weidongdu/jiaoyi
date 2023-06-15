@@ -321,20 +321,12 @@ public class EmClient {
             case ZZ1000:
                 return getIndex1000();
             case IndexAll:
-                List<EmCList> index = getIndex(IndexEnum.CYCF.getUrl());
-                index.addAll(getIndex(IndexEnum.HS300.getUrl()));
-                index.addAll(getIndex(IndexEnum.ZZ500.getUrl()));
-                index.addAll(getIndex1000());
-                return index;
+                return sync ? getIndexAll() : Collections.emptyList();
             case O_TP7:
                 return getIndexTp7();
             case O_TP02:
                 //遍历当天数据
-                if (sync) {
-                    return getIndexTp02();
-                } else {
-                    return Collections.emptyList();
-                }
+                return sync ? getIndexTp02() : Collections.emptyList();
 
             case O_BK:
                 List<EmCList> bkList = getIndex(IndexEnum.O_BK.getUrl());
@@ -345,6 +337,40 @@ public class EmClient {
             default:
                 return Collections.emptyList();
         }
+    }
+
+    private List<EmCList> getIndexAll() {
+        List<EmCList> index = getIndex(IndexEnum.CYCF.getUrl());
+        index.addAll(getIndex(IndexEnum.HS300.getUrl()));
+        index.addAll(getIndex(IndexEnum.ZZ500.getUrl()));
+        index.addAll(getIndex1000());
+
+
+        HashSet<String> codeSet = new HashSet<>(index.stream().map(EmCList::getF12Code).toList());
+
+
+        List<EmCList> list = getClistDefaultSize(false);
+        BigDecimal B_2 = new BigDecimal("-2");
+        BigDecimal B5000_0000 = new BigDecimal("50000000");
+
+        List<EmCList> filterList = list.stream()
+                .filter(c ->
+                        codeSet.contains(c.getF12Code())
+                                && c.getF3Pct().compareTo(B_2) > 0
+                                && !c.getF14Name().contains("退")
+                                //成交额大于 5000万
+                                && c.getF6Amt().compareTo(B5000_0000) > 0
+                )
+                .toList();
+
+        List<EmCList> emCLists = null;
+        try {
+            emCLists = filterIndexTp02(filterList);
+        } catch (InterruptedException e) {
+            return Collections.emptyList();
+        }
+        return (emCLists);
+
     }
 
     private List<EmCList> getIndexTp02() {
@@ -395,7 +421,7 @@ public class EmClient {
             }
 
             List<EmDailyK> ks = getDailyKs(emCList.getF12Code(), LocalDate.now(), 500, false);
-            if (ks.size() < 120) {
+            if (ks.size() < 250) {
                 continue;
             }
 
@@ -408,14 +434,16 @@ public class EmClient {
             BigDecimal[] ma20 = MaUtil.ma(20, priceArr, 3);
             BigDecimal[] ma30 = MaUtil.ma(30, priceArr, 3);
             BigDecimal[] ma60 = MaUtil.ma(60, priceArr, 3);
+            BigDecimal[] ma120 = MaUtil.ma(120, priceArr, 3);
+            BigDecimal[] ma250 = MaUtil.ma(250, priceArr, 3);
 
-            if (k.getClose().compareTo(ma5[ma5.length - 1]) <= 0
-                    || k.getClose().compareTo(ma10[ma10.length - 1]) <= 0
-                    || k.getClose().compareTo(ma20[ma20.length - 1]) <= 0
-                    || k.getClose().compareTo(ma30[ma30.length - 1]) <= 0
-                    || k.getClose().compareTo(ma60[ma60.length - 1]) <= 0) {
+            int len = ma5.length - 1;
+            ArrayList<BigDecimal> maList = new ArrayList<>(Arrays.asList(ma5[len], ma10[len], ma20[len], ma30[len], ma60[len], ma120[len], ma250[len]));
+            Collections.sort(maList);
 
-            } else {
+            BigDecimal b098 = new BigDecimal("0.98");
+
+            if (b098.multiply(k.getClose()).compareTo(maList.get(maList.size() - 1)) > 0) {
                 filterList.add(emCList);
             }
         }
@@ -425,7 +453,9 @@ public class EmClient {
     private List<EmCList> getIndexTp7() {
         List<EmCList> list = getClistDefaultSize(false);
         BigDecimal B = new BigDecimal("7");
-        return list.stream().filter(c -> c.getF3Pct().compareTo(B) > 0).collect(Collectors.toList());
+        return list.stream()
+                .filter(c -> c.getF3Pct().compareTo(B) > 0 && !c.getF14Name().contains("退"))
+                .collect(Collectors.toList());
     }
 
 

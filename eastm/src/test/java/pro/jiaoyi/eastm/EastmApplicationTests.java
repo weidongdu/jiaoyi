@@ -214,9 +214,9 @@ class EastmApplicationTests {
 
         String code = "601336";
         for (int i = 0; i < list.size(); i++) {
-            if (!list.get(i).getF12Code().equals(code)) {
-                continue;
-            }
+//            if (!list.get(i).getF12Code().equals(code)) {
+//                continue;
+//            }
 
             Thread.sleep(2000);
 
@@ -242,9 +242,10 @@ class EastmApplicationTests {
                     //结论 就是 开盘价
                     // >0 可以
                     // <0 扔掉
-                    log.info("突破日 {} 次日={} 开盘={} 最高={}", dailyKs.get(end - 1).getTradeDate() +
+                    log.info("突破日{} 收盘{} 次日={} 开盘={} 最高={}", dailyKs.get(end - 1).getTradeDate() +
                                     " " + dailyKs.get(end - 1).getName() + dailyKs.get(end - 1).getCode() +
                                     " " + dailyKs.get(end - 1).getPct(),
+                            dailyKs.get(end - 1).getPct(),
                             dailyKs.get(end).getPct(),
                             bOpen,
                             bHigh

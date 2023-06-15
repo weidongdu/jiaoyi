@@ -75,7 +75,7 @@ function getList() {
     return STOCK_LIST[type];
 }
 
-function update(code) {
+function update(code, bk) {
     if (!code) {
         alert("code为空");
         return;
@@ -90,7 +90,7 @@ function update(code) {
             lastDay = k.time;
             lastCode = data.code;
             //判断是否切换了板块bk
-            if (lastBk !== data.bk) {
+            if (bk && lastBk !== data.bk) {
                 // alert(lastBk + " -> " + data.bk);
 
                 // <div class="notification is-danger is-light">
@@ -329,5 +329,18 @@ function notify(content) {
         $('.notification.top-right').remove();
         clearInterval(sid);
     }, 2000)
+
+}
+
+
+function singleStockChart() {
+    let code = prompt("请输入code 如:[000001]", ""); //将输入的内容赋给变量 name ，
+
+    //这里需要注意的是，prompt有两个参数，前面是提示的话，后面是当对话框出来后，在对话框里的默认值
+    //如果返回的有内容
+    if (code) {
+        // chart(code, 500);
+        update(code);
+    }
 
 }
