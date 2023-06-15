@@ -340,27 +340,23 @@ public class EmClient {
     }
 
     private List<EmCList> getIndexAll() {
+        log.info("getIndexAll 指数成份");
         List<EmCList> index = getIndex(IndexEnum.CYCF.getUrl());
         index.addAll(getIndex(IndexEnum.HS300.getUrl()));
         index.addAll(getIndex(IndexEnum.ZZ500.getUrl()));
         index.addAll(getIndex1000());
 
-
         HashSet<String> codeSet = new HashSet<>(index.stream().map(EmCList::getF12Code).toList());
-
-
         List<EmCList> list = getClistDefaultSize(false);
         BigDecimal B_2 = new BigDecimal("-2");
         BigDecimal B5000_0000 = new BigDecimal("50000000");
 
-        List<EmCList> filterList = list.stream()
-                .filter(c ->
+        List<EmCList> filterList = list.stream().filter(c ->
                         codeSet.contains(c.getF12Code())
                                 && c.getF3Pct().compareTo(B_2) > 0
                                 && !c.getF14Name().contains("退")
                                 //成交额大于 5000万
-                                && c.getF6Amt().compareTo(B5000_0000) > 0
-                )
+                                && c.getF6Amt().compareTo(B5000_0000) > 0)
                 .toList();
 
         List<EmCList> emCLists = null;
@@ -375,6 +371,7 @@ public class EmClient {
 
     private List<EmCList> getIndexTp02() {
         //先拿到当天的缓存
+        log.info("getIndexTp02 非指数成份");
         String key = DateUtil.today();
         List<EmCList> cacheList = DATE_INDEX_TP02_MAP.get(key);
         if (cacheList != null && cacheList.size() > 0) return cacheList;
@@ -441,9 +438,11 @@ public class EmClient {
             ArrayList<BigDecimal> maList = new ArrayList<>(Arrays.asList(ma5[len], ma10[len], ma20[len], ma30[len], ma60[len], ma120[len], ma250[len]));
             Collections.sort(maList);
 
+            BigDecimal maMax = maList.get(maList.size() - 1);
             BigDecimal b098 = new BigDecimal("0.98");
 
-            if (b098.multiply(k.getClose()).compareTo(maList.get(maList.size() - 1)) > 0) {
+
+            if (k.getClose().compareTo(b098.multiply(maMax)) > 0 ) {
                 filterList.add(emCList);
             }
         }
