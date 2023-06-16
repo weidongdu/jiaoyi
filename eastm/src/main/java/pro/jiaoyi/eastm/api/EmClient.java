@@ -59,7 +59,9 @@ public class EmClient {
         String url = "http://push2his.eastmoney.com/api/qt/stock/kline/get?secid=" + secid
                 + "&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6"
                 + "&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61"
-                + "&klt=101&fqt=1" + "&end=" + end.toString().replace("-", "") + "&lmt=" + lmt;
+                + "&klt=101&fqt=1"
+                + "&end=" + end.toString().replace("-", "")
+                + "&lmt=" + lmt;
 
         //bk行情处理
         if (code.startsWith("90")) {
@@ -359,14 +361,11 @@ public class EmClient {
                                 && c.getF6Amt().compareTo(B5000_0000) > 0)
                 .toList();
 
-        List<EmCList> emCLists = null;
         try {
-            emCLists = filterIndexTp02(filterList);
+            return filterIndexTp02(filterList, IndexEnum.IndexAll);
         } catch (InterruptedException e) {
             return Collections.emptyList();
         }
-        return (emCLists);
-
     }
 
     private List<EmCList> getIndexTp02() {
@@ -395,19 +394,17 @@ public class EmClient {
                         && !filterSet.contains(c.getF12Code())
                 )
                 .collect(Collectors.toList());
-        List<EmCList> emCLists = null;
         try {
-            emCLists = filterIndexTp02(filterList);
+            return filterIndexTp02(filterList, IndexEnum.O_TP02);
         } catch (InterruptedException e) {
             return Collections.emptyList();
         }
-        return (emCLists);
 
     }
 
-    public List<EmCList> filterIndexTp02(List<EmCList> list) throws InterruptedException {
+    public List<EmCList> filterIndexTp02(List<EmCList> list, IndexEnum indexEnum) throws InterruptedException {
         ArrayList<EmCList> filterList = new ArrayList<>();
-        DATE_INDEX_TP02_MAP.putIfAbsent(DateUtil.today(), filterList);
+        DATE_INDEX_TP02_MAP.putIfAbsent(DateUtil.today() + indexEnum.getType(), filterList);
 
         AtomicInteger count = new AtomicInteger(0);
         for (EmCList emCList : list) {
@@ -441,8 +438,8 @@ public class EmClient {
             BigDecimal maMax = maList.get(maList.size() - 1);
             BigDecimal b098 = new BigDecimal("0.98");
 
-
-            if (k.getClose().compareTo(b098.multiply(maMax)) > 0 ) {
+            if (k.getClose().compareTo(b098.multiply(maMax)) > 0) {
+                //过滤 距离均线之上最大不超过2%
                 filterList.add(emCList);
             }
         }
@@ -476,7 +473,6 @@ public class EmClient {
      * @return
      */
     private List<EmCList> getIndex1000() {
-//        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateUtil.PATTERN_yyyyMMdd_HHmm));
         String filePath = "zz1000_" + DateUtil.today() + ".xls";
         if (okHttpUtil.downloadFile(IndexEnum.ZZ1000.getUrl(), null, filePath)) {
             List<EmCList> list = new ArrayList<>();
