@@ -109,6 +109,7 @@ public class EmRealTimeClient {
     public boolean tu(List<EmDailyK> dailyKs, int daysHigh, int boxDays, double boxDaysFactor) {
         if (dailyKs.size() < 60) return false;
 
+
         BigDecimal[] closeArr = dailyKs.stream().map(EmDailyK::getClose).toList().toArray(new BigDecimal[0]);
         BigDecimal[] ma5 = MaUtil.ma(5, closeArr, 3);
         BigDecimal[] ma10 = MaUtil.ma(10, closeArr, 3);

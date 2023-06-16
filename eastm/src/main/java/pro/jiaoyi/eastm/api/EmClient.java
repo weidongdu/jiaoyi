@@ -6,12 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.model.KPeriod;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
 import pro.jiaoyi.eastm.config.IndexEnum;
 import pro.jiaoyi.eastm.model.*;
+import pro.jiaoyi.eastm.util.EmMaUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -421,15 +421,15 @@ public class EmClient {
 
             EmDailyK k = ks.get(ks.size() - 1);
             //过滤 均线之上
-            BigDecimal[] priceArr = ks.stream().map(EmDailyK::getClose).toList().toArray(new BigDecimal[0]);
 
-            BigDecimal[] ma5 = MaUtil.ma(5, priceArr, 3);
-            BigDecimal[] ma10 = MaUtil.ma(10, priceArr, 3);
-            BigDecimal[] ma20 = MaUtil.ma(20, priceArr, 3);
-            BigDecimal[] ma30 = MaUtil.ma(30, priceArr, 3);
-            BigDecimal[] ma60 = MaUtil.ma(60, priceArr, 3);
-            BigDecimal[] ma120 = MaUtil.ma(120, priceArr, 3);
-            BigDecimal[] ma250 = MaUtil.ma(250, priceArr, 3);
+            Map<String, BigDecimal[]> ma = EmMaUtil.ma(ks);
+            BigDecimal[] ma5 = ma.get("ma5");
+            BigDecimal[] ma10 = ma.get("ma10");
+            BigDecimal[] ma20 = ma.get("ma20");
+            BigDecimal[] ma30 = ma.get("ma30");
+            BigDecimal[] ma60 = ma.get("ma60");
+            BigDecimal[] ma120 = ma.get("ma120");
+            BigDecimal[] ma250 = ma.get("ma250");
 
             int len = ma5.length - 1;
             ArrayList<BigDecimal> maList = new ArrayList<>(Arrays.asList(ma5[len], ma10[len], ma20[len], ma30[len], ma60[len], ma120[len], ma250[len]));
@@ -525,6 +525,8 @@ public class EmClient {
         }
         return total.divide(BigDecimal.valueOf(avg), 0, RoundingMode.HALF_UP);
     }
+
+
 
     public static final Map<String, String> headerMap = new HashMap<>();
 

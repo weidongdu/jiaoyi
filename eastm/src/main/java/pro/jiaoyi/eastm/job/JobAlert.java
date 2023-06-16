@@ -4,13 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.api.EmRealTimeClient;
 import pro.jiaoyi.eastm.config.WxUtil;
 import pro.jiaoyi.eastm.model.EastSpeedInfo;
 import pro.jiaoyi.eastm.model.EmDailyK;
+import pro.jiaoyi.eastm.util.EmMaUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -94,15 +94,15 @@ public class JobAlert {
 
                 boolean tu = emRealTimeClient.tu(dailyKs, 60, 60, 0.4d);
                 if (tu) {
-                    BigDecimal[] closeArr = dailyKs.stream().map(EmDailyK::getClose).toList().toArray(new BigDecimal[0]);
+                    Map<String, BigDecimal[]> ma = EmMaUtil.ma(dailyKs);
 
-                    BigDecimal[] ma5 = MaUtil.ma(5, closeArr, 3);
-                    BigDecimal[] ma10 = MaUtil.ma(10, closeArr, 3);
-                    BigDecimal[] ma20 = MaUtil.ma(20, closeArr, 3);
-                    BigDecimal[] ma30 = MaUtil.ma(30, closeArr, 3);
-                    BigDecimal[] ma60 = MaUtil.ma(60, closeArr, 3);
-                    BigDecimal[] ma120 = MaUtil.ma(120, closeArr, 3);
-                    BigDecimal[] ma250 = MaUtil.ma(250, closeArr, 3);
+                    BigDecimal[] ma5 = ma.get("ma5");
+                    BigDecimal[] ma10 = ma.get("ma10");
+                    BigDecimal[] ma20 = ma.get("ma20");
+                    BigDecimal[] ma30 = ma.get("ma30");
+                    BigDecimal[] ma60 = ma.get("ma60");
+                    BigDecimal[] ma120 = ma.get("ma120");
+                    BigDecimal[] ma250 = ma.get("ma250");
 
                     BigDecimal ma5_value = ma5[ma5.length - 1];
                     BigDecimal ma10_value = ma10[ma10.length - 1];
