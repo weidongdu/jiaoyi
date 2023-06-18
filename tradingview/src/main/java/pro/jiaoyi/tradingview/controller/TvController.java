@@ -29,14 +29,21 @@ public class TvController {
         TvChart tvChart = tvService.getTvChart(code, codeType, LocalDate.now(), 500);
         return tvChart;
     }
+    @GetMapping("/chart/random")
+    public TvChart tvChartRandom() {
+        return tvService.getTvChartRandom();
+    }
+    @GetMapping("/chart/random/after")
+    public TvChart tvChartRandomAfter(String code, @RequestParam("time") String hitDateStr) {
+        return tvService.getTvChartRandom(code, hitDateStr);
+    }
 
     @GetMapping("/stockList")
     public Map<String, List<String>> getLists(Boolean sync) {
         if (sync == null) {
             sync = false;
         }
-        Map<String, List<String>> allIndex = tvService.getAllIndex(sync);
-        return allIndex;
+        return tvService.getAllIndex(sync);
     }
 
 //

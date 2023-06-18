@@ -81,83 +81,16 @@ function update(code, bk) {
         return;
     }
 
-    getTvChart(code, (data) => {
-        // console.log(data.k);
-        if (data && data.k && data.k.length > 0) {
-            k = data.k[data.k.length - 1];
-            v = data.v[data.v.length - 1];
-            p = data.p[data.p.length - 1];
-            lastDay = k.time;
-            lastCode = data.code;
-            //判断是否切换了板块bk
-            if (bk && lastBk !== data.bk) {
-                // alert(lastBk + " -> " + data.bk);
+    getTvChart(code, renderChart);
+}
 
-                // <div class="notification is-danger is-light">
-                //   <button class="delete"></button>
-                //   Primar lorem ipsum dolor sit amet, consectetur
-                //   adipiscing elit lorem ipsum dolor. <strong>Pellentesque risus mi</strong>, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum <a>felis venenatis</a> efficitur.
-                // </div>
+//获取随机股票 (次日涨幅 > 7%)
+function updateR() {
+    getTvChartRandom(renderChart);
+}
 
-                notify(data.bk);
-
-
-                lastBk = data.bk;
-                //获取板块图
-                getTvChart(data.bk + "&codeType=BkValue", (data) => {
-                    index--;
-                    updateChartData(data, {
-                        kSeries,
-                        ma5Series,
-                        ma10Series,
-                        ma20Series,
-                        ma30Series,
-                        ma60Series,
-                        ma120Series,
-                        ma250Series,
-                        upSeries,
-                        dnSeries,
-                        volumeSeries,
-                        // ma5VolumeSeries,
-                        ma60VolumeSeries,
-                        pctSeries,
-                        hslSeries,
-                        ma5HslSeries,
-                        ma60HslSeries,
-                        oscSeries,
-                        ma5OscSeries,
-                        ma60OscSeries,
-                    })
-                })
-
-            } else {
-                updateChartData(data, {
-                    kSeries,
-                    ma5Series,
-                    ma10Series,
-                    ma20Series,
-                    ma30Series,
-                    ma60Series,
-                    ma120Series,
-                    ma250Series,
-                    upSeries,
-                    dnSeries,
-                    volumeSeries,
-                    // ma5VolumeSeries,
-                    ma60VolumeSeries,
-                    pctSeries,
-                    hslSeries,
-                    ma5HslSeries,
-                    ma60HslSeries,
-                    oscSeries,
-                    ma5OscSeries,
-                    ma60OscSeries,
-                })
-            }
-        }
-
-
-    });
+function updateRandomAfter() {
+    getTvChartRandomAfter(renderChart);
 }
 
 
@@ -260,6 +193,15 @@ $(document).keydown(function (e) {
         getStockListByType(type);
     }
 
+
+    if (186 === e.keyCode) {//186 ;
+        updateR();
+    }
+    if (222 === e.keyCode) {//222 '
+        updateRandomAfter();
+    }
+
+
 });
 
 function mock() {
@@ -342,5 +284,83 @@ function singleStockChart() {
         // chart(code, 500);
         update(code);
     }
+
+}
+
+
+const renderChart = (data) => {
+    // console.log(data.k);
+    if (data && data.k && data.k.length > 0) {
+        k = data.k[data.k.length - 1];
+        v = data.v[data.v.length - 1];
+        p = data.p[data.p.length - 1];
+        lastDay = k.time;
+        lastCode = data.code;
+        //判断是否切换了板块bk
+        let bk = false;
+        if (bk && lastBk !== data.bk) {
+            // alert(lastBk + " -> " + data.bk);
+
+            // <div class="notification is-danger is-light">
+            //   <button class="delete"></button>
+            //   Primar lorem ipsum dolor sit amet, consectetur
+            //   adipiscing elit lorem ipsum dolor. <strong>Pellentesque risus mi</strong>, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum <a>felis venenatis</a> efficitur.
+            // </div>
+
+            notify(data.bk);
+
+
+            lastBk = data.bk;
+            //获取板块图
+            getTvChart(data.bk + "&codeType=BkValue", (data) => {
+                index--;
+                updateChartData(data, {
+                    kSeries,
+                    ma5Series,
+                    ma10Series,
+                    ma20Series,
+                    ma30Series,
+                    ma60Series,
+                    ma120Series,
+                    ma250Series,
+                    upSeries,
+                    dnSeries,
+                    volumeSeries, // ma5VolumeSeries,
+                    ma60VolumeSeries,
+                    pctSeries,
+                    hslSeries,
+                    ma5HslSeries,
+                    ma60HslSeries,
+                    oscSeries,
+                    ma5OscSeries,
+                    ma60OscSeries,
+                })
+            })
+
+        } else {
+            updateChartData(data, {
+                kSeries,
+                ma5Series,
+                ma10Series,
+                ma20Series,
+                ma30Series,
+                ma60Series,
+                ma120Series,
+                ma250Series,
+                upSeries,
+                dnSeries,
+                volumeSeries, // ma5VolumeSeries,
+                ma60VolumeSeries,
+                pctSeries,
+                hslSeries,
+                ma5HslSeries,
+                ma60HslSeries,
+                oscSeries,
+                ma5OscSeries,
+                ma60OscSeries,
+            })
+        }
+    }
+
 
 }

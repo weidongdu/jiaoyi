@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.eastm.api.EmClient;
+import pro.jiaoyi.eastm.config.IndexEnum;
+import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
 import pro.jiaoyi.tradingview.config.Colors;
 import pro.jiaoyi.tradingview.model.TvChart;
@@ -30,10 +32,27 @@ public class TvTransUtil {
      *
      * @param ks
      */
+
+
+    List<String> indexCYCF = null;
+    List<String> indexHS300 = null;
+    List<String> indexZZ500 = null;
+    List<String> indexZZ1000 = null;
+
+
     public TvChart tranEmDailyKLineToTv(List<EmDailyK> ks) {
         if (ks == null || ks.size() == 0) {
             return null;
         }
+
+        if (indexCYCF == null)
+            indexCYCF = emClient.getIndex(IndexEnum.CYCF, false).stream().map(EmCList::getF12Code).toList();
+        if (indexHS300 == null)
+            indexHS300 = emClient.getIndex(IndexEnum.HS300, false).stream().map(EmCList::getF12Code).toList();
+        if (indexZZ500 == null)
+            indexZZ500 = emClient.getIndex(IndexEnum.ZZ500, false).stream().map(EmCList::getF12Code).toList();
+        if (indexZZ1000 == null)
+            indexZZ1000 = emClient.getIndex(IndexEnum.ZZ1000, false).stream().map(EmCList::getF12Code).toList();
 
         TvChart tvChart = new TvChart();
 
@@ -48,6 +67,7 @@ public class TvTransUtil {
         tvChart.setP(pList);
         tvChart.setOsc(oscList);
         tvChart.setV(vList);
+
         tvChart.setHsl(hslList);
 
         //设置limit line
@@ -67,6 +87,17 @@ public class TvTransUtil {
                 tvChart.setName(k.getName());
                 tvChart.setCcList(Collections.singletonList(emClient.getBkValueByStockCode(k.getCode())));
                 tvChart.setBk(k.getBk());
+                String cf = "";
+                if (indexCYCF.contains(k.getCode())) {
+                    cf += IndexEnum.CYCF.getName();
+                } else if (indexHS300.contains(k.getCode())) {
+                    cf += IndexEnum.HS300.getName();
+                } else if (indexZZ500.contains(k.getCode())) {
+                    cf += IndexEnum.ZZ500.getName();
+                } else if (indexZZ1000.contains(k.getCode())) {
+                    cf += IndexEnum.ZZ1000.getName();
+                }
+                tvChart.setCf(cf);
             }
 
             String time = DateUtil.strToLocalDate(k.getTradeDate(), DateUtil.PATTERN_yyyyMMdd).toString();
@@ -83,6 +114,8 @@ public class TvTransUtil {
             limitDnList.add(dnLine);
 
             if (i == ks.size() - 1) {
+
+
                 LocalDate localDate = DateUtil.strToLocalDate(k.getTradeDate(), DateUtil.PATTERN_yyyyMMdd);
                 for (int j = 1; j < 10; j++) {
 
@@ -130,6 +163,17 @@ public class TvTransUtil {
             tvVol.setValue(k.getAmt().setScale(0, RoundingMode.HALF_UP));
             tvVol.setColor(color);
             vList.add(tvVol);
+
+            if (i == ks.size() - 1) {
+                BigDecimal value = vList.get(i).getValue();
+                String w = "万";
+                BigDecimal bw = new BigDecimal(10000);
+                String y = "亿";
+                BigDecimal by = bw.multiply(bw);
+                tvChart.setVStr(value.compareTo(by) > 0 ?
+                        value.divide(by, 2, RoundingMode.HALF_UP) + y
+                        : value.divide(bw, 2, RoundingMode.HALF_UP) + w);
+            }
 
             //换手率数据
             TvVol tvHsl = new TvVol();

@@ -103,7 +103,7 @@ function updateChartData(data, series) {
     //         bk += data.ccList[i]
     //     }
     // }
-    let name = data.name +" "+ bk;
+    let name = data.name + " " + data.vstr + " " + bk + " " + data.cf;
     $("#iName").val(name);
 
     let row = $("#iLegendRow");

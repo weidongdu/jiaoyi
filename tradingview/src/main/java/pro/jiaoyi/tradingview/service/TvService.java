@@ -3,12 +3,17 @@ package pro.jiaoyi.tradingview.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.config.IndexEnum;
 import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
+import pro.jiaoyi.tradingview.config.Colors;
 import pro.jiaoyi.tradingview.model.TvChart;
+import pro.jiaoyi.tradingview.model.chart.Constants;
+import pro.jiaoyi.tradingview.model.chart.TvMarker;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -67,5 +72,105 @@ public class TvService {
             map.put(value.getType(), codeList);
         }
         return map;
+    }
+
+
+    public TvChart getTvChartRandom(String code, String hitDateString) {
+        List<EmDailyK> dailyKs = emClient.getDailyKs(code, LocalDate.now(), 500, false);
+        LocalDate localDate = DateUtil.strToLocalDate(hitDateString, "yyyy-MM-dd");
+        int index = 0;
+        for (int i = 0; i < dailyKs.size(); i++) {
+            LocalDate td = DateUtil.strToLocalDate(dailyKs.get(i).getTradeDate(), "yyyyMMdd");
+            if (td.isEqual(localDate)) {
+                index = i;
+            }
+        }
+
+        int end = Math.min(index + 2, dailyKs.size() - 1);
+        TvChart tvChart = tvTransUtil.tranEmDailyKLineToTv(dailyKs.subList(0, end));
+
+        List<TvMarker> mks = tvChart.getMks();
+//        int mkIndex = 0;
+//        for (int i = 0; i < mks.size(); i++) {
+//            TvMarker mk = mks.get(i);
+//            String time = mk.getTime();
+//            LocalDate td = DateUtil.strToLocalDate(time, "yyyy-MM-dd");
+//            if (td.isEqual(localDate)) {
+//                mkIndex = i;
+//                break;
+//            }
+//        }
+//
+//        if (mkIndex == 0) {
+//            //没有 对应在maker 创建新的 并插入
+//
+//            TvMarker tvMarker = new TvMarker();
+//            tvMarker.setColor(Colors.WHITE.getColor());
+//            tvMarker.setPosition(Constants.MARKER_POSITION_ABOVEBAR);
+//            tvMarker.setShape(Constants.MARKER_SHAPE_ARROW_DOWN);
+//            tvMarker.setText("⬇");
+//            tvMarker.setTime(hitDateString);
+//            mks.add(tvMarker);
+//        } else {
+//            TvMarker tvMarker = mks.get(mkIndex);
+//            tvMarker.setColor(Colors.WHITE.getColor());
+//            tvMarker.setPosition(Constants.MARKER_POSITION_ABOVEBAR);
+//            tvMarker.setShape(Constants.MARKER_SHAPE_ARROW_DOWN);
+//            tvMarker.setText("⬇");
+//        }
+
+        for (int i = 0; i < 2; i++) {
+            TvMarker tvMarker = new TvMarker();
+            tvMarker.setColor(Colors.WHITE.getColor());
+            tvMarker.setPosition(Constants.MARKER_POSITION_ABOVEBAR);
+            tvMarker.setShape(Constants.MARKER_SHAPE_ARROW_DOWN);
+            tvMarker.setText("⬇");
+            tvMarker.setTime(hitDateString);
+            mks.add(tvMarker);
+        }
+
+
+
+        // mks 排序, 按 time 转换成 LocalDate 先后
+        mks.sort(Comparator.comparing(o -> DateUtil.strToLocalDate(o.getTime(), "yyyy-MM-dd")));
+
+        return tvChart;
+    }
+
+    public TvChart getTvChartRandom() {
+        List<EmCList> clistDefaultSize = emClient.getClistDefaultSize(false);
+        int size = clistDefaultSize.size();
+        Random random = new Random();
+        int i = random.nextInt(size);
+
+        int count = 0;
+        while (i == size && count < 10) {
+            i = random.nextInt(size);
+            count++;
+        }
+
+        String f12Code = clistDefaultSize.get(i).getF12Code();
+        List<EmDailyK> dailyKs = emClient.getDailyKs(f12Code, LocalDate.now(), 500, false);
+
+        if (dailyKs.size() <= 120) {
+            return getTvChartRandom();
+        }
+
+        for (int j = 120; j < dailyKs.size(); j++) {
+            if (dailyKs.get(j).getPct().compareTo(new BigDecimal(7)) > 0) {
+                // 120 个交易日之后，涨幅超过 7% 的股票
+                return tvTransUtil.tranEmDailyKLineToTv(dailyKs.subList(0, j));
+            }
+        }
+
+        return getTvChartRandom();
+    }
+
+    public static void main(String[] args) {
+        // 1 - 10
+        ArrayList<Integer> ls = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+
+        System.out.println(ls.subList(0, 5));
+
     }
 }

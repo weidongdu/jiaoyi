@@ -5,8 +5,10 @@ public enum Colors {
     //黄色
     YELLOW("#fff203","黄色"),
     BLUE("#00c2ff","黄色"),
+    WHITE("#FFFFFF","白色"),
     RED("#EA463C","红色"),
     GREEN("#76D770","绿色");
+
 
     private String color;
     private String desc;
