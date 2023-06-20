@@ -36,7 +36,7 @@ public class JobAlert {
         TIP += "<br>卖出: 小幅整理期,震荡底部";
         TIP += "<br>卖出: 趋势未结束,底仓持有";
         TIP += "<br>卖出: 交易有盈利,浮动止盈";
-        TIP += "<br>买入: 计划内的票,谨慎开仓";
+        TIP += "<br>买入: 计划外的票,谨慎开仓";
     }
 
     @Autowired
