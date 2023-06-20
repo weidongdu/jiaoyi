@@ -96,7 +96,7 @@ public class EmRealTimeClient {
 
             if (eastSpeedInfo.getSpeed_f22().compareTo(BigDecimal.ONE) > 0
                     && eastSpeedInfo.getPct_f3().compareTo(BigDecimal.ZERO) > 0
-                    && eastSpeedInfo.getPct_f3().compareTo(new BigDecimal("3.5")) < 0
+                    && eastSpeedInfo.getPct_f3().compareTo(new BigDecimal("2.5")) < 0
                     && !eastSpeedInfo.getName_f14().contains("ST")) {
                 list.add(eastSpeedInfo);
             }
