@@ -28,6 +28,17 @@ public class JobAlert {
     //监控 放量有涨速
 
 
+    public static String TIP ="";
+
+
+    static {
+        TIP += "<br>卖出: 成本价附近,昨日低点";
+        TIP += "<br>卖出: 小幅整理期,震荡底部";
+        TIP += "<br>卖出: 趋势未结束,底仓持有";
+        TIP += "<br>卖出: 交易有盈利,浮动止盈";
+        TIP += "<br>买入: 计划内的票,谨慎开仓";
+    }
+
     @Autowired
     private EmRealTimeClient emRealTimeClient;
     @Autowired
@@ -64,12 +75,7 @@ public class JobAlert {
         Integer am = DAY_COUNT_MAP.get(LocalDate.now() + AM);
         if (am == null) {
             String content = "监控启动" + LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateUtil.PATTERN_yyyy_MM_dd+ "_"+ DateUtil.PATTERN_HH_mm_ss));
-            content += "<br>卖出: 成本价附近,昨日低点";
-            content += "<br>卖出: 小幅整理期,震荡底部";
-            content += "<br>卖出: 趋势未结束,底仓持有";
-            content += "<br>卖出: 交易有盈利,浮动止盈";
-            content += "<br>买入: 计划内的票,谨慎开仓";
-
+            content += TIP;
             wxUtil.send(content);
             DAY_COUNT_MAP.put(LocalDate.now() + AM, 1);
         }

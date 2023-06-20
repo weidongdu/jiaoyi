@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pro.jiaoyi.eastm.api.EmClient;
+import pro.jiaoyi.eastm.job.JobAlert;
 import pro.jiaoyi.eastm.model.EmDailyK;
 
 import java.math.BigDecimal;
@@ -30,6 +31,13 @@ public class StockController {
         BigDecimal amtHour = amtDay.divide(new BigDecimal(4), 2, RoundingMode.HALF_UP);
         jsonObject.put("vol", amtHour);
         return jsonObject;
+    }
+
+
+    @GetMapping("/tip")
+    public String tip(String tip){
+        JobAlert.TIP = tip;
+        return JobAlert.TIP;
     }
 }
 
