@@ -210,7 +210,8 @@ public class EmClient {
         if (clist.size() > 0) {
             DATE_LIST_MAP.put(DateUtil.today(), clist);
         }
-        return clist;
+
+        return clist.stream().filter(e -> !(e.getF12Code().startsWith("8") || e.getF14Name().contains("ST") || e.getF14Name().contains("退"))).toList();
     }
 
     public String getBkValueByStockCode(String code) {
@@ -324,12 +325,13 @@ public class EmClient {
                 return getIndex1000();
             case IndexAll:
                 return sync ? getIndexAll() : Collections.emptyList();
+            case IndexAll_Filter:
+                return getIndexAllFilter();
             case O_TP7:
                 return getIndexTp7();
             case O_TP02:
                 //遍历当天数据
                 return sync ? getIndexTp02() : Collections.emptyList();
-
             case O_BK:
                 List<EmCList> bkList = getIndex(IndexEnum.O_BK.getUrl());
                 initBkMap(bkList);
@@ -339,6 +341,16 @@ public class EmClient {
             default:
                 return Collections.emptyList();
         }
+    }
+
+
+    private List<EmCList> getIndexAllFilter() {
+        log.info("getIndexAll 指数成份");
+        List<EmCList> index = getIndex(IndexEnum.CYCF.getUrl());
+        index.addAll(getIndex(IndexEnum.HS300.getUrl()));
+        index.addAll(getIndex(IndexEnum.ZZ500.getUrl()));
+        index.addAll(getIndex1000());
+        return index;
     }
 
     private List<EmCList> getIndexAll() {
@@ -525,7 +537,6 @@ public class EmClient {
         }
         return total.divide(BigDecimal.valueOf(avg), 0, RoundingMode.HALF_UP);
     }
-
 
 
     public static final Map<String, String> headerMap = new HashMap<>();

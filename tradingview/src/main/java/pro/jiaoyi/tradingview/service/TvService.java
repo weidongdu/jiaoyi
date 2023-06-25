@@ -8,6 +8,7 @@ import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.config.IndexEnum;
 import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
+import pro.jiaoyi.eastm.util.EmMaUtil;
 import pro.jiaoyi.tradingview.config.Colors;
 import pro.jiaoyi.tradingview.model.TvChart;
 import pro.jiaoyi.tradingview.model.chart.Constants;
@@ -152,14 +153,32 @@ public class TvService {
         String f12Code = clistDefaultSize.get(i).getF12Code();
         List<EmDailyK> dailyKs = emClient.getDailyKs(f12Code, LocalDate.now(), 500, false);
 
-        if (dailyKs.size() <= 120) {
+        if (dailyKs.size() <= 250) {
             return getTvChartRandom();
         }
 
+        Map<String, BigDecimal[]> ma = EmMaUtil.ma(dailyKs);
+        BigDecimal[] ma5 = ma.get("ma5");
+        BigDecimal[] ma10 = ma.get("ma10");
+        BigDecimal[] ma20 = ma.get("ma20");
+        BigDecimal[] ma30 = ma.get("ma30");
+        BigDecimal[] ma60 = ma.get("ma60");
+        BigDecimal[] ma120 = ma.get("ma120");
+        BigDecimal[] ma250 = ma.get("ma250");
+
         for (int j = 120; j < dailyKs.size(); j++) {
+
+
             if (dailyKs.get(j).getPct().compareTo(new BigDecimal(7)) > 0) {
-                // 120 个交易日之后，涨幅超过 7% 的股票
-                return tvTransUtil.tranEmDailyKLineToTv(dailyKs.subList(0, j));
+
+                ArrayList<BigDecimal> mas = new ArrayList<>(Arrays.asList(ma5[j-1], ma10[j-1], ma20[j-1], ma30[j-1], ma60[j-1], ma120[j-1], ma250[j-1]));
+                Collections.sort(mas);
+                BigDecimal maMax = mas.get(mas.size() - 1);
+
+                if (dailyKs.get(j-1).getClose().compareTo(new BigDecimal("0.98").multiply(maMax)) > 0){
+                    // 120 个交易日之后，涨幅超过 7% 的股票
+                    return tvTransUtil.tranEmDailyKLineToTv(dailyKs.subList(0, j));
+                }
             }
         }
 
