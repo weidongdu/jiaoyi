@@ -12,3 +12,6 @@ logging:
   level:
     pro:
       jiaoyi: DEBUG
+
+bn:
+  top: 50
