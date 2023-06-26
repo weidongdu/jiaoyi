@@ -29,6 +29,7 @@
         <module>common</module>
         <module>eastm</module>
         <module>tradingview</module>
+        <module>bn</module>
     </modules>
 
 

@@ -211,7 +211,7 @@ public class EmClient {
             DATE_LIST_MAP.put(DateUtil.today(), clist);
         }
 
-        return clist.stream().filter(e -> !(e.getF12Code().startsWith("8") || e.getF14Name().contains("ST") || e.getF14Name().contains("退"))).toList();
+        return clist.stream().filter(e -> !(e.getF12Code().startsWith("8") ||  e.getF14Name().contains("ST") || e.getF14Name().contains("退"))).toList();
     }
 
     public String getBkValueByStockCode(String code) {

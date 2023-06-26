@@ -53,20 +53,28 @@ public class OkHttpUtil {
         return builder.build();
     }
 
-    /**
-     * 构建请求 Request 包含请求体
-     *
-     * @param url
-     * @param headers
-     * @param body
-     * @return
-     */
     public Request buildRequest(String url, Map<String, String> headers, RequestBody body) {
         Request.Builder reqBuilder = new Request.Builder().url(url);
         if (headers != null) {
             headers.forEach(reqBuilder::addHeader);
         }
         return reqBuilder.post(body).build();
+    }
+
+
+
+    public Request buildRequest(String url, Map<String, String> headerMap, String method) {
+        Request.Builder requestBuilder = new Request.Builder();
+        if (headerMap != null && !headerMap.keySet().isEmpty()) {
+            headerMap.forEach(requestBuilder::header);
+        }
+        if ("DELETE".equals(method) || "PUT".equals(method)) {
+            return requestBuilder.url(url).method(method, null).build();
+        }
+        if ("POST".equals(method)) {
+            return requestBuilder.url(url).method(method, RequestBody.create(new byte[0])).build();
+        }
+        return requestBuilder.url(url).build();
     }
 
 
@@ -91,7 +99,7 @@ public class OkHttpUtil {
         }
     }
 
-    private byte[] sendDefault(Request request) {
+    public byte[] sendDefault(Request request) {
         HttpUrl url = request.url();
         //发送请求
         try (Response response = client.newCall(request).execute()) {
@@ -176,4 +184,16 @@ public class OkHttpUtil {
         }
         return false;
     }
+//
+//    public byte[] sendRequest(Request request) throws IOException {
+//        log.info("request url={}", request.url());
+//        try (Response response = client.newCall(request).execute()) {
+//            log.info("response code={} message={}", response.code(), response.message());
+//            if (response.isSuccessful()) {
+//                return Objects.requireNonNull(response.body()).bytes();
+//            }
+//            log.error("response fail");
+//            return EMPTY_BYTE_ARRAY;
+//        }
+//    }
 }

@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class DateUtil {
+    public static final String PATTERN_yyyyMMdd_HH_mm_ss = "yyyyMMdd_HH:mm:ss";
     public static final String PATTERN_yyyyMMdd = "yyyyMMdd";
     public static final String PATTERN_yyyyMMdd_HHmm = "yyyyMMdd_HHmm";
     public static final String PATTERN_yyyy_MM_dd = "yyyy-MM-dd";
@@ -41,6 +42,16 @@ public class DateUtil {
 
     public static String today() {
         return LocalDate.now().toString().replace("-", "");
+    }
+
+
+    public static String tsToStr(long ts, String pattern){
+        /*
+         * timestamp -> string pattern=pattern
+         */
+        Instant instant = Instant.ofEpochMilli(ts); // 将时间戳转为 Instant 对象
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern); // 定义格式化器
+        return formatter.format(instant.atZone(ZoneId.systemDefault()));
     }
 
     public static void main(String[] args) {
