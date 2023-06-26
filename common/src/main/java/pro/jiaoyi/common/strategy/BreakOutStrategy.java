@@ -44,10 +44,10 @@ public class BreakOutStrategy {
         //突破分2个方向
         //1. 向上突破
 
-        String MAUP = "[MAUP]";
+        String side = "[MAUP]";
         int keep = 2;
         if (k.getPct().compareTo(BigDecimal.ZERO) > 0) {
-            log.info("{}pct {} > 0 ", MAUP, k.getPct());
+            log.info("{}pct {} > 0 ", side, k.getPct());
             //均线向上发散  keep2
             int keepCount = 0;
             for (int i = 0; i < keep; i++) {
@@ -60,7 +60,7 @@ public class BreakOutStrategy {
             }
 
             if (keepCount == keep) {//满足发散
-                log.info("{}满足发散up keepCount {}", MAUP, keepCount);
+                log.info("{}满足发散 keepCount {}", side, keepCount);
                 //判断箱体
                 int boxCount = 0;
                 int highCount = 0;
@@ -72,18 +72,18 @@ public class BreakOutStrategy {
                     //1, 判断 x days 新高
                     if (preK.getHigh().compareTo(k.getClose()) > 0) {
                         highCount = i;
-                        log.info("{}新高Stop {}", MAUP, i);
+                        log.info("{}新高Stop {}", side, i);
                         break;
                     }
 
                     if (i == last - 1) {
-                        log.info("{}新高Stop {}", MAUP, i);
+                        log.info("{}新高Stop {}", side, i);
                         highCount = i;
                     }
                 }
 
                 if (highCount > daysHigh) {
-                    log.info("{}新高{} > days{}", MAUP, highCount, daysHigh);
+                    log.info("{}新高{} > days{}", side, highCount, daysHigh);
                     BigDecimal bHighCount = new BigDecimal(highCount);
                     // 新高满足
                     //开始判断box
@@ -102,10 +102,10 @@ public class BreakOutStrategy {
                     BigDecimal lMin = l.stream().min(BigDecimal::compareTo).get();
                     BigDecimal diff = hMax.subtract(lMin);
                     BigDecimal rangePct = diff.divide(lMin, 4, RoundingMode.HALF_UP);
-                    log.info("{}hMax={} lMin={} diff={} rangePct={}", MAUP, hMax, lMin, diff, rangePct);
+                    log.info("{}hMax={} lMin={} diff={} rangePct={}", side, hMax, lMin, diff, rangePct);
 
                     if (rangePct.compareTo(BDUtil.b0_2) < 0) {
-                        log.info("{}rangePct {} < {}", MAUP, rangePct, BDUtil.b0_2);
+                        log.info("{}rangePct {} < {}", side, rangePct, BDUtil.b0_2);
                         //BOX
                         //1, up down range 20%
                         //2, high point size > 1/10
@@ -116,11 +116,11 @@ public class BreakOutStrategy {
                         long hAreaCount = h.stream().filter(b -> b.compareTo(hArea) > 0).count();
                         long lAreaCount = h.stream().filter(b -> b.compareTo(lArea) < 0).count();
                         BigDecimal areaSize = BDUtil.b0_1.multiply(bHighCount);
-                        log.info("{}hAreaCount={} lAreaCount={} areaSize={}", MAUP, hAreaCount, lAreaCount, areaSize);
+                        log.info("{}hAreaCount={} lAreaCount={} areaSize={}", side, hAreaCount, lAreaCount, areaSize);
                         if (new BigDecimal(hAreaCount).compareTo(areaSize) > 0
                                 && new BigDecimal(lAreaCount).compareTo(areaSize) > 0) {
                             //box fit
-                            log.warn("{}hit box up", MAUP);
+                            log.warn("{}hit box up", side);
                             return true;
                         }
 
@@ -130,7 +130,7 @@ public class BreakOutStrategy {
                         BigDecimal lMinLocationPct = new BigDecimal(lMinLocation).divide(bHighCount, 4, RoundingMode.HALF_UP);
                         if (lMinLocationPct.compareTo(BDUtil.b0_4) > 0 && lMinLocationPct.compareTo(BDUtil.b0_6) < 0) {
                             //中间低
-                            log.info("{}curve lMinLocationPct={} range {}-{} ", MAUP, lMinLocationPct, BDUtil.b0_4, BDUtil.b0_6);
+                            log.info("{}curve lMinLocationPct={} range {}-{} ", side, lMinLocationPct, BDUtil.b0_4, BDUtil.b0_6);
                             BigDecimal highPct10 = hMax.subtract(diff.multiply(BDUtil.b0_1));
                             int count = 0;
                             for (int i = 0; i < 2; i++) {
@@ -141,7 +141,7 @@ public class BreakOutStrategy {
                             }
                             if (count == 2) {
                                 //fit curve
-                                log.warn("{}hit curve up", MAUP);
+                                log.warn("{}hit curve up", side);
                                 return true;
                             }
                         }
@@ -154,6 +154,8 @@ public class BreakOutStrategy {
 
         //2. 向下突破
         if (k.getPct().compareTo(BigDecimal.ZERO) < 0) {
+            side = "[MADOWN]";
+            log.info("{}pct {} < 0 ", side, k.getPct());
             //均线向上发散  keep2
             int keepCount = 0;
             for (int i = 0; i < keep; i++) {
@@ -166,9 +168,93 @@ public class BreakOutStrategy {
             }
 
             if (keepCount == keep) {//满足发散
+                log.info("{}满足发散 keepCount {}", side, keepCount);
                 //判断箱体
+                int boxCount = 0;
+                int lowCount = 0;
+                //从最后向前遍历
+                //找到最高点> k.getClose
+                for (int i = 1; i < last; i++) {
+                    int index = last - i;
+                    K preK = dailyKs.get(index);
+                    //1, 判断 x days 新高
+                    if (preK.getLow().compareTo(k.getClose()) < 0) {
+                        lowCount = i;
+                        log.info("{}新低Stop {}", side, i);
+                        break;
+                    }
+
+                    if (i == last - 1) {
+                        log.info("{}新低Stop {}", side, i);
+                        lowCount = i;
+                    }
+                }
+
+                if (lowCount > daysHigh) {
+                    log.info("{}新低{} > days{}", side, lowCount, daysHigh);
+                    BigDecimal bLowCount = new BigDecimal(lowCount);
+                    // 新高满足
+                    //开始判断box
+                    ArrayList<BigDecimal> h = new ArrayList<>();
+                    ArrayList<BigDecimal> l = new ArrayList<>();
+                    for (int i = 1; i < lowCount; i++) {
+                        int index = last - i;
+                        K preK = dailyKs.get(index);
+                        h.add(preK.getHigh());
+                        l.add(preK.getLow());
+                    }
 
 
+                    //获取 list max
+                    BigDecimal hMax = h.stream().max(BigDecimal::compareTo).get();
+                    BigDecimal lMin = l.stream().min(BigDecimal::compareTo).get();
+                    BigDecimal diff = hMax.subtract(lMin);
+                    BigDecimal rangePct = diff.divide(lMin, 4, RoundingMode.HALF_UP);
+                    log.info("{}hMax={} lMin={} diff={} rangePct={}", side, hMax, lMin, diff, rangePct);
+
+                    if (rangePct.compareTo(BDUtil.b0_2) < 0) {
+                        log.info("{}rangePct {} < {}", side, rangePct, BDUtil.b0_2);
+                        //BOX
+                        //1, up down range 20%
+                        //2, high point size > 1/10
+                        //3, low point size > 1/10
+                        //range fit
+                        BigDecimal hArea = hMax.subtract(diff.multiply(BDUtil.b0_2));
+                        BigDecimal lArea = lMin.add(diff.multiply(BDUtil.b0_2));
+                        long hAreaCount = h.stream().filter(b -> b.compareTo(hArea) > 0).count();
+                        long lAreaCount = h.stream().filter(b -> b.compareTo(lArea) < 0).count();
+                        BigDecimal areaSize = BDUtil.b0_1.multiply(bLowCount);
+                        log.info("{}hAreaCount={} lAreaCount={} areaSize={}", side, hAreaCount, lAreaCount, areaSize);
+                        if (new BigDecimal(hAreaCount).compareTo(areaSize) > 0
+                                && new BigDecimal(lAreaCount).compareTo(areaSize) > 0) {
+                            //box fit
+                            log.warn("{}hit box up", side);
+                            return true;
+                        }
+
+                        //CURVE
+                        //两头高
+                        int hMaxLocation = h.indexOf(hMax);
+                        BigDecimal hMaxLocationPct = new BigDecimal(hMaxLocation).divide(bLowCount, 4, RoundingMode.HALF_UP);
+                        if (hMaxLocationPct.compareTo(BDUtil.b0_4) > 0 && hMaxLocationPct.compareTo(BDUtil.b0_6) < 0) {
+                            //中间低
+                            log.info("{}curve lMinLocationPct={} range {}-{} ", side, hMaxLocationPct, BDUtil.b0_4, BDUtil.b0_6);
+                            BigDecimal lowPct10 = lMin.add(diff.multiply(BDUtil.b0_1));
+                            int count = 0;
+                            for (int i = 0; i < 2; i++) {
+                                //前面2个
+                                if (l.get(i).compareTo(lowPct10) > 0) break;
+                                if (l.get(last - i).compareTo(lowPct10) > 0) break;
+                                count++;
+                            }
+                            if (count == 2) {
+                                //fit curve
+                                log.warn("{}hit curve up", side);
+                                return true;
+                            }
+                        }
+                    }
+                }
                 //判断曲线
             }
         }
