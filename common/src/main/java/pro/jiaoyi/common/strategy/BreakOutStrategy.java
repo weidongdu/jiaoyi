@@ -3,12 +3,11 @@ package pro.jiaoyi.common.strategy;
 import lombok.extern.slf4j.Slf4j;
 import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.model.K;
-import pro.jiaoyi.common.util.DateUtil;
+import pro.jiaoyi.common.util.BDUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -27,109 +26,155 @@ public class BreakOutStrategy {
         if (dailyKs.size() < ignoreDays) return false;
 
 
+        int size = dailyKs.size();
+        int last = size - 1;
+        K k = dailyKs.get(last);
+
+
         Map<String, BigDecimal[]> ma = MaUtil.ma(dailyKs);
         BigDecimal[] ma5 = ma.get("ma5");
         if (ma5.length == 0) return false;
+
         BigDecimal[] ma10 = ma.get("ma10");
         BigDecimal[] ma20 = ma.get("ma20");
         BigDecimal[] ma30 = ma.get("ma30");
         BigDecimal[] ma60 = ma.get("ma60");
 
-        int size = dailyKs.size();
-        int index = size - 1;
 
-        K k = dailyKs.get(size - 1);
-        if (k.getClose().compareTo(k.getOpen()) < 0
-                || k.getClose().compareTo(BigDecimal.valueOf(40)) > 0) {
-            log.info("今日开盘价{} > 最新价{}, 不符合条件", k.getOpen(), k.getClose());
-            return false;
+        //突破分2个方向
+        //1. 向上突破
+
+        String MAUP = "[MAUP]";
+        int keep = 2;
+        if (k.getPct().compareTo(BigDecimal.ZERO) > 0) {
+            log.info("{}pct {} > 0 ", MAUP, k.getPct());
+            //均线向上发散  keep2
+            int keepCount = 0;
+            for (int i = 0; i < keep; i++) {
+                if (k.getClose().compareTo(ma5[last - i]) < 0) break;
+                if (ma5[last - i].compareTo(ma10[last - i]) < 0) break;
+                if (ma10[last - i].compareTo(ma20[last - i]) < 0) break;
+                if (ma20[last - i].compareTo(ma30[last - i]) < 0) break;
+                if (ma30[last - i].compareTo(ma60[last - i]) < 0) break;
+                keepCount++;
+            }
+
+            if (keepCount == keep) {//满足发散
+                log.info("{}满足发散up keepCount {}", MAUP, keepCount);
+                //判断箱体
+                int boxCount = 0;
+                int highCount = 0;
+                //从最后向前遍历
+                //找到最高点> k.getClose
+                for (int i = 1; i < last; i++) {
+                    int index = last - i;
+                    K preK = dailyKs.get(index);
+                    //1, 判断 x days 新高
+                    if (preK.getHigh().compareTo(k.getClose()) > 0) {
+                        highCount = i;
+                        log.info("{}新高Stop {}", MAUP, i);
+                        break;
+                    }
+
+                    if (i == last - 1) {
+                        log.info("{}新高Stop {}", MAUP, i);
+                        highCount = i;
+                    }
+                }
+
+                if (highCount > daysHigh) {
+                    log.info("{}新高{} > days{}", MAUP, highCount, daysHigh);
+                    BigDecimal bHighCount = new BigDecimal(highCount);
+                    // 新高满足
+                    //开始判断box
+                    ArrayList<BigDecimal> h = new ArrayList<>();
+                    ArrayList<BigDecimal> l = new ArrayList<>();
+                    for (int i = 1; i < highCount; i++) {
+                        int index = last - i;
+                        K preK = dailyKs.get(index);
+                        h.add(preK.getHigh());
+                        l.add(preK.getLow());
+                    }
+
+
+                    //获取 list max
+                    BigDecimal hMax = h.stream().max(BigDecimal::compareTo).get();
+                    BigDecimal lMin = l.stream().min(BigDecimal::compareTo).get();
+                    BigDecimal diff = hMax.subtract(lMin);
+                    BigDecimal rangePct = diff.divide(lMin, 4, RoundingMode.HALF_UP);
+                    log.info("{}hMax={} lMin={} diff={} rangePct={}", MAUP, hMax, lMin, diff, rangePct);
+
+                    if (rangePct.compareTo(BDUtil.b0_2) < 0) {
+                        log.info("{}rangePct {} < {}", MAUP, rangePct, BDUtil.b0_2);
+                        //BOX
+                        //1, up down range 20%
+                        //2, high point size > 1/10
+                        //3, low point size > 1/10
+                        //range fit
+                        BigDecimal hArea = hMax.subtract(diff.multiply(BDUtil.b0_2));
+                        BigDecimal lArea = lMin.add(diff.multiply(BDUtil.b0_2));
+                        long hAreaCount = h.stream().filter(b -> b.compareTo(hArea) > 0).count();
+                        long lAreaCount = h.stream().filter(b -> b.compareTo(lArea) < 0).count();
+                        BigDecimal areaSize = BDUtil.b0_1.multiply(bHighCount);
+                        log.info("{}hAreaCount={} lAreaCount={} areaSize={}", MAUP, hAreaCount, lAreaCount, areaSize);
+                        if (new BigDecimal(hAreaCount).compareTo(areaSize) > 0
+                                && new BigDecimal(lAreaCount).compareTo(areaSize) > 0) {
+                            //box fit
+                            log.warn("{}hit box up", MAUP);
+                            return true;
+                        }
+
+                        //CURVE
+                        //两头高
+                        int lMinLocation = l.indexOf(lMin);
+                        BigDecimal lMinLocationPct = new BigDecimal(lMinLocation).divide(bHighCount, 4, RoundingMode.HALF_UP);
+                        if (lMinLocationPct.compareTo(BDUtil.b0_4) > 0 && lMinLocationPct.compareTo(BDUtil.b0_6) < 0) {
+                            //中间低
+                            log.info("{}curve lMinLocationPct={} range {}-{} ", MAUP, lMinLocationPct, BDUtil.b0_4, BDUtil.b0_6);
+                            BigDecimal highPct10 = hMax.subtract(diff.multiply(BDUtil.b0_1));
+                            int count = 0;
+                            for (int i = 0; i < 2; i++) {
+                                //前面2个
+                                if (h.get(i).compareTo(highPct10) < 0) break;
+                                if (h.get(last - i).compareTo(highPct10) < 0) break;
+                                count++;
+                            }
+                            if (count == 2) {
+                                //fit curve
+                                log.warn("{}hit curve up", MAUP);
+                                return true;
+                            }
+                        }
+                    }
+                }
+                //判断曲线
+            }
         }
 
 
-        if (k.getPct().compareTo(BigDecimal.ZERO) > 0
-                && k.getClose().compareTo(ma5[index]) > 0
-                && k.getClose().compareTo(ma10[index]) > 0
-                && k.getClose().compareTo(ma20[index]) > 0
-                && k.getClose().compareTo(ma30[index]) > 0
-                && k.getClose().compareTo(ma60[index]) > 0) {
-
-            int count = 0;
-            for (int j = 1; j < index - 1; j++) {
-                if (index - j == 1) {
-                    log.info("遍历所有, 持续新高 {}天 {}", j, dailyKs.get(index - j));
-                    count = j;
-                    break;
-                }
-                BigDecimal high = dailyKs.get(index - j).getHigh();
-                if (high.compareTo(k.getClose()) >= 0) {
-                    log.info("打破新高截止, {}天 {}", j, dailyKs.get(index - j));
-                    count = j;
-                    break;
-                }
-            }
-            log.info("over days high , count = {} high", count);
-
-            ArrayList<BigDecimal> highList = new ArrayList<>();
-            ArrayList<BigDecimal> lowList = new ArrayList<>();
-
-            int countBox = 0;//箱体计数
-            for (int j = 1; j < count; j++) {
-                //1, 高点超过高点
-                //2, 低点低于高点
-                int tmpIndex = index - j;
-                K dk = dailyKs.get(tmpIndex);
-                if (k.getLow().compareTo(dk.getHigh()) < 0 && k.getHigh().compareTo(dk.getHigh()) > 0) {
-                    countBox++;
-                }
-                highList.add(dk.getHigh());
-                lowList.add(dk.getLow());
+        //2. 向下突破
+        if (k.getPct().compareTo(BigDecimal.ZERO) < 0) {
+            //均线向上发散  keep2
+            int keepCount = 0;
+            for (int i = 0; i < keep; i++) {
+                if (k.getClose().compareTo(ma5[last - i]) > 0) break;
+                if (ma5[last - i].compareTo(ma10[last - i]) > 0) break;
+                if (ma10[last - i].compareTo(ma20[last - i]) > 0) break;
+                if (ma20[last - i].compareTo(ma30[last - i]) > 0) break;
+                if (ma30[last - i].compareTo(ma60[last - i]) > 0) break;
+                keepCount++;
             }
 
-            log.info("over box high , count = {} high", countBox);
+            if (keepCount == keep) {//满足发散
+                //判断箱体
 
-            if (count > daysHigh && countBox > boxDays * boxDaysFactor) {
-//                log.error("满足条件箱体突破 {}", k);
 
-                K fk = dailyKs.get(size - count);
-                log.error("满足条件箱体突破 {}k [{}] from {} to {}", count, fk.getName(),
-                        DateUtil.tsToStr(fk.getTsOpen(), DateUtil.PATTERN_yyyyMMdd_HH_mm_ss) + "=" + fk.getClose(),
-                        DateUtil.tsToStr(k.getTsOpen(), DateUtil.PATTERN_yyyyMMdd_HH_mm_ss) + "=" + k.getClose());
-
-                return true;
-            }
-
-            if (count > daysHigh) {
-                log.info("开始判断曲线");
-                highList.add(k.getClose());
-                Collections.sort(highList);
-                int locationHigh = highList.indexOf(k.getClose());
-                BigDecimal locationHighPct = BigDecimal.valueOf(locationHigh).divide(BigDecimal.valueOf(highList.size()), 3, RoundingMode.HALF_UP);
-                log.info("开始判断曲线 最新价 location pct = {}", locationHighPct);
-                if (locationHighPct.compareTo(new BigDecimal("0.9")) < 0) {
-                    return false;
-                }
-
-                //获取lowList 最低价
-                BigDecimal lowest = lowList.stream().min(BigDecimal::compareTo).get();
-                log.info("开始判断曲线 最低价 = {}", lowest);
-                int locationLow = lowList.indexOf(lowest);
-                BigDecimal locationLowPct = BigDecimal.valueOf(locationLow).divide(BigDecimal.valueOf(lowList.size()), 3, RoundingMode.HALF_UP);
-                if ((locationLowPct.compareTo(new BigDecimal("0.4")) < 0
-                        || locationLowPct.compareTo(new BigDecimal("0.6")) > 0)) {
-                    return false;
-                }
-
-                BigDecimal hh = highList.get(highList.size() - 1);
-                if (lowest.compareTo(new BigDecimal("0.7").multiply(hh)) > 0) {
-                    K fk = dailyKs.get(size - count);
-                    log.error("开始判断曲线 曲线成功{}k [{}] from {} to {}", count, fk.getName(),
-                            DateUtil.tsToStr(fk.getTsOpen(), DateUtil.PATTERN_yyyyMMdd_HH_mm_ss) + "=" + fk.getClose(),
-                            DateUtil.tsToStr(k.getTsOpen(), DateUtil.PATTERN_yyyyMMdd_HH_mm_ss) + "=" + k.getClose());
-                    return true;
-                }
+                //判断曲线
             }
         }
+
         return false;
     }
+
 
 }
