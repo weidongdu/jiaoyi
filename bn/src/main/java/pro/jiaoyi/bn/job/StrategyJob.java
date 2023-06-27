@@ -13,6 +13,8 @@ import pro.jiaoyi.common.util.DateUtil;
 
 import java.util.*;
 
+import static pro.jiaoyi.common.strategy.BreakOutStrategy.SIDE_MAP;
+
 @Slf4j
 @Component
 public class StrategyJob {
@@ -42,7 +44,10 @@ public class StrategyJob {
     @Scheduled(fixedRate = 20 * 1000)
     public void kline() {
         log.info("run kline SYMBOLS.size={}", SYMBOLS.size());
-        if (SYMBOLS.size() == 0) return;
+        if (SYMBOLS.size() == 0) {
+            exchangeInfo();
+            return;
+        }
 
         ArrayList<String> list = new ArrayList<>(SYMBOLS);
         Collections.shuffle(list);
@@ -51,17 +56,17 @@ public class StrategyJob {
             if (!symbol.endsWith("USDT")) {
                 continue;
             }
-            List<BnK> kline = futureApi.kline(symbol, "5m", 300);
+            List<BnK> kline = futureApi.kline(symbol, "1m", 490);
             log.info("kline {} size={}", symbol, kline.size());
             int last = kline.size() - 1;
             int days = 60;
-            boolean b = BreakOutStrategy.breakOut(kline, days, days, days, 0.4f);
-            if (b) {
-                String content = "BreakOut";
+            int b = BreakOutStrategy.breakOut(kline, days, days, days, 0.4f);
+            if (b != 0) {
+                String content = "BreakOut_" + SIDE_MAP.get(b);
                 content += "<br>" + symbol + "_" + kline.get(last).getClose();
                 content += "<br>" + "trade=" + DateUtil.tsToStr(kline.get(last).getTsOpen(), DateUtil.PATTERN_yyyyMMdd_HH_mm_ss);
                 content += "<br>" + "push=" + DateUtil.tsToStr(new Date().getTime(), DateUtil.PATTERN_yyyyMMdd_HH_mm_ss);
-                content += "<br><br>" + "http://190.92.246.121:28080/v/diff/lineRace?i=1m&s=" + symbol;
+                content += "<br><br>" + "http://190.92.246.121:28080/v/diff/lineRace?i%3D1m%26s=" + symbol;
 
                 wxUtil.send(content);
             }

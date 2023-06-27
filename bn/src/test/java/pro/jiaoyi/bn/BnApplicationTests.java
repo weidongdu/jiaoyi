@@ -31,10 +31,10 @@ class BnApplicationTests {
             }
 
             int days = 60;
-            boolean b = BreakOutStrategy.breakOut(kavausdt.subList(i, end), days, days, days, 0.4f);
-            if (b){
-                System.out.println("break out");
-            }
+//            boolean b = BreakOutStrategy.breakOut(kavausdt.subList(i, end), days, days, days, 0.4f);
+//            if (b){
+//                System.out.println("break out");
+//            }
         }
 
     }
