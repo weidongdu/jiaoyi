@@ -106,8 +106,8 @@ public class JobAlert {
                 EmDailyK k = dailyKs.get(dailyKs.size() - 1);
 
 
-                boolean tu = emRealTimeClient.tu(dailyKs, 60, 60, 0.4d);
-                if (tu) {
+                int tu = emRealTimeClient.tu(dailyKs, 60, 60, 0.4d);
+                if (tu != 0) {
                     Map<String, BigDecimal[]> ma = EmMaUtil.ma(dailyKs);
 
                     BigDecimal[] ma5 = ma.get("ma5");
@@ -177,8 +177,8 @@ public class JobAlert {
                         f = new BigDecimal("1.1");
                     }
                     k.setHigh(f.multiply(k.getPreClose()).setScale(2, RoundingMode.HALF_UP));
-                    boolean tu2 = emRealTimeClient.tu(dailyKs, 60, 60, 0.4d);
-                    if (!tu2) {
+                    int tu2 = emRealTimeClient.tu(dailyKs, 60, 60, 0.4d);
+                    if (tu2 == 0) {
                         log.info("涨停价还不满足,加入block list,{}", k);
                         blockList.add(code);
                     }

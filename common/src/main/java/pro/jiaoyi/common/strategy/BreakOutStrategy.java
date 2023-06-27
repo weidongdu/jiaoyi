@@ -51,7 +51,7 @@ public class BreakOutStrategy {
         //突破分2个方向
         //1. 向上突破
 
-        String side = "[MAUP]";
+        String side = "[MAUP]" + k.getName() + "_";
         int keep = 2;
         if (k.getPct().compareTo(BigDecimal.ZERO) > 0) {
             log.info("{}pct {} > 0 ", side, k.getPct());
@@ -76,16 +76,16 @@ public class BreakOutStrategy {
                 for (int i = 1; i < last; i++) {
                     int index = last - i;
                     K preK = dailyKs.get(index);
-                    //1, 判断 x days 新高
-                    if (preK.getHigh().compareTo(k.getClose()) > 0) {
+                    //1, 判断 x days 新高 持续的找 找到最远的那个
+                    if (k.getClose().compareTo(preK.getHigh()) > 0 && k.getLow().compareTo(preK.getHigh()) < 0) {
                         highCount = i;
-                        log.info("{}新高Stop {}", side, i);
-                        break;
+                        log.info("{} 突破 {} {}", side, i, preK);
                     }
 
-                    if (i == last - 1) {
-                        log.info("{}新高Stop {}", side, i);
-                        highCount = i;
+                    if (preK.getHigh().compareTo(k.getClose()) > 0) {
+                        boxCount++;
+                        log.info("{} 新高 stop {} {}", side, boxCount, preK);
+                        break;
                     }
                 }
 
@@ -96,7 +96,7 @@ public class BreakOutStrategy {
                     //开始判断box
                     ArrayList<BigDecimal> h = new ArrayList<>();
                     ArrayList<BigDecimal> l = new ArrayList<>();
-                    for (int i = 1; i < highCount; i++) {
+                    for (int i = 0; i < highCount; i++) {
                         int index = last - i;
                         K preK = dailyKs.get(index);
                         h.add(preK.getHigh());
@@ -107,6 +107,11 @@ public class BreakOutStrategy {
                     //获取 list max
                     BigDecimal hMax = h.stream().max(BigDecimal::compareTo).get();
                     BigDecimal lMin = l.stream().min(BigDecimal::compareTo).get();
+                    if (lMin.compareTo(BigDecimal.ZERO) == 0) {
+                        log.info("{}lMin == 0", side);
+                        return 0;
+                    }
+
                     BigDecimal diff = hMax.subtract(lMin);
                     BigDecimal rangePct = diff.divide(lMin, 4, RoundingMode.HALF_UP);
                     log.info("{}hMax={} lMin={} diff={} rangePct={}", side, hMax, lMin, diff, rangePct);
@@ -143,7 +148,7 @@ public class BreakOutStrategy {
                             for (int i = 0; i < 2; i++) {
                                 //前面2个
                                 if (h.get(i).compareTo(highPct10) < 0) break;
-                                if (h.get(highCount - i).compareTo(highPct10) < 0) break;
+                                if (h.get(h.size() - 1 - i).compareTo(highPct10) < 0) break;
                                 count++;
                             }
                             if (count == 2) {
@@ -161,7 +166,7 @@ public class BreakOutStrategy {
 
         //2. 向下突破
         if (k.getPct().compareTo(BigDecimal.ZERO) < 0) {
-            side = "[MADOWN]";
+            side = "[MADOWN]" + k.getName() + "_";
             log.info("{}pct {} < 0 ", side, k.getPct());
             //均线向上发散  keep2
             int keepCount = 0;
@@ -184,16 +189,15 @@ public class BreakOutStrategy {
                 for (int i = 1; i < last; i++) {
                     int index = last - i;
                     K preK = dailyKs.get(index);
-                    //1, 判断 x days 新高
-                    if (preK.getLow().compareTo(k.getClose()) < 0) {
+                    //1, 判断 x days 新高 找到最远在那个
+                    if (k.getClose().compareTo(preK.getLow()) < 0 && k.getHigh().compareTo(preK.getLow()) > 0) {
                         lowCount = i;
-                        log.info("{}新低Stop {}", side, i);
-                        break;
+                        log.info("{} 突破 {} {}", side, i, preK);
                     }
 
-                    if (i == last - 1) {
-                        log.info("{}新低Stop {}", side, i);
-                        lowCount = i;
+                    if (preK.getLow().compareTo(k.getClose()) < 0){
+                        log.info("{} 新低Stop {} {}", side, i, preK);
+                        break;
                     }
                 }
 
@@ -215,6 +219,11 @@ public class BreakOutStrategy {
                     //获取 list max
                     BigDecimal hMax = h.stream().max(BigDecimal::compareTo).get();
                     BigDecimal lMin = l.stream().min(BigDecimal::compareTo).get();
+                    if (lMin.compareTo(BigDecimal.ZERO) == 0) {
+                        log.info("{}lMin == 0", side);
+                        return 0;
+                    }
+
                     BigDecimal diff = hMax.subtract(lMin);
                     BigDecimal rangePct = diff.divide(lMin, 4, RoundingMode.HALF_UP);
                     log.info("{}hMax={} lMin={} diff={} rangePct={}", side, hMax, lMin, diff, rangePct);
@@ -251,7 +260,7 @@ public class BreakOutStrategy {
                             for (int i = 0; i < 2; i++) {
                                 //前面2个
                                 if (l.get(i).compareTo(lowPct10) > 0) break;
-                                if (l.get(lowCount - i).compareTo(lowPct10) > 0) break;
+                                if (l.get(l.size() - 1 - i).compareTo(lowPct10) > 0) break;
                                 count++;
                             }
                             if (count == 2) {

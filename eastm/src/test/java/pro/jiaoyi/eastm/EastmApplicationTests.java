@@ -25,6 +25,8 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
 
+import static pro.jiaoyi.common.strategy.BreakOutStrategy.SIDE_MAP;
+
 @SpringBootTest
 @Slf4j
 class EastmApplicationTests {
@@ -228,8 +230,8 @@ class EastmApplicationTests {
 
             for (int j = 1; j < dailyKs.size() - 70; j++) {
                 int end = dailyKs.size() - 1 - j;
-                boolean tu = emRealTimeClient.tu(dailyKs.subList(Math.max(0, end - 100), end), 60, 60, 0.4d);
-                if (tu) {
+                int tu = emRealTimeClient.tu(dailyKs.subList(Math.max(0, end - 100), end), 60, 60, 0.4d);
+                if (tu != 0) {
                     BigDecimal bHigh = (dailyKs.get(end).getHigh().subtract(dailyKs.get(end - 1).getClose()))
                             .divide(dailyKs.get(end - 1).getClose(), 4, RoundingMode.HALF_UP)
                             .multiply(new BigDecimal(100)).setScale(2, RoundingMode.HALF_UP);
@@ -242,7 +244,8 @@ class EastmApplicationTests {
                     //结论 就是 开盘价
                     // >0 可以
                     // <0 扔掉
-                    log.info("突破日{} 收盘{} 次日={} 开盘={} 最高={}", dailyKs.get(end - 1).getTradeDate() +
+                    String side = SIDE_MAP.get(tu);
+                    log.info("{} 突破日{} 收盘{} 次日={} 开盘={} 最高={}", side, dailyKs.get(end - 1).getTradeDate() +
                                     " " + dailyKs.get(end - 1).getName() + dailyKs.get(end - 1).getCode() +
                                     " " + dailyKs.get(end - 1).getPct(),
                             dailyKs.get(end - 1).getPct(),
@@ -271,7 +274,7 @@ class EastmApplicationTests {
 
     @Test
     public void vol() {
-        String[] codes = {"300161","301046","600739","600848"};
+        String[] codes = {"300161", "301046", "600739", "600848"};
         vol(codes);
     }
 
@@ -327,10 +330,9 @@ class EastmApplicationTests {
 
 
     @Test
-    public void highBack(){
+    public void highBack() {
 
     }
-
 
 
 }

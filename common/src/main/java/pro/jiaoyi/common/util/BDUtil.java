@@ -13,6 +13,7 @@ public class BDUtil {
     public static final BigDecimal B40 = new BigDecimal("40");
     public static final BigDecimal B30 = new BigDecimal("30");
     public static final BigDecimal B20 = new BigDecimal("20");
+    public static final BigDecimal B15 = new BigDecimal("20");
     public static final BigDecimal B10 = new BigDecimal("10");
 
 
@@ -36,6 +37,7 @@ public class BDUtil {
     public static final BigDecimal b0_3 = new BigDecimal("0.3");
     public static final BigDecimal b0_2 = new BigDecimal("0.2");
     public static final BigDecimal b0_1 = new BigDecimal("0.1");
+    public static final BigDecimal b0_05 = new BigDecimal("0.05");
 
 
 

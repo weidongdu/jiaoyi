@@ -104,8 +104,8 @@ public class EmRealTimeClient {
 
 
     //箱体突破判定
-    public boolean tu(List<EmDailyK> dailyKs, int daysHigh, int boxDays, double boxDaysFactor) {
-        return BreakOutStrategy.breakOut(dailyKs, 60, daysHigh, boxDays, boxDaysFactor) != 0;
+    public int tu(List<EmDailyK> dailyKs, int daysHigh, int boxDays, double boxDaysFactor) {
+        return BreakOutStrategy.breakOut(dailyKs, 60, daysHigh, boxDays, boxDaysFactor);
     }
 
     public String url(String code) {
