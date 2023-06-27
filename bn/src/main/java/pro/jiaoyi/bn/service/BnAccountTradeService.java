@@ -304,7 +304,7 @@ public class BnAccountTradeService {
 
         //有盈利 判断比例
         BigDecimal pct = unRealizedProfit.divide(position.getIsolatedWallet(), 2, RoundingMode.HALF_UP);
-        if (pct.compareTo(new BigDecimal("0.1")) < 0) {
+        if (pct.compareTo(new BigDecimal("0.05")) < 0) {
             log.info("当前持仓盈利:{}% 不进行挂单", BDUtil.p100(pct));
             return;
         }
@@ -405,72 +405,77 @@ public class BnAccountTradeService {
             //0.7 保本 * 30
             //0.8 保本 * 40
             //0.9 保本 * 50
-            if (pct.compareTo(new BigDecimal(2)) > 0) {
-                base = base.add(holdPct.multiply(new BigDecimal("100")));
+            if (pct.compareTo(B2) > 0) {
+                base = base.add(holdPct.multiply(B100));
 
-            } else if (pct.compareTo(new BigDecimal(1)) > 0) {
-                base = base.add(holdPct.multiply(new BigDecimal("60")));
+            } else if (pct.compareTo(B1) > 0) {
+                base = base.add(holdPct.multiply(B60));
 
-            } else if (pct.compareTo(new BigDecimal("0.9")) > 0) {
-                base = base.add(holdPct.multiply(new BigDecimal("50")));
+            } else if (pct.compareTo(b0_9) > 0) {
+                base = base.add(holdPct.multiply(B50));
 
-            } else if (pct.compareTo(new BigDecimal("0.8")) > 0) {
-                base = base.add(holdPct.multiply(new BigDecimal("40")));
+            } else if (pct.compareTo(b0_8) > 0) {
+                base = base.add(holdPct.multiply(B40));
 
-            } else if (pct.compareTo(new BigDecimal("0.7")) > 0) {
-                base = base.add(holdPct.multiply(new BigDecimal("30")));
+            } else if (pct.compareTo(b0_7) > 0) {
+                base = base.add(holdPct.multiply(B30));
 
-            } else if (pct.compareTo(new BigDecimal("0.6")) > 0) {
-                base = base.add(holdPct.multiply(new BigDecimal("20")));
+            } else if (pct.compareTo(b0_6) > 0) {
+                base = base.add(holdPct.multiply(B20));
 
-            } else if (pct.compareTo(new BigDecimal("0.5")) > 0) {
-                base = base.add(holdPct.multiply(new BigDecimal("10")));
+            } else if (pct.compareTo(b0_5) > 0) {
+                base = base.add(holdPct.multiply(B15));
 
-            } else if (pct.compareTo(new BigDecimal("0.4")) > 0) {
-                base = base.add(holdPct.multiply(new BigDecimal("7")));
+            } else if (pct.compareTo(b0_4) > 0) {
+                base = base.add(holdPct.multiply(B10));
 
-            } else if (pct.compareTo(new BigDecimal("0.3")) > 0) {
-                base = base.add(holdPct.multiply(new BigDecimal("5")));
+            } else if (pct.compareTo(b0_3) > 0) {
+                base = base.add(holdPct.multiply(B7));
 
-            } else if (pct.compareTo(new BigDecimal("0.2")) > 0) {
-                base = base.add(holdPct.multiply(new BigDecimal("3")));
+            } else if (pct.compareTo(b0_2) > 0) {
+                base = base.add(holdPct.multiply(B5));
+
+            } else if (pct.compareTo(b0_1) > 0) {
+                base = base.add(holdPct.multiply(B3));
             } else {
-                base = base.add(holdPct.multiply(new BigDecimal("1")));
+                base = base.add(holdPct.multiply(B1));
             }
 
         } else {
             //空单
-            if (pct.compareTo(new BigDecimal(2)) > 0) {
-                base = base.subtract(holdPct.multiply(new BigDecimal("100")));
+            if (pct.compareTo(B2) > 0) {
+                base = base.subtract(holdPct.multiply(B100));
 
-            } else if (pct.compareTo(new BigDecimal(1)) > 0) {
-                base = base.subtract(holdPct.multiply(new BigDecimal("60")));
+            } else if (pct.compareTo(B1) > 0) {
+                base = base.subtract(holdPct.multiply(B60));
 
-            } else if (pct.compareTo(new BigDecimal("0.9")) > 0) {
-                base = base.subtract(holdPct.multiply(new BigDecimal("50")));
+            } else if (pct.compareTo(b0_9) > 0) {
+                base = base.subtract(holdPct.multiply(B50));
 
-            } else if (pct.compareTo(new BigDecimal("0.8")) > 0) {
-                base = base.subtract(holdPct.multiply(new BigDecimal("40")));
+            } else if (pct.compareTo(b0_8) > 0) {
+                base = base.subtract(holdPct.multiply(B40));
 
-            } else if (pct.compareTo(new BigDecimal("0.7")) > 0) {
-                base = base.subtract(holdPct.multiply(new BigDecimal("30")));
+            } else if (pct.compareTo(b0_7) > 0) {
+                base = base.subtract(holdPct.multiply(B30));
 
-            } else if (pct.compareTo(new BigDecimal("0.6")) > 0) {
-                base = base.subtract(holdPct.multiply(new BigDecimal("20")));
+            } else if (pct.compareTo(b0_6) > 0) {
+                base = base.subtract(holdPct.multiply(B20));
 
-            } else if (pct.compareTo(new BigDecimal("0.5")) > 0) {
-                base = base.subtract(holdPct.multiply(new BigDecimal("10")));
+            } else if (pct.compareTo(b0_5) > 0) {
+                base = base.subtract(holdPct.multiply(B15));
 
-            } else if (pct.compareTo(new BigDecimal("0.4")) > 0) {
-                base = base.subtract(holdPct.multiply(new BigDecimal("7")));
+            } else if (pct.compareTo(b0_4) > 0) {
+                base = base.subtract(holdPct.multiply(B10));
 
-            } else if (pct.compareTo(new BigDecimal("0.3")) > 0) {
-                base = base.subtract(holdPct.multiply(new BigDecimal("5")));
+            } else if (pct.compareTo(b0_3) > 0) {
+                base = base.subtract(holdPct.multiply(B7));
 
-            } else if (pct.compareTo(new BigDecimal("0.2")) > 0) {
-                base = base.subtract(holdPct.multiply(new BigDecimal("3")));
+            } else if (pct.compareTo(b0_2) > 0) {
+                base = base.subtract(holdPct.multiply(B5));
+            } else if (pct.compareTo(b0_1) > 0) {
+                base = base.subtract(holdPct.multiply(B3));
             } else {
-                base = base.subtract(holdPct.multiply(new BigDecimal("1")));
+                base = base.subtract(holdPct.multiply(B1));
             }
         }
 
@@ -550,6 +555,9 @@ public class BnAccountTradeService {
                 base = base.add(holdPct.multiply(B7));
                 System.out.println(base);
             } else if (pct.compareTo(b0_2) > 0) {
+                base = base.add(holdPct.multiply(B5));
+                System.out.println(base);
+            } else if (pct.compareTo(b0_1) > 0) {
                 base = base.add(holdPct.multiply(B5));
                 System.out.println(base);
             } else {

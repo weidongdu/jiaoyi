@@ -197,6 +197,10 @@ public class FutureApi {
             String s = new String(bytes);
             log.info("ticker24hr {}", s);
             JSONArray jsonArray = JSONArray.parseArray(s);
+
+            if (jsonArray == null || jsonArray.size() == 0) {
+                return Collections.emptyList();
+            }
             List<Ticker24hr> list = jsonArray.toJavaList(Ticker24hr.class);
             List<Ticker24hr> sortList = list.stream().sorted(Comparator.comparing(Ticker24hr::getQuoteVolume)).collect(Collectors.toList());
             Collections.reverse(sortList);

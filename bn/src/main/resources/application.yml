@@ -15,3 +15,5 @@ logging:
 
 bn:
   top: 50
+  kline:
+    interval: 5m

@@ -28,6 +28,9 @@ public class StrategyJob {
     @Value("${bn.top}")
     private int top;
 
+    @Value("${bn.kline.interval}")
+    private String interval;
+
     public static Set<String> SYMBOLS = new HashSet<>();
 
     @Scheduled(fixedRate = 30 * 60 * 1000)
@@ -42,7 +45,21 @@ public class StrategyJob {
     }
 
     @Scheduled(fixedRate = 20 * 1000)
-    public void kline() {
+    public void kline_m1() {
+        kline("1m",240);
+    }
+
+    @Scheduled(fixedRate = 20 * 1000)
+    public void kline_m5() {
+        kline("5m",60);
+    }
+
+    @Scheduled(fixedRate = 20 * 1000)
+    public void kline_m30() {
+        kline("30m",60);
+    }
+
+    public void kline(String p, int daysHigh) {
         log.info("run kline SYMBOLS.size={}", SYMBOLS.size());
         if (SYMBOLS.size() == 0) {
             exchangeInfo();
@@ -56,17 +73,21 @@ public class StrategyJob {
             if (!symbol.endsWith("USDT")) {
                 continue;
             }
-            List<BnK> kline = futureApi.kline(symbol, "1m", 490);
+            List<BnK> kline = futureApi.kline(symbol, p, 490);
+            if (kline.size() == 0) {
+                continue;
+            }
+            kline.forEach(bnK -> bnK.setName(symbol));
             log.info("kline {} size={}", symbol, kline.size());
             int last = kline.size() - 1;
             int days = 60;
-            int b = BreakOutStrategy.breakOut(kline, days, days, days, 0.4f);
+            int b = BreakOutStrategy.breakOut(kline, days, daysHigh, days, 0.4f);
             if (b != 0) {
-                String content = "BreakOut_" + SIDE_MAP.get(b);
+                String content = SIDE_MAP.get(b) + "_" + p;
                 content += "<br>" + symbol + "_" + kline.get(last).getClose();
                 content += "<br>" + "trade=" + DateUtil.tsToStr(kline.get(last).getTsOpen(), DateUtil.PATTERN_yyyyMMdd_HH_mm_ss);
                 content += "<br>" + "push=" + DateUtil.tsToStr(new Date().getTime(), DateUtil.PATTERN_yyyyMMdd_HH_mm_ss);
-                content += "<br><br>" + "http://190.92.246.121:28080/v/diff/lineRace?i%3D1m%26s=" + symbol;
+                content += "<br><br>" + "http://190.92.246.121:28080/v/diff/lineRace?i%3D" + p + "%26s=" + symbol;
 
                 wxUtil.send(content);
             }
