@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.model.K;
 import pro.jiaoyi.common.util.BDUtil;
+import pro.jiaoyi.common.util.EmojiUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -16,14 +17,20 @@ import java.util.Map;
  */
 @Slf4j
 public class BreakOutStrategy {
+    public static final Map<Integer, String> SIDE_MAP = Map.of(
+            1, EmojiUtil.UP + "箱体",
+            2, EmojiUtil.UP + "曲线",
+            -1, EmojiUtil.DOWN + "箱体",
+            -2, EmojiUtil.DOWN + "down 曲线",
+            0, "未知");
 
-    public static <T extends K> boolean breakOut(List<T> dailyKs, int ignoreDays, int daysHigh, int boxDays, double boxDaysFactor) {
+    public static <T extends K> int breakOut(List<T> dailyKs, int ignoreDays, int daysHigh, int boxDays, double boxDaysFactor) {
         int max = 60;
         //最小值校验  由于不同周期, 结构类似, 所以要限制
         ignoreDays = Math.max(ignoreDays, max);
         daysHigh = Math.max(daysHigh, max);
         boxDays = Math.max(boxDays, max);
-        if (dailyKs.size() < ignoreDays) return false;
+        if (dailyKs.size() < ignoreDays) return 0;
 
 
         int size = dailyKs.size();
@@ -33,7 +40,7 @@ public class BreakOutStrategy {
 
         Map<String, BigDecimal[]> ma = MaUtil.ma(dailyKs);
         BigDecimal[] ma5 = ma.get("ma5");
-        if (ma5.length == 0) return false;
+        if (ma5.length == 0) return 0;
 
         BigDecimal[] ma10 = ma.get("ma10");
         BigDecimal[] ma20 = ma.get("ma20");
@@ -121,7 +128,7 @@ public class BreakOutStrategy {
                                 && new BigDecimal(lAreaCount).compareTo(areaSize) > 0) {
                             //box fit
                             log.warn("{}hit box up", side);
-                            return true;
+                            return 1;
                         }
 
                         //CURVE
@@ -136,13 +143,13 @@ public class BreakOutStrategy {
                             for (int i = 0; i < 2; i++) {
                                 //前面2个
                                 if (h.get(i).compareTo(highPct10) < 0) break;
-                                if (h.get(last - i).compareTo(highPct10) < 0) break;
+                                if (h.get(highCount - i).compareTo(highPct10) < 0) break;
                                 count++;
                             }
                             if (count == 2) {
                                 //fit curve
                                 log.warn("{}hit curve up", side);
-                                return true;
+                                return 2;
                             }
                         }
                     }
@@ -229,7 +236,7 @@ public class BreakOutStrategy {
                                 && new BigDecimal(lAreaCount).compareTo(areaSize) > 0) {
                             //box fit
                             log.warn("{}hit box up", side);
-                            return true;
+                            return -1;
                         }
 
                         //CURVE
@@ -244,13 +251,13 @@ public class BreakOutStrategy {
                             for (int i = 0; i < 2; i++) {
                                 //前面2个
                                 if (l.get(i).compareTo(lowPct10) > 0) break;
-                                if (l.get(last - i).compareTo(lowPct10) > 0) break;
+                                if (l.get(lowCount - i).compareTo(lowPct10) > 0) break;
                                 count++;
                             }
                             if (count == 2) {
                                 //fit curve
                                 log.warn("{}hit curve up", side);
-                                return true;
+                                return -2;
                             }
                         }
                     }
@@ -259,7 +266,7 @@ public class BreakOutStrategy {
             }
         }
 
-        return false;
+        return 0;
     }
 
 
