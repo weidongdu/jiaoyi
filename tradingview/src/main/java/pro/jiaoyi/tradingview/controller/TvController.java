@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.eastm.config.IndexEnum;
-import pro.jiaoyi.tradingview.LoadConfig;
 import pro.jiaoyi.tradingview.config.Colors;
 import pro.jiaoyi.tradingview.model.TvChart;
 import pro.jiaoyi.tradingview.model.chart.Constants;
@@ -80,7 +79,7 @@ public class TvController {
         Map<String, List<TvTimeValue>> kMaLines = tvChart.getKMaLines();
         kMaLines.put("up",Collections.emptyList());
         kMaLines.put("dn",Collections.emptyList());
-        List<String[]> TArray = LoadConfig.T_SHADOW_DATA.stream().filter(arr -> arr[0].equals(code)).toList();
+        List<String[]> TArray = new ArrayList<>();//LoadConfig.T_SHADOW_DATA.stream().filter(arr -> arr[0].equals(code)).toList();
         if (TArray.size() > 0) {
             List<TvMarker> mks = tvChart.getMks();
             //String[] head = {"code", "name", "date", "high", "max", "min"};
