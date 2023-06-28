@@ -47,6 +47,11 @@ public class TvService {
         return tvTransUtil.tranEmDailyKLineToTv(dailyKs);
     }
 
+    public TvChart getTvChart(String code, LocalDate date, Integer limit, boolean force) {
+        List<EmDailyK> dailyKs = emClient.getDailyKs(code, date, limit, force);
+        return tvTransUtil.tranEmDailyKLineToTv(dailyKs);
+    }
+
     public List<EmCList> getIndex(String type, boolean sort, boolean sync) {
         IndexEnum indexEnum = IndexEnum.getByType(type);
         if (indexEnum == null) {

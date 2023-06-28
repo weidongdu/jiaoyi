@@ -9,6 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
+import pro.jiaoyi.common.util.BDUtil;
+import pro.jiaoyi.common.util.DateUtil;
+import pro.jiaoyi.common.util.FileUtil;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.api.EmRealTimeClient;
@@ -22,8 +25,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static pro.jiaoyi.common.strategy.BreakOutStrategy.SIDE_MAP;
 
@@ -330,9 +337,156 @@ class EastmApplicationTests {
 
 
     @Test
-    public void highBack() {
+    public void tBack() throws InterruptedException {
+        List<EmCList> list = emClient.getClistDefaultSize(false);
+
+        String fileName = "上影线" + DateUtil.today() + ".csv";
+        String sb1 = "code" + "," +
+                "name" + "," +
+                "date" + "," +
+                "high" + "," +
+                "max" + "," +
+                "min" + "\n";
+        FileUtil.writeToFile(fileName, sb1);
+
+
+        String code = "605366";
+        for (int i = 0; i < list.size(); i++) {
+//            if (!list.get(i).getF12Code().equals(code)) {
+//                continue;
+//            }
+            Thread.sleep(2000);
+            List<EmDailyK> dailyKs = emClient.getDailyKs(list.get(i).getF12Code(), LocalDate.now(), 5000, false);
+            if (dailyKs.size() < 70) {
+                continue;
+            }
+
+            if (dailyKs.get(0).getPct().compareTo(BigDecimal.ZERO) < 0) {
+                continue;
+            }
+            Map<String, BigDecimal[]> ma = MaUtil.ma(dailyKs);
+            BigDecimal[] ma5 = ma.get("ma5");
+            BigDecimal[] ma10 = ma.get("ma10");
+            BigDecimal[] ma20 = ma.get("ma20");
+            BigDecimal[] ma30 = ma.get("ma30");
+            BigDecimal[] ma60 = ma.get("ma60");
+            BigDecimal[] ma120 = ma.get("ma120");
+            BigDecimal[] ma250 = ma.get("ma250");
+
+            //up T
+
+            for (int j = 250; j < dailyKs.size(); j++) {
+                EmDailyK k = dailyKs.get(j);
+                BigDecimal[] ochl = k.ochl();
+                BigDecimal o = ochl[0];
+                BigDecimal c = ochl[1];
+                BigDecimal h = ochl[2];
+                BigDecimal l = ochl[3];
+
+                if (o.compareTo(BigDecimal.ZERO) < 0) continue;
+                if (c.compareTo(BigDecimal.ZERO) < 0) continue;
+                if (h.compareTo(BigDecimal.ZERO) < 0) continue;
+                if (l.compareTo(BigDecimal.ZERO) < 0) continue;
+
+                //1 pct > 0 , pct< 3
+                if (k.getPct().compareTo(BigDecimal.ZERO) <= 0 || k.getPct().compareTo(new BigDecimal(3)) >= 0) {
+                    continue;
+                }
+
+                if (k.getClose().compareTo(ma5[j]) < 0) continue;
+                if (k.getClose().compareTo(ma10[j]) < 0) continue;
+                if (k.getClose().compareTo(ma20[j]) < 0) continue;
+                if (k.getClose().compareTo(ma30[j]) < 0) continue;
+                if (k.getClose().compareTo(ma60[j]) < 0) continue;
+                if (k.getClose().compareTo(ma120[j]) < 0) continue;
+                if (k.getClose().compareTo(ma250[j]) < 0) continue;
+
+                if (k.getOpen().compareTo(k.getClose()) >= 0) {
+                    continue;
+                }
+
+                BigDecimal shadow = h.subtract(c);
+                BigDecimal body = c.subtract(o);
+                if (shadow.compareTo(BigDecimal.ZERO) == 0) {
+                    continue;
+                }
+
+                BigDecimal bodyPct = body.divide(shadow, 3, RoundingMode.HALF_UP);
+                if (bodyPct.compareTo(BDUtil.b0_2) > 0) {
+                    continue;
+                }
+                if (o.subtract(l).compareTo(h.subtract(c)) > 0) {
+                    continue;
+                }
+//                后续涨幅
+
+
+                int highDays = 0;
+
+                //查看创了多少日新高
+                for (int m = 0; m < j; m++) {
+                    int index = j - m;
+                    EmDailyK preK = dailyKs.get(index);
+                    if (preK.getHigh().compareTo(k.getHigh()) > 0 || index == 1) {
+                        highDays = m;
+                        log.info("满足上影线{}，创了{}日新高", k, m);
+
+                        ArrayList<BigDecimal> pcts = new ArrayList<>();
+                        for (int mp = 1; mp < 30; mp++) {
+                            int indexMp = Math.min(j + mp, dailyKs.size() - 1);
+                            EmDailyK afterK = dailyKs.get(indexMp);
+                            BigDecimal diff = afterK.getHigh().subtract(c);
+                            BigDecimal pct = diff.divide(c, 3, RoundingMode.HALF_UP);
+                            pcts.add(pct);
+                        }
+                        Collections.sort(pcts);
+                        log.warn("满足上影线{}，{}新高, 后续30日涨幅 max={} min={}", k.getTradeDate(), highDays, BDUtil.p100(pcts.get(pcts.size() - 1)), BDUtil.p100(pcts.get(0)));
+                        String sb = k.getCode() + "," +
+                                k.getName() + "," +
+                                k.getTradeDate() + "," +
+                                highDays + "," +
+                                BDUtil.p100(pcts.get(pcts.size() - 1)) + "," +
+                                BDUtil.p100(pcts.get(0)) + "\n";
+
+                        FileUtil.writeToFile(fileName, sb);
+                        break;
+                    }
+
+                }
+
+
+            }
+
+
+        }
 
     }
 
+
+    @Test
+    public List<String[]> getCsv(String[] head, String file) {
+
+//        String[] head = {"code", "name", "date", "high", "max", "min"};
+        ArrayList<String[]> csv = new ArrayList<>();
+        csv.add(head);
+//        Path path = Paths.get("/Users/dwd/dev/GitHub/jiaoyi/eastm/上影线20230627.csv");
+//        String file = "/Users/dwd/dev/GitHub/jiaoyi/eastm/上影线20230627.csv";
+        Path path = Paths.get(file);
+        try (Stream<String> lines = Files.lines(path)) {
+            StringBuilder stringBuilder = new StringBuilder();
+//            lines.forEach(stringBuilder::append);
+            lines.forEach(line -> {
+                if (line.contains(head[0])) {
+                    return;
+                }
+                String[] split = line.split(",");
+                csv.add(split);
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return csv;
+    }
 
 }

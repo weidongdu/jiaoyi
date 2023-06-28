@@ -93,6 +93,10 @@ function updateRandomAfter() {
     getTvChartRandomAfter(renderChart);
 }
 
+function updateT() {
+    getTvChartT(renderChart);
+}
+
 
 function openTap(name, code) {
     if (name + code === '') {
@@ -199,6 +203,10 @@ $(document).keydown(function (e) {
     }
     if (222 === e.keyCode) {//222 '
         updateRandomAfter();
+    }
+
+    if (220 === e.keyCode) {//\ 220
+        updateT();
     }
 
 

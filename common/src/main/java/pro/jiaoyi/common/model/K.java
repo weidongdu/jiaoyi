@@ -71,4 +71,8 @@ public class K {
      */
     private long tsClose;
 
+
+    public BigDecimal[] ochl(){
+        return new BigDecimal[]{open, close, high, low};
+    }
 }

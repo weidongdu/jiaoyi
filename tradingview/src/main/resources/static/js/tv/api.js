@@ -37,6 +37,17 @@ function getTvChart(code, cb) {
     });
 }
 
+function getTvChartT(cb) {
+    let code = prompt("请输入code 如:[000001]", ""); //将输入的内容赋给变量 name ，
+    // let code = $("#iCode").val();
+    let url = baseUrl + "/tv/chart/T?code=" + code;
+    //通过jquery get 获取 json
+    $.get(url, function (data) {
+        console.log(data);
+        cb(data);
+    });
+}
+
 
 function getStockList(cb) {
     let url = baseUrl + "/tv/stockList";

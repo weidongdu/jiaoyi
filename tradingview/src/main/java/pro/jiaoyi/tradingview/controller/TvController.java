@@ -6,14 +6,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.eastm.config.IndexEnum;
+import pro.jiaoyi.tradingview.LoadConfig;
+import pro.jiaoyi.tradingview.config.Colors;
 import pro.jiaoyi.tradingview.model.TvChart;
+import pro.jiaoyi.tradingview.model.chart.Constants;
+import pro.jiaoyi.tradingview.model.chart.TvMarker;
+import pro.jiaoyi.tradingview.model.chart.TvTimeValue;
 import pro.jiaoyi.tradingview.service.TvService;
+import pro.jiaoyi.tradingview.service.TvTransUtil;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @Slf4j
@@ -64,4 +69,33 @@ public class TvController {
         }
         return map;
     }
+
+
+
+    @GetMapping("/chart/T")
+    public TvChart tvChartT(@RequestParam String code, String codeType) {
+        log.info("tvChart code={} codeType={}", code, codeType);
+        TvChart tvChart = tvService.getTvChart(code, LocalDate.now(), 5000, true);
+        tvChart.setMks(new ArrayList<>());
+        Map<String, List<TvTimeValue>> kMaLines = tvChart.getKMaLines();
+        kMaLines.put("up",Collections.emptyList());
+        kMaLines.put("dn",Collections.emptyList());
+        List<String[]> TArray = LoadConfig.T_SHADOW_DATA.stream().filter(arr -> arr[0].equals(code)).toList();
+        if (TArray.size() > 0) {
+            List<TvMarker> mks = tvChart.getMks();
+            //String[] head = {"code", "name", "date", "high", "max", "min"};
+            for (String[] arr : TArray) {
+                TvMarker mk = new TvMarker();
+                mk.setColor(Colors.YELLOW.getColor());
+                mk.setPosition(Constants.MARKER_POSITION_ABOVEBAR);
+                mk.setShape(Constants.MARKER_SHAPE_ARROW_DOWN);
+                mk.setText("T");
+                mk.setTime(DateUtil.strToLocalDate(arr[2],DateUtil.PATTERN_yyyyMMdd).toString());
+                mks.add(mk);
+            }
+            TvTransUtil.sortMks(mks);
+        }
+        return tvChart;
+    }
+
 }

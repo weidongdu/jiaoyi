@@ -16,10 +16,7 @@ import pro.jiaoyi.tradingview.model.chart.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -334,5 +331,10 @@ public class TvTransUtil {
             maList.add(tvTimeValue);
         }
         vMaMap.put("ma" + ma, maList);
+    }
+
+
+    public static void sortMks(List<TvMarker> mks){
+        mks.sort(Comparator.comparing(o -> DateUtil.strToLocalDate(o.getTime(), "yyyy-MM-dd")));
     }
 }
