@@ -489,4 +489,11 @@ class EastmApplicationTests {
         return csv;
     }
 
+
+    @Test
+    public void must() {
+        List<EmCList> must = emClient.must();
+        log.info("{}", must.size());
+    }
+
 }

@@ -59,6 +59,7 @@ public class MaUtil {
         EMPTY_MA_MAP = Collections.unmodifiableMap(tempMap);
     }
 
+
     public static <T extends K> Map<String, BigDecimal[]> ma(List<T> list) {
 
         if (list == null || list.size() < 5) {

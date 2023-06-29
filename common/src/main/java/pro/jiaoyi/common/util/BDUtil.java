@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class BDUtil {
+    public static final BigDecimal B1_5Y = new BigDecimal("150000000");
+    public static final BigDecimal B5000W = new BigDecimal("50000000");
     public static final BigDecimal B100 = new BigDecimal("100");
     public static final BigDecimal B90 = new BigDecimal("90");
     public static final BigDecimal B80 = new BigDecimal("80");
@@ -38,6 +40,7 @@ public class BDUtil {
     public static final BigDecimal b0_2 = new BigDecimal("0.2");
     public static final BigDecimal b0_1 = new BigDecimal("0.1");
     public static final BigDecimal b0_05 = new BigDecimal("0.05");
+    public static final BigDecimal b0_02 = new BigDecimal("0.02");
 
 
 

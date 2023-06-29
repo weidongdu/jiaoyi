@@ -3,6 +3,7 @@ package pro.jiaoyi.eastm.config;
 public enum IndexEnum {
 
 
+    BIXUAN("cycf", "0.必选", ""),
     CYCF("cycf", "1.创业成分", "http://25.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=100&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&wbp2u=|0|0|0|web&fid=f3&fs=b:BK0638+f:!50&fields=f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f14,f15,f16,f17,f18,f22,f23,f100"),
     HS300("hs300", "2.沪深300", "http://34.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=300&po=1&np=1&fltt=2&invt=2&wbp2u=|0|0|0|web&fid=f3&fs=b:BK0500+f:!50&fields=f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f14,f15,f16,f17,f18,f22,f23,f100"),
     ZZ500("zz500", "3.中证500", "http://17.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=500&po=1&np=1&fltt=2&invt=2&wbp2u=|0|0|0|web&fid=f3&fs=b:BK0701+f:!50&fields=f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f14,f15,f16,f17,f18,f22,f23,f100"),

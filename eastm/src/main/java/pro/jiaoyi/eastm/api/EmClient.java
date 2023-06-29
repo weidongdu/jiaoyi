@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.model.KPeriod;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
@@ -21,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static pro.jiaoyi.common.util.BDUtil.*;
 import static pro.jiaoyi.eastm.util.ExcelUtil.simpleRead;
 
 @Component
@@ -211,7 +213,10 @@ public class EmClient {
             DATE_LIST_MAP.put(DateUtil.today(), clist);
         }
 
-        return clist.stream().filter(e -> !(e.getF12Code().startsWith("8") ||  e.getF14Name().contains("ST") || e.getF14Name().contains("退"))).toList();
+        return clist.stream().filter(e -> !(e.getF12Code().startsWith("8")
+                        || e.getF14Name().contains("ST")
+                        || e.getF14Name().contains("退")))
+                .toList();
     }
 
     public String getBkValueByStockCode(String code) {
@@ -315,6 +320,8 @@ public class EmClient {
 
             case ALL:
                 return getClistDefaultSize(false);
+            case BIXUAN:
+                return must();
             case HS300:
                 return getIndex(IndexEnum.HS300.getUrl());
             case CYCF:
@@ -341,6 +348,87 @@ public class EmClient {
             default:
                 return Collections.emptyList();
         }
+    }
+
+    public List<EmCList> must() {
+        return must(0);
+    }
+
+    public List<EmCList> must(int lastOffSet) {
+        List<EmCList> list = getClistDefaultSize(false);
+        List<EmCList> fList = list.stream().filter(e ->
+                e.getF3Pct().compareTo(BigDecimal.ZERO) > 0
+                        && e.getF3Pct().compareTo(B5) < 0
+                        && e.getF6Amt().compareTo(B5000W) > 0
+                        && e.getF8Turnover().compareTo(B10) < 0
+                        && !e.getF12Code().startsWith("8")
+                        && !e.getF14Name().contains("ST")
+                        && !e.getF14Name().contains("退")
+        ).toList();
+
+        log.info("必选满足条件的 list size={}", fList.size());
+
+        AtomicInteger count = new AtomicInteger(0);
+
+        ArrayList<EmCList> result = new ArrayList<>();
+        for (EmCList emCList : fList) {
+            if (count.incrementAndGet() % 10 == 0) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            log.info("当前处理第{}/{}个", count.get(), fList.size());
+            List<EmDailyK> ks = getDailyKs(emCList.getF12Code(), LocalDate.now(), 500, false);
+            if (ks.size() < 250) {
+                continue;
+            }
+            int last = ks.size() - 1 - lastOffSet;
+            Map<String, BigDecimal[]> ma = MaUtil.ma(ks);
+            BigDecimal[] ma5 = ma.get("ma5");
+            BigDecimal[] ma10 = ma.get("ma10");
+            BigDecimal[] ma20 = ma.get("ma20");
+            BigDecimal[] ma30 = ma.get("ma30");
+            BigDecimal[] ma60 = ma.get("ma60");
+            BigDecimal[] ma120 = ma.get("ma120");
+            BigDecimal[] ma250 = ma.get("ma250");
+            //均线之上
+            EmDailyK k = ks.get(last);
+            BigDecimal[] ochl = k.ochl();
+            BigDecimal o = ochl[0];
+            BigDecimal c = ochl[1];
+            BigDecimal h = ochl[2];
+            BigDecimal l = ochl[3];
+
+            if (c.compareTo(ma5[last]) <= 0) continue;
+            if (c.compareTo(ma10[last]) <= 0) continue;
+            if (c.compareTo(ma20[last]) <= 0) continue;
+            if (c.compareTo(ma30[last]) <= 0) continue;
+            if (c.compareTo(ma60[last]) <= 0) continue;
+            if (c.compareTo(ma120[last]) <= 0) continue;
+            if (c.compareTo(ma250[last]) <= 0) continue;
+
+            //最近5天 最高点距离k 不超2
+            ArrayList<BigDecimal> high5 = new ArrayList<>();
+            for (int i = 0; i < 5; i++) {
+                high5.add(ks.get(last - 1 - i).getHigh());
+            }
+
+            BigDecimal max = high5.stream().max(BigDecimal::compareTo).get();
+            BigDecimal diff = max.subtract(c);
+            if (diff.compareTo(BigDecimal.ZERO) < 0) {
+                continue;
+            }
+
+            BigDecimal diffPct = max.subtract(c).divide(c, 4, RoundingMode.HALF_UP);
+            if (diffPct.compareTo(b0_02) > 0) {
+                continue;
+            }
+            result.add(emCList);
+        }
+        return result;
     }
 
 
