@@ -62,7 +62,7 @@ public class JobAlert {
         DATE_NAME_CODE_MAP.clear();
         DATE_STOCK_CODE_BK_MAP.clear();
         BK_MAP.clear();
-        DATE_LIST_MAP.clear();
+        DATE_INDEX_ALL_MAP.clear();
         DATE_KLINE_MAP.clear();
     }
 

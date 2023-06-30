@@ -203,14 +203,14 @@ public class EmClient {
     public List<EmCList> getClistDefaultSize(boolean force) {
         //从本地缓存先加载
         if (!force) {
-            List<EmCList> list = DATE_LIST_MAP.get(DateUtil.today());
+            List<EmCList> list = DATE_INDEX_ALL_MAP.get(DateUtil.today());
             if (list != null && list.size() > 0) {
                 return list;
             }
         }
         List<EmCList> clist = getClist(1, 10000);
         if (clist.size() > 0) {
-            DATE_LIST_MAP.put(DateUtil.today(), clist);
+            DATE_INDEX_ALL_MAP.put(DateUtil.today(), clist);
         }
 
         return clist.stream().filter(e -> !(e.getF12Code().startsWith("8")
@@ -660,7 +660,7 @@ public class EmClient {
     public static final Map<String, Map<String, String>> DATE_NAME_CODE_MAP = new ConcurrentHashMap<>();
     public static final Map<String, Map<String, String>> DATE_STOCK_CODE_BK_MAP = new ConcurrentHashMap<>();
     public static final Map<String, String> BK_MAP = new ConcurrentHashMap<>();
-    public static final Map<String, List<EmCList>> DATE_LIST_MAP = new ConcurrentHashMap<>();
+    public static final Map<String, List<EmCList>> DATE_INDEX_ALL_MAP = new ConcurrentHashMap<>();
     public static final Map<String, List<EmDailyK>> DATE_KLINE_MAP = new ConcurrentHashMap<>();
     public static final Map<String, List<EmCList>> DATE_INDEX_TP02_MAP = new ConcurrentHashMap<>();
     public static final Map<String, List<EmCList>> DATE_INDEX_BIXUAN_MAP = new ConcurrentHashMap<>();
