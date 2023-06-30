@@ -350,7 +350,14 @@ public class EmClient {
         }
     }
 
+
     public List<EmCList> must() {
+        String key = DateUtil.today();
+        List<EmCList> emCLists = DATE_INDEX_BIXUAN_MAP.get(key);
+        if (emCLists != null && emCLists.size() > 0) {
+            return emCLists;
+        }
+
         return must(0);
     }
 
@@ -410,24 +417,34 @@ public class EmClient {
             if (c.compareTo(ma120[last]) <= 0) continue;
             if (c.compareTo(ma250[last]) <= 0) continue;
 
-            //最近5天 最高点距离k 不超2
-            ArrayList<BigDecimal> high5 = new ArrayList<>();
+
+            ArrayList<BigDecimal> h5 = new ArrayList<>();
+            ArrayList<BigDecimal> l5 = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
-                high5.add(ks.get(last - 1 - i).getHigh());
+                h5.add(ks.get(last - 1 - i).getHigh());
+                l5.add(ks.get(last - 1 - i).getLow());
             }
 
-            BigDecimal max = high5.stream().max(BigDecimal::compareTo).get();
+            BigDecimal max = h5.stream().max(BigDecimal::compareTo).get();
             BigDecimal diff = max.subtract(c);
             if (diff.compareTo(BigDecimal.ZERO) < 0) {
                 continue;
             }
 
-            BigDecimal diffPct = max.subtract(c).divide(c, 4, RoundingMode.HALF_UP);
-            if (diffPct.compareTo(b0_02) > 0) {
+            BigDecimal min = l5.stream().min(BigDecimal::compareTo).get();
+            BigDecimal diffLowPct = c.subtract(min).divide(c, 4, RoundingMode.HALF_UP);
+            BigDecimal diffHighPct = max.subtract(c).divide(c, 4, RoundingMode.HALF_UP);
+            if (diffHighPct.compareTo(b0_02) > 0 || diffLowPct.compareTo(b0_1) > 0) {
+                //最近5天 最低点距离k 不超10%
+                //最近5天 最高点距离k 不超2
                 continue;
             }
+            log.warn("find bixuan {}", emCList);
             result.add(emCList);
         }
+
+        String key = DateUtil.today();
+        DATE_INDEX_BIXUAN_MAP.put(key, result);
         return result;
     }
 
@@ -646,6 +663,7 @@ public class EmClient {
     public static final Map<String, List<EmCList>> DATE_LIST_MAP = new ConcurrentHashMap<>();
     public static final Map<String, List<EmDailyK>> DATE_KLINE_MAP = new ConcurrentHashMap<>();
     public static final Map<String, List<EmCList>> DATE_INDEX_TP02_MAP = new ConcurrentHashMap<>();
+    public static final Map<String, List<EmCList>> DATE_INDEX_BIXUAN_MAP = new ConcurrentHashMap<>();
 
 
 }

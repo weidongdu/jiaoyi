@@ -16,6 +16,7 @@ public class BnTradeJob {
     @Autowired
     private BnAccountTradeService bnAccountTradeService;
 
+    public static int holdCount = 0;
 
     @Scheduled(fixedRate = 20 * 1000)
     public void run() {

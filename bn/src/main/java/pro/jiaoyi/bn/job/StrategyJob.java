@@ -44,10 +44,10 @@ public class StrategyJob {
         log.info("stop exchangeInfo");
     }
 
-    @Scheduled(fixedRate = 20 * 1000)
-    public void kline_m1() {
-        kline("1m",240);
-    }
+//    @Scheduled(fixedRate = 20 * 1000)
+//    public void kline_m1() {
+//        kline("1m",240);
+//    }
 
     @Scheduled(fixedRate = 20 * 1000)
     public void kline_m5() {
@@ -57,6 +57,10 @@ public class StrategyJob {
     @Scheduled(fixedRate = 20 * 1000)
     public void kline_m30() {
         kline("30m",60);
+    }
+    @Scheduled(fixedRate = 20 * 1000)
+    public void kline_h4() {
+        kline("4h",60);
     }
 
     public void kline(String p, int daysHigh) {
