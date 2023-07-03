@@ -209,14 +209,20 @@ public class EmClient {
             }
         }
         List<EmCList> clist = getClist(1, 10000);
-        if (clist.size() > 0) {
-            DATE_INDEX_ALL_MAP.put(DateUtil.today(), clist);
-        }
 
-        return clist.stream().filter(e -> !(e.getF12Code().startsWith("8")
-                        || e.getF14Name().contains("ST")
-                        || e.getF14Name().contains("退")))
-                .toList();
+        long day15 = new Date().getTime() - 15 * 24 * 60 * 60 * 1000;
+        if (clist.size() > 0) {
+            List<EmCList> list = clist.stream().filter(e -> !(
+                    e.getF12Code().startsWith("8")
+                    || e.getF14Name().contains("ST")
+                    || e.getF14Name().contains("退")
+            )).toList();
+
+            DATE_INDEX_ALL_MAP.put(DateUtil.today(), new ArrayList<>(list));
+            return DATE_INDEX_ALL_MAP.get(DateUtil.today());
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     public String getBkValueByStockCode(String code) {
@@ -320,8 +326,8 @@ public class EmClient {
 
             case ALL:
                 return getClistDefaultSize(false);
-            case BIXUAN:
-                return must();
+//            case BIXUAN:
+//                return must();
             case HS300:
                 return getIndex(IndexEnum.HS300.getUrl());
             case CYCF:

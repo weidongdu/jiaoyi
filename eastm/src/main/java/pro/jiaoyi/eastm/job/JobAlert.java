@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import pro.jiaoyi.common.util.DateUtil;
+import pro.jiaoyi.common.util.EmojiUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.api.EmRealTimeClient;
 import pro.jiaoyi.eastm.config.WxUtil;
@@ -27,15 +28,17 @@ public class JobAlert {
     //监控 放量有涨速
 
 
-    public static String TIP ="";
+    public static String TIP = "";
 
 
     static {
-        TIP += "<br>卖出: 成本价附近,昨日低点";
-        TIP += "<br>卖出: 小幅整理期,震荡底部";
-        TIP += "<br>卖出: 趋势未结束,底仓持有";
-        TIP += "<br>卖出: 交易有盈利,浮动止盈";
-        TIP += "<br>买入: 计划外的票,谨慎开仓";
+        TIP += "<br>" + EmojiUtil.DOWN + "卖出: 成本价附近,昨日低点";
+        TIP += "<br>" + EmojiUtil.DOWN + "卖出: 小幅整理期,震荡底部";
+        TIP += "<br>" + EmojiUtil.DOWN + "卖出: 趋势未结束,底仓持有";
+        TIP += "<br>" + EmojiUtil.DOWN + "卖出: 交易有盈利,浮动止盈";
+        TIP += "<br>" + EmojiUtil.UP + "买入: 计划外的票,谨慎开仓";
+        TIP += "<br>" + EmojiUtil.UP + "买入: 高开再新高,量要同步新高";
+        TIP += "<br>" + EmojiUtil.UP + "买入: 仓位要控制,不要贪多";
     }
 
     @Autowired
@@ -73,7 +76,7 @@ public class JobAlert {
 
         Integer am = DAY_COUNT_MAP.get(LocalDate.now() + AM);
         if (am == null) {
-            String content = "监控启动" + LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateUtil.PATTERN_yyyy_MM_dd+ "_"+ DateUtil.PATTERN_HH_mm_ss));
+            String content = "监控启动" + LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateUtil.PATTERN_yyyy_MM_dd + "_" + DateUtil.PATTERN_HH_mm_ss));
             content += TIP;
             wxUtil.send(content);
             DAY_COUNT_MAP.put(LocalDate.now() + AM, 1);
@@ -200,7 +203,7 @@ public class JobAlert {
             return false;
         }
 
-        if (SEND_WX_MAP.size() > 1000){
+        if (SEND_WX_MAP.size() > 1000) {
             //清空 非today 开头在key
             SEND_WX_MAP.entrySet().removeIf(entry -> !entry.getKey().startsWith(DateUtil.today()));
         }

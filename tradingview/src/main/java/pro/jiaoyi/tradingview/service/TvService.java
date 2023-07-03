@@ -60,7 +60,14 @@ public class TvService {
 
         List<EmCList> index = emClient.getIndex(indexEnum, sync);
         if (sort) {
-            index.sort(Comparator.comparing(EmCList::getF100bk));
+            if (index != null && index.size() > 0){
+                try {
+
+                    index.sort(Comparator.comparing(EmCList::getF100bk));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
         return index;
     }
@@ -136,7 +143,6 @@ public class TvService {
         }
 
 
-
         // mks 排序, 按 time 转换成 LocalDate 先后
         mks.sort(Comparator.comparing(o -> DateUtil.strToLocalDate(o.getTime(), "yyyy-MM-dd")));
 
@@ -176,11 +182,11 @@ public class TvService {
 
             if (dailyKs.get(j).getPct().compareTo(new BigDecimal(7)) > 0) {
 
-                ArrayList<BigDecimal> mas = new ArrayList<>(Arrays.asList(ma5[j-1], ma10[j-1], ma20[j-1], ma30[j-1], ma60[j-1], ma120[j-1], ma250[j-1]));
+                ArrayList<BigDecimal> mas = new ArrayList<>(Arrays.asList(ma5[j - 1], ma10[j - 1], ma20[j - 1], ma30[j - 1], ma60[j - 1], ma120[j - 1], ma250[j - 1]));
                 Collections.sort(mas);
                 BigDecimal maMax = mas.get(mas.size() - 1);
 
-                if (dailyKs.get(j-1).getClose().compareTo(new BigDecimal("0.98").multiply(maMax)) > 0){
+                if (dailyKs.get(j - 1).getClose().compareTo(new BigDecimal("0.98").multiply(maMax)) > 0) {
                     // 120 个交易日之后，涨幅超过 7% 的股票
                     return tvTransUtil.tranEmDailyKLineToTv(dailyKs.subList(0, j));
                 }
