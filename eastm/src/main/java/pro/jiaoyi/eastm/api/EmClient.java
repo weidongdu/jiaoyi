@@ -20,6 +20,7 @@ import pro.jiaoyi.eastm.util.EmMaUtil;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -182,8 +183,11 @@ public class EmClient {
             String key = DateUtil.today() + "-" + code;
             String path = "kline/" + DateUtil.today() + "/" + key + ".json";
             if (!FileUtil.fileCheck(path)) {
-                //不存在
-                FileUtil.writeToFile(path, JSON.toJSONString(list));
+                //不存在 且 在每天15:00之后
+                if (LocalTime.now().isAfter(LocalTime.of(15, 0))) {
+                    FileUtil.writeToFile(path, JSON.toJSONString(list));
+                }
+//                FileUtil.writeToFile(path, JSON.toJSONString(list));
             }
             return list;
         }
