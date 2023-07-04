@@ -3,9 +3,11 @@ package pro.jiaoyi.common.indicator.MaUtil;
 
 import com.alibaba.fastjson.JSON;
 import pro.jiaoyi.common.model.K;
+import pro.jiaoyi.common.util.BDUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +62,29 @@ public class MaUtil {
     }
 
 
+    public static <T extends K> BigDecimal maDiffPct60(List<T> list) {
+        if (list == null || list.size() < 60) {
+            return BDUtil.BN1; // -1
+        }
+
+        Map<String, BigDecimal[]> ma = ma(list);
+        BigDecimal[] ma5 = ma.get("ma5");
+        BigDecimal[] ma10 = ma.get("ma10");
+        BigDecimal[] ma20 = ma.get("ma20");
+        BigDecimal[] ma30 = ma.get("ma30");
+        BigDecimal[] ma60 = ma.get("ma60");
+
+        int last = list.size() - 1;
+        ArrayList<BigDecimal> mas = new ArrayList<>(List.of(ma5[last], ma10[last], ma20[last], ma30[last], ma60[last]));
+        mas.sort(BigDecimal::compareTo);
+
+        BigDecimal min = mas.get(0);
+        BigDecimal max = mas.get(4);
+
+        return max.divide(min, 4, RoundingMode.HALF_UP);
+    }
+
+
     public static <T extends K> Map<String, BigDecimal[]> ma(List<T> list) {
 
         if (list == null || list.size() < 5) {
@@ -87,7 +112,6 @@ public class MaUtil {
 
         return maMap;
     }
-
 
 
     public static void main(String[] args) {

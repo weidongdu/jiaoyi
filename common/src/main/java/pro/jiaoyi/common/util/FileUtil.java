@@ -1,5 +1,6 @@
 package pro.jiaoyi.common.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,6 +27,17 @@ public class FileUtil {
 //        String content = "Hello, world!";
 
         try {
+
+
+
+            // 创建文件对象
+            File file = new File(fileName);
+            // 如果文件名包含路径，则创建对应的目录
+            File parentDir = file.getParentFile();
+            if (parentDir != null && !parentDir.exists()) {
+                parentDir.mkdirs();
+            }
+
             // 如果文件不存在，则创建文件
             Path path = Paths.get(fileName);
             if (!Files.exists(path)) {

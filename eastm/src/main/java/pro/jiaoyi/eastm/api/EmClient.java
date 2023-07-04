@@ -1,5 +1,7 @@
 package pro.jiaoyi.eastm.api;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Component;
 import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.model.KPeriod;
 import pro.jiaoyi.common.util.DateUtil;
+import pro.jiaoyi.common.util.FileUtil;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
 import pro.jiaoyi.eastm.config.IndexEnum;
 import pro.jiaoyi.eastm.model.*;
@@ -28,6 +31,8 @@ import static pro.jiaoyi.eastm.util.ExcelUtil.simpleRead;
 @Component
 @Slf4j
 public class EmClient {
+
+    public static AtomicInteger COUNT = new AtomicInteger(0);
 
     @Autowired
     private OkHttpUtil okHttpUtil;
@@ -49,6 +54,19 @@ public class EmClient {
             if (emDailyKS != null && emDailyKS.size() > 0) {
                 log.info("hit local cache for code:{}", key);
                 return emDailyKS;
+            }
+
+            //查本地文件
+            String path = "kline/" + DateUtil.today() + "/" + key + ".json";
+            if (FileUtil.fileCheck(path)) {
+                //读取文件
+                log.info("hit local file for code:{}", path);
+                String ks = FileUtil.readFromFile(path);
+                if (ks != null && ks.startsWith("[")) {
+                    List<EmDailyK> list = JSONArray.parseArray(ks, EmDailyK.class);
+                    DATE_KLINE_MAP.put(key, list);
+                    return list;
+                }
             }
         }
 
@@ -74,10 +92,29 @@ public class EmClient {
         }
 
 
+        if (COUNT.incrementAndGet() % 10 == 0){
+            try {
+                log.info("sleep 1s");
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                log.error("sleep error", e);
+            }
+        }
+
         byte[] bytes = okHttpUtil.getForBytes(url, headerMap);
+
+
         if (bytes.length > 0) {
-            EmResult<EmDataKline> emResult = JSONObject.parseObject(new String(bytes), new TypeReference<>() {
-            });
+            String s = new String(bytes);
+            EmResult<EmDataKline> emResult = null;
+            try {
+                emResult = JSONObject.parseObject(s, new TypeReference<>() {
+                });
+            } catch (Exception e) {
+                log.error("parse error:{}", s, e);
+                return Collections.emptyList();
+            }
+
             EmDataKline data = emResult.getData();
             List<String> klines = data.getKlines();
 
@@ -140,8 +177,14 @@ public class EmClient {
             String s1 = list.get(0).getTradeDate() + " " + list.get(0).getCode() + " " + list.get(0).getName() + " " + list.get(0).getPct();
             String s2 = list.get(size - 1).getTradeDate() + " " + list.get(size - 1).getCode() + " " + list.get(size - 1).getName() + " " + list.get(size - 1).getPct();
             log.info("获取日线行情数据 size={} start={} end={}", size, s1, s2);
-
             DATE_KLINE_MAP.put(DateUtil.today() + "-" + code, list);
+
+            String key = DateUtil.today() + "-" + code;
+            String path = "kline/" + DateUtil.today() + "/" + key + ".json";
+            if (!FileUtil.fileCheck(path)) {
+                //不存在
+                FileUtil.writeToFile(path, JSON.toJSONString(list));
+            }
             return list;
         }
 
@@ -214,8 +257,8 @@ public class EmClient {
         if (clist.size() > 0) {
             List<EmCList> list = clist.stream().filter(e -> !(
                     e.getF12Code().startsWith("8")
-                    || e.getF14Name().contains("ST")
-                    || e.getF14Name().contains("退")
+                            || e.getF14Name().contains("ST")
+                            || e.getF14Name().contains("退")
             )).toList();
 
             DATE_INDEX_ALL_MAP.put(DateUtil.today(), new ArrayList<>(list));
@@ -326,8 +369,8 @@ public class EmClient {
 
             case ALL:
                 return getClistDefaultSize(false);
-//            case BIXUAN:
-//                return must();
+            case BIXUAN:
+                return must(sync);
             case HS300:
                 return getIndex(IndexEnum.HS300.getUrl());
             case CYCF:
@@ -336,10 +379,10 @@ public class EmClient {
                 return getIndex(IndexEnum.ZZ500.getUrl());
             case ZZ1000:
                 return getIndex1000();
-            case IndexAll:
-                return sync ? getIndexAll() : Collections.emptyList();
             case IndexAll_Filter:
-                return getIndexAllFilter();
+                return sync ? getIndexAll() : Collections.emptyList();
+            case IndexAll_Component:
+                return getIndexAllComponent();
             case O_TP7:
                 return getIndexTp7();
             case O_TP02:
@@ -367,7 +410,16 @@ public class EmClient {
         return must(0);
     }
 
+
+    public List<EmCList> must(boolean sync) {
+        if (sync) {
+            return must(0);
+        }
+        return Collections.emptyList();
+    }
+
     public List<EmCList> must(int lastOffSet) {
+
         List<EmCList> list = getClistDefaultSize(false);
         List<EmCList> fList = list.stream().filter(e ->
                 e.getF3Pct().compareTo(BigDecimal.ZERO) > 0
@@ -385,15 +437,7 @@ public class EmClient {
 
         ArrayList<EmCList> result = new ArrayList<>();
         for (EmCList emCList : fList) {
-            if (count.incrementAndGet() % 10 == 0) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            log.info("当前处理第{}/{}个", count.get(), fList.size());
+            log.info("当前处理第{}/{}个", count.incrementAndGet(), fList.size());
             List<EmDailyK> ks = getDailyKs(emCList.getF12Code(), LocalDate.now(), 500, false);
             if (ks.size() < 250) {
                 continue;
@@ -422,7 +466,9 @@ public class EmClient {
             if (c.compareTo(ma60[last]) <= 0) continue;
             if (c.compareTo(ma120[last]) <= 0) continue;
             if (c.compareTo(ma250[last]) <= 0) continue;
-
+            //ma5 - ma60 之间 diff < 10%
+            BigDecimal diffPct60 = MaUtil.maDiffPct60(ks);
+            if (diffPct60.compareTo(B1_1) > 0) continue;
 
             ArrayList<BigDecimal> h5 = new ArrayList<>();
             ArrayList<BigDecimal> l5 = new ArrayList<>();
@@ -451,11 +497,12 @@ public class EmClient {
 
         String key = DateUtil.today();
         DATE_INDEX_BIXUAN_MAP.put(key, result);
+        log.info("必选满足条件的 list size={}", result.size());
         return result;
     }
 
 
-    private List<EmCList> getIndexAllFilter() {
+    private List<EmCList> getIndexAllComponent() {
         log.info("getIndexAll 指数成份");
         List<EmCList> index = getIndex(IndexEnum.CYCF.getUrl());
         index.addAll(getIndex(IndexEnum.HS300.getUrl()));
@@ -485,7 +532,7 @@ public class EmClient {
                 .toList();
 
         try {
-            return filterIndexTp02(filterList, IndexEnum.IndexAll);
+            return filterIndexTp02(filterList, IndexEnum.IndexAll_Filter);
         } catch (InterruptedException e) {
             return Collections.emptyList();
         }
@@ -532,13 +579,17 @@ public class EmClient {
         AtomicInteger count = new AtomicInteger(0);
         for (EmCList emCList : list) {
 
-            if (count.addAndGet(1) % 5 == 0) {
+            if (count.addAndGet(1) % 10 == 0) {
                 log.info("run {} / {}", count.get(), list.size());
-                Thread.sleep(1000);
             }
 
-            List<EmDailyK> ks = getDailyKs(emCList.getF12Code(), LocalDate.now(), 500, false);
-            if (ks.size() < 250) {
+            List<EmDailyK> ks = null;
+            try {
+                ks = getDailyKs(emCList.getF12Code(), LocalDate.now(), 500, false);
+            } catch (Exception e) {
+                log.error("getDailyKs error", e);
+            }
+            if (ks == null || ks.size() < 250) {
                 continue;
             }
 

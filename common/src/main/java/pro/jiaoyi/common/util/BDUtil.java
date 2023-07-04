@@ -30,6 +30,11 @@ public class BDUtil {
     public static final BigDecimal B1 = new BigDecimal("1");
 
 
+    public static final BigDecimal B1_15 = new BigDecimal("1.15");
+    public static final BigDecimal B1_1 = new BigDecimal("1.1");
+    public static final BigDecimal B1_05 = new BigDecimal("1.05");
+
+
     public static final BigDecimal b0_9 = new BigDecimal("0.9");
     public static final BigDecimal b0_8 = new BigDecimal("0.8");
     public static final BigDecimal b0_7 = new BigDecimal("0.7");
@@ -41,7 +46,7 @@ public class BDUtil {
     public static final BigDecimal b0_1 = new BigDecimal("0.1");
     public static final BigDecimal b0_05 = new BigDecimal("0.05");
     public static final BigDecimal b0_02 = new BigDecimal("0.02");
-
+    public static final BigDecimal BN1 = new BigDecimal("-1");
 
 
     public static String p100(BigDecimal b) {
