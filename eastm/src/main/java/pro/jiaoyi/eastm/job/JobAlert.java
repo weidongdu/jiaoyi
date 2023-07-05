@@ -44,7 +44,7 @@ public class JobAlert {
         TIP += "<br>" + EmojiUtil.DOWN + "卖出: 趋势未结束,底仓持有";
         TIP += "<br>" + EmojiUtil.DOWN + "卖出: 交易有盈利,浮动止盈";
         TIP += "<br>" + EmojiUtil.UP + "买入: 计划外的票,谨慎开仓";
-        TIP += "<br>" + EmojiUtil.UP + "买入: 高开再新高,量要同步新高";
+        TIP += "<br>" + EmojiUtil.UP + "买入: 高开再新高,量同步新高";
         TIP += "<br>" + EmojiUtil.UP + "买入: 仓位要控制,不要贪多";
     }
 
@@ -126,6 +126,33 @@ public class JobAlert {
                 }
 
                 EmDailyK k = dailyKs.get(dailyKs.size() - 1);
+                Map<String, BigDecimal[]> ma = EmMaUtil.ma(dailyKs);
+
+                BigDecimal[] ma5 = ma.get("ma5");
+                BigDecimal[] ma10 = ma.get("ma10");
+                BigDecimal[] ma20 = ma.get("ma20");
+                BigDecimal[] ma30 = ma.get("ma30");
+                BigDecimal[] ma60 = ma.get("ma60");
+                BigDecimal[] ma120 = ma.get("ma120");
+                BigDecimal[] ma250 = ma.get("ma250");
+
+                int last = dailyKs.size() - 1;
+                BigDecimal ma5_value = ma5[last];
+                BigDecimal ma10_value = ma10[last];
+                BigDecimal ma20_value = ma20[last];
+                BigDecimal ma30_value = ma30[last];
+                BigDecimal ma60_value = ma60[last];
+                BigDecimal ma120_value = ma120[last];
+                BigDecimal ma250_value = ma250[last];
+
+                if (k.getClose().compareTo(ma5_value) < 0
+                        || k.getClose().compareTo(ma10_value) < 0
+                        || k.getClose().compareTo(ma20_value) < 0
+                        || k.getClose().compareTo(ma30_value) < 0
+                        || k.getClose().compareTo(ma60_value) < 0) {
+                    log.info("不满足均线之上");
+                    continue;
+                }
 
                 BigDecimal dayAmtTop10 = emClient.amtTop10p(dailyKs);
                 BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
@@ -207,33 +234,9 @@ public class JobAlert {
 //                int tu = emRealTimeClient.tu(dailyKs, 60, 60, 0.4d);
                 boolean tu = emRealTimeClient.tu_old(dailyKs, 60, 60, 0.4d);
                 if (tu) {
-                    Map<String, BigDecimal[]> ma = EmMaUtil.ma(dailyKs);
-
-                    BigDecimal[] ma5 = ma.get("ma5");
-                    BigDecimal[] ma10 = ma.get("ma10");
-                    BigDecimal[] ma20 = ma.get("ma20");
-                    BigDecimal[] ma30 = ma.get("ma30");
-                    BigDecimal[] ma60 = ma.get("ma60");
-                    BigDecimal[] ma120 = ma.get("ma120");
-                    BigDecimal[] ma250 = ma.get("ma250");
-
-                    int last = dailyKs.size() - 1;
-                    BigDecimal ma5_value = ma5[last];
-                    BigDecimal ma10_value = ma10[last];
-                    BigDecimal ma20_value = ma20[last];
-                    BigDecimal ma30_value = ma30[last];
-                    BigDecimal ma60_value = ma60[last];
-                    BigDecimal ma120_value = ma120[last];
-                    BigDecimal ma250_value = ma250[last];
-
 
                     log.info("run {} {}", code, name);
-                    if (k.getClose().compareTo(ma5_value) < 0
-                            || k.getClose().compareTo(ma10_value) < 0
-                            || k.getClose().compareTo(ma20_value) < 0
-                            || k.getClose().compareTo(ma30_value) < 0
-                            || k.getClose().compareTo(ma60_value) < 0
-                            || k.getClose().compareTo(ma120_value) < 0
+                    if (k.getClose().compareTo(ma120_value) < 0
                             || k.getClose().compareTo(ma250_value) < 0) {
                         log.info("不满足均线之上");
                         blockList.add(code);
@@ -249,7 +252,6 @@ public class JobAlert {
                     if (push) {
                         wxUtil.send(content);
                     }
-
 
                 } else {
                     //设置 最高价, 如果还不满足 , 加入block list
