@@ -19,6 +19,9 @@ import pro.jiaoyi.eastm.model.EastSpeedInfo;
 import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
 import pro.jiaoyi.eastm.model.excel.Index1000XlsData;
+import pro.jiaoyi.eastm.model.fenshi.DetailTrans;
+import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiTrans;
+import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiVo;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -29,6 +32,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -494,6 +499,54 @@ class EastmApplicationTests {
     public void must() {
         List<EmCList> must = emClient.must();
         log.info("{}", must.size());
+    }
+
+
+    @Test
+    public void fenshi1() {
+//        String code = "000002";
+
+        List<EmCList> all = emClient.getClistDefaultSize(false);
+        List<String> openHighList = all.stream().filter(em -> {
+            BigDecimal pre = em.getF18Close();
+            BigDecimal open = em.getF17Open();
+            if (pre.compareTo(BigDecimal.ZERO) <= 0) {
+                return false;
+            }
+
+            BigDecimal openPct = open.divide(pre, 4, RoundingMode.HALF_UP);
+            return openPct.compareTo(new BigDecimal("1.005")) > 0 &&
+                    openPct.compareTo(new BigDecimal("1.03")) < 0;
+        }).map(EmCList::getF12Code).toList();
+
+
+
+        for (String code : openHighList) {
+
+            EastGetStockFenShiVo f = emRealTimeClient.getFenshiByCode(code);
+            LocalDateTime openTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 30));
+            if (f != null) {
+                EastGetStockFenShiTrans trans = EastGetStockFenShiTrans.trans(f);
+                assert trans != null;
+                List<DetailTrans> list = trans.getData();
+
+                List<DetailTrans> open60S = new ArrayList<>();
+                List<DetailTrans> open60SOver = new ArrayList<>();
+
+                for (int i = 0; i < list.size(); i++) {
+                    DetailTrans detailTrans = list.get(i);
+                    if (detailTrans.getTs() >= DateUtil.toTimestamp(openTime)
+                            && detailTrans.getTs() <= DateUtil.toTimestamp(openTime.plusSeconds(60))) {
+                        //开盘 判断是否高开
+                        open60S.add(detailTrans);
+                    }
+                }
+
+                System.out.println("open30S size " + open60S.size());
+            }
+        }
+
+
     }
 
 }

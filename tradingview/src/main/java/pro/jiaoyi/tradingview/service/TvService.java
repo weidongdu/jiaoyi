@@ -62,7 +62,6 @@ public class TvService {
         if (sort) {
             if (index != null && index.size() > 0){
                 try {
-
                     index.sort(Comparator.comparing(EmCList::getF100bk));
                 } catch (Exception e) {
                     throw new RuntimeException(e);

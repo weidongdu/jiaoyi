@@ -3,26 +3,33 @@ package pro.jiaoyi.eastm.job;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.EmojiUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.api.EmRealTimeClient;
 import pro.jiaoyi.eastm.config.WxUtil;
 import pro.jiaoyi.eastm.model.EastSpeedInfo;
+import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
+import pro.jiaoyi.eastm.model.fenshi.DetailTrans;
+import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiTrans;
+import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiVo;
 import pro.jiaoyi.eastm.util.EmMaUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static pro.jiaoyi.eastm.api.EmClient.*;
 
-//@Component
+@Component
 @Slf4j
 public class JobAlert {
     //监控 放量有涨速
@@ -74,6 +81,23 @@ public class JobAlert {
     public void run() {
         if (!EmRealTimeClient.tradeTime()) return;
 
+
+        List<EmCList> all = emClient.getClistDefaultSize(false);
+        List<EmCList> openHighList = all.stream().filter(em -> {
+            BigDecimal pre = em.getF18Close();
+            BigDecimal open = em.getF17Open();
+            if (pre.compareTo(BigDecimal.ZERO) <= 0) {
+                return false;
+            }
+
+            BigDecimal openPct = open.divide(pre, 4, RoundingMode.HALF_UP);
+            return openPct.compareTo(new BigDecimal("1.005")) > 0
+                    && openPct.compareTo(new BigDecimal("1.03")) < 0;
+        }).toList();
+
+        Set<String> openHighCodeSet = openHighList.stream().map(EmCList::getF12Code).collect(Collectors.toSet());
+
+
         Integer am = DAY_COUNT_MAP.get(LocalDate.now() + AM);
         if (am == null) {
             String content = "监控启动" + LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateUtil.PATTERN_yyyy_MM_dd + "_" + DateUtil.PATTERN_HH_mm_ss));
@@ -92,13 +116,9 @@ public class JobAlert {
                 if (code.startsWith("8")) continue;
                 //过滤 假设涨停也无法满足条件
                 List<String> blockList = DAY_BLOCKLIST_MAP.computeIfAbsent(LocalDate.now(), k -> new ArrayList<>());
-                if (blockList.contains(code)) {
-                    log.info("block code {} {}", code, name);
-                    continue;
-                }
+
 
                 log.info("run speed {} {} {}", code, name, top.getSpeed_f22());
-
                 List<EmDailyK> dailyKs = emClient.getDailyKs(code, LocalDate.now(), 300, true);
                 if (dailyKs.size() < 250) {
                     log.info("k size {} < 250", dailyKs.size());
@@ -107,9 +127,86 @@ public class JobAlert {
 
                 EmDailyK k = dailyKs.get(dailyKs.size() - 1);
 
+                BigDecimal dayAmtTop10 = emClient.amtTop10p(dailyKs);
+                BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
+                BigDecimal fAmt = new BigDecimal("0.1").multiply(hourAmt);
+                if (fAmt.compareTo(new BigDecimal("2500000")) < 0) {
+                    continue;
+                }
 
-                int tu = emRealTimeClient.tu(dailyKs, 60, 60, 0.4d);
-                if (tu != 0) {
+                EastGetStockFenShiVo fEastGetStockFenShiVo = emRealTimeClient.getFenshiByCode(code);
+                if (fEastGetStockFenShiVo == null) continue;
+
+                EastGetStockFenShiTrans trans = EastGetStockFenShiTrans.trans(fEastGetStockFenShiVo);
+                if (trans == null) continue;
+
+                List<DetailTrans> DetailTransList = trans.getData();
+                if (DetailTransList == null || DetailTransList.isEmpty()) continue;
+
+                //判断70s 内 是否大于 0.1 fAmt
+                BigDecimal fenshiAmtLast70 = emRealTimeClient.getFenshiAmt(DetailTransList, 70);
+                //成交量放大倍数
+                BigDecimal fx = fenshiAmtLast70.divide(hourAmt, 4, RoundingMode.HALF_UP);
+                if (fx.compareTo(new BigDecimal("0.1")) < 0) {
+                    log.info("成交量不满足条件");
+                    continue;
+                }
+
+                String amtStr = amtStr(fAmt);
+                String fenshiAmtStr = amtStr(fenshiAmtLast70);
+
+                if (openHighCodeSet.contains(code)) {
+                    log.info("开盘高开 {}", code);
+                    //当前家是否为最高价
+                    LocalDateTime openTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 30));
+
+                    List<DetailTrans> open60s = DetailTransList.stream()
+                            .filter(d -> d.getTs() >= DateUtil.toTimestamp(openTime)
+                                    && d.getTs() <= DateUtil.toTimestamp(openTime.plusSeconds(60)))
+                            .toList();
+
+                    BigDecimal open60sAmt = BigDecimal.ZERO;
+                    for (DetailTrans open60 : open60s) {
+                        open60sAmt = open60sAmt.add(open60.amt());
+                    }
+
+                    if (open60sAmt.compareTo(fenshiAmtLast70) < 0) {
+                        //最近量满足
+                        log.info("最近amt > open 1m");
+                        //判断 价格是否最高
+                        List<BigDecimal> priceList = DetailTransList.stream()
+                                .filter(detailTrans ->
+                                        detailTrans.getTs() >= DateUtil.toTimestamp(openTime))
+                                .map(DetailTrans::getPrice).toList();
+                        BigDecimal max = priceList.stream().max(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
+
+                        for (int i = 0; i < 5; i++) {
+                            //最后5个价格 有就一个是最高价
+                            if (priceList.get(priceList.size() - 1 - i).compareTo(max) == 0) {
+                                log.info("满足分时 二次突破 最高价 {}", max);
+                                String content = "高开分时突破" + code + "_" + name + "_" + k.getBk()
+                                        + "<br>" + "价格=" + k.getClose() + ",涨幅=" + k.getPct()
+                                        + "<br>" + "标准量=" + amtStr + ",M1=" + fx + "_" + fenshiAmtStr
+                                        + "<br>" + LocalDateTime.now().toString().substring(0, 16);
+                                log.info("价格突破成功 {}", content.replaceAll("<br>", "\n"));
+                                boolean push = checkSendWxCount(code);
+                                if (push) {
+                                    wxUtil.send(content);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+
+
+                if (blockList.contains(code)) {
+                    log.info("block code {} {}", code, name);
+                    continue;
+                }
+//                int tu = emRealTimeClient.tu(dailyKs, 60, 60, 0.4d);
+                boolean tu = emRealTimeClient.tu_old(dailyKs, 60, 60, 0.4d);
+                if (tu) {
                     Map<String, BigDecimal[]> ma = EmMaUtil.ma(dailyKs);
 
                     BigDecimal[] ma5 = ma.get("ma5");
@@ -120,13 +217,14 @@ public class JobAlert {
                     BigDecimal[] ma120 = ma.get("ma120");
                     BigDecimal[] ma250 = ma.get("ma250");
 
-                    BigDecimal ma5_value = ma5[ma5.length - 1];
-                    BigDecimal ma10_value = ma10[ma10.length - 1];
-                    BigDecimal ma20_value = ma20[ma20.length - 1];
-                    BigDecimal ma30_value = ma30[ma30.length - 1];
-                    BigDecimal ma60_value = ma60[ma60.length - 1];
-                    BigDecimal ma120_value = ma120[ma120.length - 1];
-                    BigDecimal ma250_value = ma250[ma250.length - 1];
+                    int last = dailyKs.size() - 1;
+                    BigDecimal ma5_value = ma5[last];
+                    BigDecimal ma10_value = ma10[last];
+                    BigDecimal ma20_value = ma20[last];
+                    BigDecimal ma30_value = ma30[last];
+                    BigDecimal ma60_value = ma60[last];
+                    BigDecimal ma120_value = ma120[last];
+                    BigDecimal ma250_value = ma250[last];
 
 
                     log.info("run {} {}", code, name);
@@ -141,24 +239,6 @@ public class JobAlert {
                         blockList.add(code);
                         continue;
                     }
-                    BigDecimal dayAmtTop10 = emClient.amtTop10p(dailyKs);
-                    BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
-                    BigDecimal fAmt = new BigDecimal("0.1").multiply(hourAmt);
-                    if (fAmt.compareTo(new BigDecimal("2500000")) < 0) {
-                        continue;
-                    }
-                    //判断70s 内 是否大于 0.1 fAmt
-                    BigDecimal fenshiAmt = emRealTimeClient.getFenshiAmt(code, 70);
-                    //成交量放大倍数
-                    BigDecimal fx = fenshiAmt.divide(hourAmt, 2, RoundingMode.HALF_UP);
-                    if (fx.compareTo(new BigDecimal("0.1")) < 0) {
-                        log.info("成交量不满足条件");
-                        continue;
-                    }
-
-
-                    String amtStr = amtStr(fAmt);
-                    String fenshiAmtStr = amtStr(fenshiAmt);
 
                     String content = code + "_" + name + "_" + k.getBk()
                             + "<br>" + "价格=" + k.getClose() + ",涨幅=" + k.getPct()
@@ -179,8 +259,9 @@ public class JobAlert {
                         f = new BigDecimal("1.1");
                     }
                     k.setHigh(f.multiply(k.getPreClose()).setScale(2, RoundingMode.HALF_UP));
-                    int tu2 = emRealTimeClient.tu(dailyKs, 60, 60, 0.4d);
-                    if (tu2 == 0) {
+//                    int tu2 = emRealTimeClient.tu(dailyKs, 60, 60, 0.4d);
+                    boolean tu2 = emRealTimeClient.tu_old(dailyKs, 60, 60, 0.4d);
+                    if (tu2) {
                         log.info("涨停价还不满足,加入block list,{}", k);
                         blockList.add(code);
                     }

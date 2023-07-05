@@ -12,15 +12,15 @@ import pro.jiaoyi.eastm.model.EmDailyK;
 import pro.jiaoyi.eastm.model.fenshi.DetailTrans;
 import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiTrans;
 import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiVo;
+import pro.jiaoyi.eastm.util.EmMaUtil;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -112,6 +112,104 @@ public class EmRealTimeClient {
         return BreakOutStrategy.breakOut(dailyKs, 60, daysHigh, boxDays, boxDaysFactor);
     }
 
+    public boolean tu_old(List<EmDailyK> dailyKs, int daysHigh, int boxDays, double boxDaysFactor) {
+        if (dailyKs.size() < 60) return false;
+
+        Map<String, BigDecimal[]> ma = EmMaUtil.ma(dailyKs);
+        BigDecimal[] ma5 = ma.get("ma5");
+        BigDecimal[] ma10 = ma.get("ma10");
+        BigDecimal[] ma20 = ma.get("ma20");
+        BigDecimal[] ma30 = ma.get("ma30");
+        BigDecimal[] ma60 = ma.get("ma60");
+
+
+        int size = dailyKs.size();
+        int index = size - 1;
+
+        EmDailyK k = dailyKs.get(size - 1);
+        if (k.getClose().compareTo(k.getOpen()) < 0
+                || k.getClose().compareTo(BigDecimal.valueOf(40)) > 0) {
+            log.info("今日开盘价{} > 最新价{}, 不符合条件", k.getOpen(), k.getClose());
+            return false;
+        }
+        if (k.getPct().compareTo(BigDecimal.ZERO) > 0
+                && k.getClose().compareTo(ma5[index]) > 0
+                && k.getClose().compareTo(ma10[index]) > 0
+                && k.getClose().compareTo(ma20[index]) > 0
+                && k.getClose().compareTo(ma30[index]) > 0
+                && k.getClose().compareTo(ma60[index]) > 0) {
+
+            int count = 0;
+            for (int j = 1; j < index - 1; j++) {
+                if (index - j == 1) {
+                    log.info("遍历所有, 持续新高 {}天 {}", j, dailyKs.get(index - j));
+                    count = j;
+                    break;
+                }
+                BigDecimal high = dailyKs.get(index - j).getHigh();
+                if (high.compareTo(k.getClose()) >= 0) {
+                    log.info("打破新高截止, {}天 {}", j, dailyKs.get(index - j));
+                    count = j;
+                    break;
+                }
+            }
+            log.info("over days high , count = {} high", count);
+
+            ArrayList<BigDecimal> highList = new ArrayList<>();
+            ArrayList<BigDecimal> lowList = new ArrayList<>();
+
+            int countBox = 0;//箱体计数
+            for (int j = 1; j < count; j++) {
+                //1, 高点超过高点
+                //2, 低点低于高点
+                int tmpIndex = index - j;
+                EmDailyK dk = dailyKs.get(tmpIndex);
+                if (k.getLow().compareTo(dk.getHigh()) < 0 && k.getHigh().compareTo(dk.getHigh()) > 0) {
+                    countBox++;
+                }
+                highList.add(dk.getHigh());
+                lowList.add(dk.getLow());
+            }
+
+            log.info("over box high , count = {} high", countBox);
+
+            if (count > daysHigh && countBox > boxDays * boxDaysFactor) {
+                log.error("满足条件箱体突破 {}", k);
+                return true;
+            }
+
+            if (count > daysHigh) {
+                log.info("开始判断曲线");
+                highList.add(k.getClose());
+                Collections.sort(highList);
+                int locationHigh = highList.indexOf(k.getClose());
+                BigDecimal locationHighPct = BigDecimal.valueOf(locationHigh).divide(BigDecimal.valueOf(highList.size()), 3, RoundingMode.HALF_UP);
+                log.info("最新价 location pct = {}", locationHighPct);
+                if (locationHighPct.compareTo(new BigDecimal("0.9")) < 0) {
+                    return false;
+                }
+
+                //获取lowList 最低价
+                BigDecimal lowest = lowList.stream().min(BigDecimal::compareTo).get();
+                log.info("最低价 = {}", lowest);
+                int locationLow = lowList.indexOf(lowest);
+                BigDecimal locationLowPct = BigDecimal.valueOf(locationLow).divide(BigDecimal.valueOf(lowList.size()), 3, RoundingMode.HALF_UP);
+                if ((locationLowPct.compareTo(new BigDecimal("0.4")) < 0
+                        || locationLowPct.compareTo(new BigDecimal("0.6")) > 0)) {
+                    return false;
+                }
+
+                BigDecimal hh = highList.get(highList.size() - 1);
+                if (lowest.compareTo(new BigDecimal("0.7").multiply(hh)) > 0) {
+                    EmDailyK fk = dailyKs.get(size - count);
+                    log.info("曲线成功{}k [{}] from {} to {}", count, fk.getName(), fk.getTradeDate() + "=" + fk.getClose(), k.getTradeDate() + "=" + k.getClose());
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public String url(String code) {
         int market = 0;
         if (code.startsWith("6")) {
@@ -153,6 +251,18 @@ public class EmRealTimeClient {
         return null;
     }
 
+    public BigDecimal getFenshiAmt(List<DetailTrans> list,int second) {
+
+        //累计计算最近90s 内的list 成交量
+        long start = second * 1000L;
+        List<DetailTrans> lastS = list.stream().filter(d -> d.getTs() >= (System.currentTimeMillis() - start)).toList();
+        BigDecimal sum = BigDecimal.ZERO;
+        for (DetailTrans detailTrans : lastS) {
+            sum = sum.add(detailTrans.amt());
+        }
+
+        return sum;
+    }
     public BigDecimal getFenshiAmt(String code, int second) {
         EastGetStockFenShiVo f = this.getFenshiByCode(code);
         if (f == null) {
@@ -169,15 +279,8 @@ public class EmRealTimeClient {
             return BigDecimal.ZERO;
         }
 
-        //累计计算最近90s 内的list 成交量
-        long start = second * 1000L;
-        List<DetailTrans> lastS = list.stream().filter(d -> d.getTs() >= (System.currentTimeMillis() - start)).toList();
-        BigDecimal sum = BigDecimal.ZERO;
-        for (DetailTrans detailTrans : lastS) {
-            sum = sum.add(detailTrans.amt());
-        }
 
-        return sum;
+        return getFenshiAmt(list,second);
     }
 
 

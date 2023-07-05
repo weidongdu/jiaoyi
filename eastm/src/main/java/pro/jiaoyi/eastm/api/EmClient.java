@@ -93,7 +93,7 @@ public class EmClient {
         }
 
 
-        if (COUNT.incrementAndGet() % 10 == 0){
+        if (COUNT.incrementAndGet() % 10 == 0) {
             try {
                 log.info("sleep 1s");
                 Thread.sleep(1000);
@@ -392,6 +392,8 @@ public class EmClient {
             case O_TP02:
                 //遍历当天数据
                 return sync ? getIndexTp02() : Collections.emptyList();
+            case OPEN_HIGH:
+                return getIndexOpenHigh();
             case O_BK:
                 List<EmCList> bkList = getIndex(IndexEnum.O_BK.getUrl());
                 initBkMap(bkList);
@@ -401,6 +403,25 @@ public class EmClient {
             default:
                 return Collections.emptyList();
         }
+    }
+
+    public List<EmCList> getIndexOpenHigh() {
+
+        List<EmCList> all = getClistDefaultSize(false);
+        List<EmCList> openHighList = all.stream().filter(em -> {
+            BigDecimal pre = em.getF18Close();
+            BigDecimal open = em.getF17Open();
+            if (pre.compareTo(BigDecimal.ZERO) <= 0) {
+                return false;
+            }
+
+            BigDecimal openPct = open.divide(pre, 4, RoundingMode.HALF_UP);
+            return openPct.compareTo(new BigDecimal("1.005")) > 0
+                    && openPct.compareTo(new BigDecimal("1.03")) < 0
+                    && em.getF3Pct().compareTo(B7) > 0;
+        }).toList();
+
+        return new ArrayList<>(openHighList);
     }
 
 
