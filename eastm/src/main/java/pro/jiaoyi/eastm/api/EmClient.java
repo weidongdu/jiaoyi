@@ -265,8 +265,12 @@ public class EmClient {
                             || e.getF14Name().contains("退")
             )).toList();
 
-            DATE_INDEX_ALL_MAP.put(DateUtil.today(), new ArrayList<>(list));
-            return DATE_INDEX_ALL_MAP.get(DateUtil.today());
+            //超过 每天 9:31 之后的数据 在放入缓存
+            if (LocalTime.now().isAfter(LocalTime.of(9, 31))) {
+                DATE_INDEX_ALL_MAP.put(DateUtil.today(), new ArrayList<>(list));
+                return DATE_INDEX_ALL_MAP.get(DateUtil.today());
+            }
+            return new ArrayList<>(list);
         } else {
             return Collections.emptyList();
         }
