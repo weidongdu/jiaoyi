@@ -54,7 +54,7 @@ public class EmRealTimeClient {
 
         LocalDateTime now = LocalDateTime.now();
 
-        String amStart = LocalDate.now() + "09:25:00";
+        String amStart = LocalDate.now() + "09:30:00";
         String amEnd = LocalDate.now() + "11:30:00";
 
         String pmStart = LocalDate.now() + "13:00:00";
