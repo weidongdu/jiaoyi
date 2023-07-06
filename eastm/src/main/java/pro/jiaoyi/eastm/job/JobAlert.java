@@ -86,12 +86,12 @@ public class JobAlert {
         List<EmCList> openHighList = all.stream().filter(em -> {
             BigDecimal pre = em.getF18Close();
             BigDecimal open = em.getF17Open();
-            if (pre.compareTo(BigDecimal.ZERO) <= 0) {
+            if (open.compareTo(BigDecimal.ZERO) == 0) {
                 return false;
             }
 
             BigDecimal openPct = open.divide(pre, 4, RoundingMode.HALF_UP);
-            return openPct.compareTo(new BigDecimal("1.005")) > 0
+            return openPct.compareTo(BigDecimal.ZERO) >= 0
                     && openPct.compareTo(new BigDecimal("1.03")) < 0;
         }).toList();
 
