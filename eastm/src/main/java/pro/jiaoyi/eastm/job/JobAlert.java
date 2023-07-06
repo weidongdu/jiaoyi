@@ -86,13 +86,26 @@ public class JobAlert {
         List<EmCList> openHighList = all.stream().filter(em -> {
             BigDecimal pre = em.getF18Close();
             BigDecimal open = em.getF17Open();
-            if (pre.compareTo(BigDecimal.ZERO) == 0 ) {
+            if (pre.compareTo(BigDecimal.ZERO) == 0) {
                 return false;
             }
 
             BigDecimal openPct = open.divide(pre, 4, RoundingMode.HALF_UP);
-            return openPct.compareTo(BigDecimal.ZERO) >= 0
-                    && openPct.compareTo(new BigDecimal("1.03")) < 0;
+
+            //高开 0.5% - 3%
+            if (openPct.compareTo(new BigDecimal("1.005")) > 0
+                    && openPct.compareTo(new BigDecimal("1.03")) < 0) {
+                return true;
+            }
+
+            // 高开 0 - 0.5% 且开盘价等于最低价
+            if (openPct.compareTo(new BigDecimal("1.005")) <= 0
+                    && openPct.compareTo(BigDecimal.ONE) >= 0
+                    && open.compareTo(em.getF16Low()) == 0) {
+                return true;
+            }
+            return false;
+
         }).toList();
 
         Set<String> openHighCodeSet = openHighList.stream().map(EmCList::getF12Code).collect(Collectors.toSet());
