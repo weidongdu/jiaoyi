@@ -86,7 +86,7 @@ public class JobAlert {
         List<EmCList> openHighList = all.stream().filter(em -> {
             BigDecimal pre = em.getF18Close();
             BigDecimal open = em.getF17Open();
-            if (open.compareTo(BigDecimal.ZERO) == 0) {
+            if (pre.compareTo(BigDecimal.ZERO) == 0 ) {
                 return false;
             }
 
