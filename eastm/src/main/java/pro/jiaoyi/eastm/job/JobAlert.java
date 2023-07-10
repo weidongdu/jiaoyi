@@ -197,11 +197,12 @@ public class JobAlert {
                         || k.getClose().compareTo(ma20_value) < 0
                         || k.getClose().compareTo(ma30_value) < 0
                         || k.getClose().compareTo(ma60_value) < 0
-
                         || ma5_value.compareTo(ma250_value) < 0
-                        || ma5[last - 1].compareTo(ma250[last - 1]) < 0
                 ) {
                     log.info("不满足均线之上");
+                    if (ma5[last - 1].compareTo(ma250[last - 1]) < 0){
+                        blockList.add(code);
+                    }
                     continue;
                 }
 
