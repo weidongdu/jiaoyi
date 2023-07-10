@@ -138,20 +138,21 @@ public class JobAlert {
         if (tops.size() > 0) {
             for (EastSpeedInfo top : tops) {
                 String code = top.getCode_f12();
+                String name = top.getName_f14();
                 if (!INDEXSET.contains(code)) {
-                    log.info("not index code {}", code);
+                    log.info("not index code {}", code + name);
                     continue;
                 }
-                String name = top.getName_f14();
+
                 if (code.startsWith("8")) {
-                    log.info("北交所排除 {} {}", code, name);
+                    log.info("北交所排除 {}", code + name);
                     continue;
                 }
 
                 //过滤 假设涨停也无法满足条件
                 List<String> blockList = DAY_BLOCKLIST_MAP.computeIfAbsent(LocalDate.now(), k -> new ArrayList<>());
                 if (blockList.contains(code)) {
-                    log.info("block code {}", code);
+                    log.info("block code {}", code + name);
                     continue;
                 }
 
@@ -159,6 +160,15 @@ public class JobAlert {
                 List<EmDailyK> dailyKs = emClient.getDailyKs(code, LocalDate.now(), 300, true);
                 if (dailyKs.size() < 250) {
                     log.info("k size {} < 250", dailyKs.size());
+                    blockList.add(code);
+                    continue;
+                }
+
+                BigDecimal dayAmtTop10 = emClient.amtTop10p(dailyKs);
+                BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
+                if (hourAmt.compareTo(BDUtil.B5000W) < 0) {
+                    log.info("日成交额 {} 不满足条件(约成交额 ma60<1亿)", amtStr(dayAmtTop10));
+                    blockList.add(code);
                     continue;
                 }
 
@@ -191,13 +201,6 @@ public class JobAlert {
                     continue;
                 }
 
-                BigDecimal dayAmtTop10 = emClient.amtTop10p(dailyKs);
-                BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
-                if (hourAmt.compareTo(BDUtil.B5000W) < 0) {
-                    log.info("日成交额不满足条件{}(约成交额 ma60<1亿)", hourAmt);
-                    blockList.add(code);
-                    continue;
-                }
                 BigDecimal fAmt = new BigDecimal("0.1").multiply(hourAmt);
 
                 EastGetStockFenShiVo fEastGetStockFenShiVo = emRealTimeClient.getFenshiByCode(code);
@@ -216,7 +219,7 @@ public class JobAlert {
                 String fenshiAmtStr = amtStr(fenshiAmtLast70);
 
                 if (fx.compareTo(new BigDecimal("0.1")) < 0) {
-                    log.info("分时成交量{} 不满足条件{}",fenshiAmtStr,amtStr);
+                    log.info("分时成交量{} 不满足条件{}", fenshiAmtStr, amtStr);
                     continue;
                 }
 
