@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import pro.jiaoyi.common.util.BDUtil;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.EmojiUtil;
 import pro.jiaoyi.eastm.api.EmClient;
@@ -79,7 +80,7 @@ public class JobAlert {
         updateIndex();
     }
 
-    public void updateIndex(){
+    public void updateIndex() {
         INDEXSET.clear();
         INDEXSET.addAll(emClient.getIndex(IndexEnum.HS300.getUrl()).stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
         INDEXSET.addAll(emClient.getIndex(IndexEnum.CYCF.getUrl()).stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
@@ -98,6 +99,10 @@ public class JobAlert {
 
         List<EmCList> all = emClient.getClistDefaultSize(false);
         List<EmCList> openHighList = all.stream().filter(em -> {
+            if (!INDEXSET.contains(em.getF12Code())) {
+                return false;
+            }
+
             BigDecimal pre = em.getF18Close();
             BigDecimal open = em.getF17Open();
             if (pre.compareTo(BigDecimal.ZERO) == 0) {
@@ -105,23 +110,17 @@ public class JobAlert {
             }
 
             BigDecimal openPct = open.divide(pre, 4, RoundingMode.HALF_UP);
-
             //高开 0.5% - 3%
             if (openPct.compareTo(new BigDecimal("1.005")) > 0
                     && openPct.compareTo(new BigDecimal("1.03")) < 0) {
                 return true;
             }
-
             // 高开 0 - 0.5% 且开盘价等于最低价
-            if (openPct.compareTo(new BigDecimal("1.005")) <= 0
+            return openPct.compareTo(new BigDecimal("1.005")) <= 0
                     && openPct.compareTo(BigDecimal.ONE) >= 0
-                    && open.compareTo(em.getF16Low()) == 0) {
-                return true;
-            }
-            return false;
+                    && open.compareTo(em.getF16Low()) == 0;
 
         }).toList();
-
         Set<String> openHighCodeSet = openHighList.stream().map(EmCList::getF12Code).collect(Collectors.toSet());
 
 
@@ -139,17 +138,22 @@ public class JobAlert {
         if (tops.size() > 0) {
             for (EastSpeedInfo top : tops) {
                 String code = top.getCode_f12();
-
                 if (!INDEXSET.contains(code)) {
                     log.info("not index code {}", code);
                     continue;
                 }
-
                 String name = top.getName_f14();
-                if (code.startsWith("8")) continue;
+                if (code.startsWith("8")) {
+                    log.info("北交所排除 {} {}", code, name);
+                    continue;
+                }
+
                 //过滤 假设涨停也无法满足条件
                 List<String> blockList = DAY_BLOCKLIST_MAP.computeIfAbsent(LocalDate.now(), k -> new ArrayList<>());
-
+                if (blockList.contains(code)) {
+                    log.info("block code {}", code);
+                    continue;
+                }
 
                 log.info("run speed {} {} {}", code, name, top.getSpeed_f22());
                 List<EmDailyK> dailyKs = emClient.getDailyKs(code, LocalDate.now(), 300, true);
@@ -189,17 +193,17 @@ public class JobAlert {
 
                 BigDecimal dayAmtTop10 = emClient.amtTop10p(dailyKs);
                 BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
-                BigDecimal fAmt = new BigDecimal("0.1").multiply(hourAmt);
-                if (fAmt.compareTo(new BigDecimal("750")) < 0) {
+                if (hourAmt.compareTo(BDUtil.B5000W) < 0) {
+                    log.info("日成交额不满足条件{}(约成交额 ma60<1亿)", hourAmt);
+                    blockList.add(code);
                     continue;
                 }
+                BigDecimal fAmt = new BigDecimal("0.1").multiply(hourAmt);
 
                 EastGetStockFenShiVo fEastGetStockFenShiVo = emRealTimeClient.getFenshiByCode(code);
                 if (fEastGetStockFenShiVo == null) continue;
-
                 EastGetStockFenShiTrans trans = EastGetStockFenShiTrans.trans(fEastGetStockFenShiVo);
                 if (trans == null) continue;
-
                 List<DetailTrans> DetailTransList = trans.getData();
                 if (DetailTransList == null || DetailTransList.isEmpty()) continue;
 
@@ -207,13 +211,15 @@ public class JobAlert {
                 BigDecimal fenshiAmtLast70 = emRealTimeClient.getFenshiAmt(DetailTransList, 70);
                 //成交量放大倍数
                 BigDecimal fx = fenshiAmtLast70.divide(hourAmt, 4, RoundingMode.HALF_UP);
-                if (fx.compareTo(new BigDecimal("0.1")) < 0) {
-                    log.info("成交量不满足条件");
-                    continue;
-                }
 
                 String amtStr = amtStr(fAmt);
                 String fenshiAmtStr = amtStr(fenshiAmtLast70);
+
+                if (fx.compareTo(new BigDecimal("0.1")) < 0) {
+                    log.info("分时成交量{} 不满足条件{}",fenshiAmtStr,amtStr);
+                    continue;
+                }
+
 
                 if (openHighCodeSet.contains(code)) {
                     log.info("开盘高开 {}", code);
@@ -371,7 +377,6 @@ public class JobAlert {
 
             System.out.println();
         }
-
 
     }
 
