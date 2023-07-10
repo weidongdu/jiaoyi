@@ -196,7 +196,9 @@ public class JobAlert {
                         || k.getClose().compareTo(ma10_value) < 0
                         || k.getClose().compareTo(ma20_value) < 0
                         || k.getClose().compareTo(ma30_value) < 0
-                        || k.getClose().compareTo(ma60_value) < 0) {
+                        || k.getClose().compareTo(ma60_value) < 0
+
+                        || ma5_value.compareTo(ma250_value) < 0) {
                     log.info("不满足均线之上");
                     continue;
                 }
@@ -228,7 +230,6 @@ public class JobAlert {
                     log.info("开盘高开 {}", code);
                     //当前家是否为最高价
                     LocalDateTime openTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 30));
-
                     List<DetailTrans> open60s = DetailTransList.stream()
                             .filter(d -> d.getTs() >= DateUtil.toTimestamp(openTime)
                                     && d.getTs() <= DateUtil.toTimestamp(openTime.plusSeconds(60)))
@@ -261,6 +262,7 @@ public class JobAlert {
                                 boolean push = checkSendWxCount(code);
                                 if (push) {
                                     wxUtil.send(content);
+                                    blockList.add(code);
                                 }
                                 break;
                             }
@@ -269,10 +271,6 @@ public class JobAlert {
                 }
 
 
-                if (blockList.contains(code)) {
-                    log.info("block code {} {}", code, name);
-                    continue;
-                }
 //                int tu = emRealTimeClient.tu(dailyKs, 60, 60, 0.4d);
                 boolean tu = emRealTimeClient.tu_old(dailyKs, 60, 60, 0.4d);
                 if (tu) {
@@ -293,6 +291,7 @@ public class JobAlert {
                     boolean push = checkSendWxCount(code);
                     if (push) {
                         wxUtil.send(content);
+                        blockList.add(code);
                     }
 
                 } else {
