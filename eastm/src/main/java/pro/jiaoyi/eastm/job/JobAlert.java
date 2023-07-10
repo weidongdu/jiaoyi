@@ -158,7 +158,7 @@ public class JobAlert {
 
                 log.info("run speed {} {} {}", code, name, top.getSpeed_f22());
                 List<EmDailyK> dailyKs = emClient.getDailyKs(code, LocalDate.now(), 300, true);
-                if (dailyKs.size() < 250) {
+                if (dailyKs.size() < 260) {
                     log.info("k size {} < 250", dailyKs.size());
                     blockList.add(code);
                     continue;
@@ -198,7 +198,9 @@ public class JobAlert {
                         || k.getClose().compareTo(ma30_value) < 0
                         || k.getClose().compareTo(ma60_value) < 0
 
-                        || ma5_value.compareTo(ma250_value) < 0) {
+                        || ma5_value.compareTo(ma250_value) < 0
+                        || ma5[last - 1].compareTo(ma250[last - 1]) < 0
+                ) {
                     log.info("不满足均线之上");
                     continue;
                 }
