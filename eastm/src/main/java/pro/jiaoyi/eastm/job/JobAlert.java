@@ -8,6 +8,7 @@ import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.EmojiUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.api.EmRealTimeClient;
+import pro.jiaoyi.eastm.config.IndexEnum;
 import pro.jiaoyi.eastm.config.WxUtil;
 import pro.jiaoyi.eastm.model.EastSpeedInfo;
 import pro.jiaoyi.eastm.model.EmCList;
@@ -64,6 +65,7 @@ public class JobAlert {
     public static final String PM = "PM";
 
     public static final Map<LocalDate, List<String>> DAY_BLOCKLIST_MAP = new HashMap<>();
+    public static final Set<String> INDEXSET = new HashSet<>();
 
     //cron 每天上午8点 清空
     @Scheduled(cron = "0 0 9 * * ?")
@@ -74,6 +76,12 @@ public class JobAlert {
         BK_MAP.clear();
         DATE_INDEX_ALL_MAP.clear();
         DATE_KLINE_MAP.clear();
+        INDEXSET.clear();
+
+        INDEXSET.addAll(emClient.getIndex(IndexEnum.HS300.getUrl()).stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
+        INDEXSET.addAll(emClient.getIndex(IndexEnum.CYCF.getUrl()).stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
+        INDEXSET.addAll(emClient.getIndex(IndexEnum.ZZ500.getUrl()).stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
+        INDEXSET.addAll(emClient.getIndex1000().stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
     }
 
 
@@ -125,6 +133,11 @@ public class JobAlert {
         if (tops.size() > 0) {
             for (EastSpeedInfo top : tops) {
                 String code = top.getCode_f12();
+                if (!INDEXSET.contains(code)) {
+                    log.info("not index code {}", code);
+                    continue;
+                }
+
                 String name = top.getName_f14();
                 if (code.startsWith("8")) continue;
                 //过滤 假设涨停也无法满足条件

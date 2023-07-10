@@ -184,7 +184,8 @@ public class EmClient {
             String path = "kline/" + DateUtil.today() + "/" + key + ".json";
             if (!FileUtil.fileCheck(path)) {
                 //不存在 且 在每天15:00之后
-                if (LocalTime.now().isAfter(LocalTime.of(15, 0))) {
+                if (LocalTime.now().isAfter(LocalTime.of(15, 0))
+                        && LocalTime.now().isBefore(LocalTime.of(9, 0))) {
                     FileUtil.writeToFile(path, JSON.toJSONString(list));
                 }
 //                FileUtil.writeToFile(path, JSON.toJSONString(list));
@@ -389,12 +390,14 @@ public class EmClient {
                 return getIndex1000();
             case IndexAll_Filter:
                 return sync ? getIndexAll() : Collections.emptyList();
+//                return   Collections.emptyList();
             case IndexAll_Component:
                 return getIndexAllComponent();
             case O_TP7:
                 return getIndexTp7();
             case O_TP02:
                 //遍历当天数据
+//                return Collections.emptyList();
                 return sync ? getIndexTp02() : Collections.emptyList();
             case OPEN_HIGH:
                 return getIndexOpenHigh();
@@ -658,7 +661,7 @@ public class EmClient {
     }
 
 
-    private List<EmCList> getIndex(String url) {
+    public List<EmCList> getIndex(String url) {
         byte[] bytes = okHttpUtil.getForBytes(url, headerMap);
         if (bytes.length > 0) {
             return parseEmCLists(bytes);
@@ -675,7 +678,7 @@ public class EmClient {
      *
      * @return
      */
-    private List<EmCList> getIndex1000() {
+    public List<EmCList> getIndex1000() {
         String filePath = "zz1000_" + DateUtil.today() + ".xls";
         if (okHttpUtil.downloadFile(IndexEnum.ZZ1000.getUrl(), null, filePath)) {
             List<EmCList> list = new ArrayList<>();
