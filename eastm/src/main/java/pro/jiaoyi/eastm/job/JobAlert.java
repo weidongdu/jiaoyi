@@ -77,6 +77,7 @@ public class JobAlert {
         BK_MAP.clear();
         DATE_INDEX_ALL_MAP.clear();
         DATE_KLINE_MAP.clear();
+        DAY_BLOCKLIST_MAP.clear();
         updateIndex();
     }
 
