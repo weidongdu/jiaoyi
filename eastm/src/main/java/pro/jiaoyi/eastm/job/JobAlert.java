@@ -76,19 +76,25 @@ public class JobAlert {
         BK_MAP.clear();
         DATE_INDEX_ALL_MAP.clear();
         DATE_KLINE_MAP.clear();
-        INDEXSET.clear();
+        updateIndex();
+    }
 
+    public void updateIndex(){
+        INDEXSET.clear();
         INDEXSET.addAll(emClient.getIndex(IndexEnum.HS300.getUrl()).stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
         INDEXSET.addAll(emClient.getIndex(IndexEnum.CYCF.getUrl()).stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
         INDEXSET.addAll(emClient.getIndex(IndexEnum.ZZ500.getUrl()).stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
         INDEXSET.addAll(emClient.getIndex1000().stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
-    }
 
+    }
 
     @Scheduled(fixedRate = 1000 * 10L)
     public void run() {
         if (!EmRealTimeClient.tradeTime()) return;
 
+        if (INDEXSET.isEmpty()) {
+            updateIndex();
+        }
 
         List<EmCList> all = emClient.getClistDefaultSize(false);
         List<EmCList> openHighList = all.stream().filter(em -> {
@@ -133,6 +139,7 @@ public class JobAlert {
         if (tops.size() > 0) {
             for (EastSpeedInfo top : tops) {
                 String code = top.getCode_f12();
+
                 if (!INDEXSET.contains(code)) {
                     log.info("not index code {}", code);
                     continue;
