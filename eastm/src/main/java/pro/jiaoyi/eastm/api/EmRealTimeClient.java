@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pro.jiaoyi.common.strategy.BreakOutStrategy;
+import pro.jiaoyi.common.util.BDUtil;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
 import pro.jiaoyi.eastm.model.EastSpeedInfo;
@@ -94,6 +95,7 @@ public class EmRealTimeClient {
 
             if (eastSpeedInfo.getSpeed_f22().compareTo(BigDecimal.ONE) > 0
                     && eastSpeedInfo.getPct_f3().compareTo(BigDecimal.ZERO) > 0
+                    && eastSpeedInfo.getPrice_f2().compareTo(BDUtil.B50) < 0
                     && eastSpeedInfo.getPct_f3().compareTo(new BigDecimal("2.5")) < 0
                     && !eastSpeedInfo.getName_f14().contains("ST")) {
                 list.add(eastSpeedInfo);
@@ -251,7 +253,7 @@ public class EmRealTimeClient {
         return null;
     }
 
-    public BigDecimal getFenshiAmt(List<DetailTrans> list,int second) {
+    public BigDecimal getFenshiAmt(List<DetailTrans> list, int second) {
 
         //累计计算最近90s 内的list 成交量
         long start = second * 1000L;
@@ -263,6 +265,7 @@ public class EmRealTimeClient {
 
         return sum;
     }
+
     public BigDecimal getFenshiAmt(String code, int second) {
         EastGetStockFenShiVo f = this.getFenshiByCode(code);
         if (f == null) {
@@ -280,7 +283,7 @@ public class EmRealTimeClient {
         }
 
 
-        return getFenshiAmt(list,second);
+        return getFenshiAmt(list, second);
     }
 
 
