@@ -15,7 +15,8 @@ public enum IndexEnum {
     OPEN_HIGH("open_high", "高开0.5-3", ""),
     ALL("all", "全部", ""),
     O_BK("bk", "板块", "http://92.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=100&po=1&np=1&fltt=2&invt=2&wbp2u=6502094531899276|0|1|0|web&fid=f3&fs=m:90+t:2+f:!50&fields=f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f14,f15,f16,f17,f18,f22,f23,f100"),
-    O_TAMT60("tamt60", "7.成交额超过amt60", "");
+    O_TAMT60("tamt60", "7.成交额超过amt60", ""),
+    X10("amt_ma_60", "10X放量", "");
 
 
     private String name;

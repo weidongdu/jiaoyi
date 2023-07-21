@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.model.KPeriod;
+import pro.jiaoyi.common.util.BDUtil;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.FileUtil;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
@@ -185,7 +186,7 @@ public class EmClient {
             if (!FileUtil.fileCheck(path)) {
                 //不存在 且 在每天15:00之后
                 if (LocalTime.now().isAfter(LocalTime.of(15, 0))
-                        && LocalTime.now().isBefore(LocalTime.of(9, 0))) {
+                        || LocalTime.now().isBefore(LocalTime.of(9, 0))) {
                     FileUtil.writeToFile(path, JSON.toJSONString(list));
                 }
 //                FileUtil.writeToFile(path, JSON.toJSONString(list));
@@ -407,9 +408,35 @@ public class EmClient {
                 return bkList;
 
             case O_TAMT60:
+            case X10:
+                return getX10();
             default:
                 return Collections.emptyList();
         }
+    }
+
+    private List<EmCList> getX10() {
+        List<EmCList> list = getClistDefaultSize(false);
+        List<EmCList> fList = list.stream().filter(em -> {
+            boolean code = em.getF12Code().startsWith("6") || em.getF12Code().startsWith("0") || em.getF12Code().startsWith("3");
+            boolean amt = em.getF6Amt().compareTo(B1_5Y) > 0;
+            return code && amt;
+        }).toList();
+
+        ArrayList<EmCList> x10 = new ArrayList<>();
+        for (EmCList emCList : fList) {
+            List<EmDailyK> ks = getDailyKs(emCList.getF12Code(), LocalDate.now(), 500, false);
+            if (ks.size() < 100) {
+                continue;
+            }
+            BigDecimal[] array = ks.stream().map(EmDailyK::getAmt).toList().toArray(new BigDecimal[0]);
+            BigDecimal[] ma60 = MaUtil.ma(60, array, 2);
+            if (ks.get(ks.size()-1).getAmt().compareTo(BDUtil.B10.multiply(ma60[ma60.length-1])) > 0) {
+                x10.add(emCList);
+            }
+        }
+
+        return x10;
     }
 
     public List<EmCList> getIndexOpenHigh() {

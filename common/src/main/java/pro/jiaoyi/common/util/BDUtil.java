@@ -5,7 +5,9 @@ import java.math.RoundingMode;
 
 public class BDUtil {
     public static final BigDecimal B1_5Y = new BigDecimal("150000000");
+    public static final BigDecimal B1Y = new BigDecimal("100000000");
     public static final BigDecimal B5000W = new BigDecimal("50000000");
+    public static final BigDecimal B1W = new BigDecimal("10000");
     public static final BigDecimal B100 = new BigDecimal("100");
     public static final BigDecimal B90 = new BigDecimal("90");
     public static final BigDecimal B80 = new BigDecimal("80");
@@ -51,6 +53,17 @@ public class BDUtil {
 
     public static String p100(BigDecimal b) {
         return b.multiply(B100).setScale(2, RoundingMode.HALF_UP).toPlainString();
+    }
+
+    public static String amtHuman(BigDecimal b) {
+        if (b.compareTo(B1Y) > 0) {
+            return b.divide(B1Y, 2, RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP).toPlainString() + "亿";
+        }
+        if (b.compareTo(B1W) > 0) {
+            return b.divide(B1W, 2, RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP).toPlainString() + "万";
+        }
+
+        return b.setScale(2, RoundingMode.HALF_UP).toPlainString();
     }
 
 }

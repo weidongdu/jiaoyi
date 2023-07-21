@@ -1,9 +1,11 @@
 package pro.jiaoyi.tradingview.service;
 
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pro.jiaoyi.common.util.DateUtil;
+import pro.jiaoyi.common.util.FileUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.config.IndexEnum;
 import pro.jiaoyi.eastm.model.EmCList;
@@ -16,6 +18,8 @@ import pro.jiaoyi.tradingview.model.chart.TvMarker;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -83,6 +87,8 @@ public class TvService {
             }
             map.put(value.getType(), codeList);
         }
+        String file = LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateUtil.PATTERN_yyyyMMdd_HHmm)) + ".json";
+        FileUtil.writeToFile(file, JSON.toJSONString(map));
         return map;
     }
 

@@ -3,6 +3,7 @@ package pro.jiaoyi.eastm;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.read.listener.ReadListener;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -520,7 +521,6 @@ class EastmApplicationTests {
         }).map(EmCList::getF12Code).toList();
 
 
-
         for (String code : openHighList) {
 
             EastGetStockFenShiVo f = emRealTimeClient.getFenshiByCode(code);
@@ -549,4 +549,71 @@ class EastmApplicationTests {
 
     }
 
+
+    @Test
+    public void x10() {
+        List<EmCList> list = emClient.getClistDefaultSize(false);
+        int size = list.size();
+        LocalDate now = LocalDate.now();
+        String head = "TradeDate" + "," + "Code" + "," + "Name" + "," + "收盘" + "," + "收盘P" + "," + "amt" + "," + "ma60" + "," + "次开P" + "," + "次开" + "," + "次收P" + "," + "次收" + ","  + "收-开" + "," + "最大" + "," + "几日" + "," + "最小" + "," + "几日" + "\n";
+        FileUtil.writeToFile("x10_5.csv", head);
+
+
+        for (int i = 0; i < list.size(); i++) {
+            EmCList emCList = list.get(i);
+            log.info("{}/{} code={} name={}", i, size, emCList.getF12Code(), emCList.getF14Name());
+            List<EmDailyK> ks = emClient.getDailyKs(emCList.getF12Code(), now, 1000, false);
+            if (ks.size() < 100) {
+                log.info("code={} name={} size={}", emCList.getF12Code(), emCList.getF14Name(), ks.size());
+                continue;
+            }
+
+            BigDecimal[] amtArray = ks.stream().map(EmDailyK::getAmt).toList().toArray(new BigDecimal[0]);
+            BigDecimal[] amtMa60 = MaUtil.ma(60, amtArray, 2);
+
+            for (int j = 60; j < ks.size() - 5; j++) {
+                EmDailyK k = ks.get(j);
+                BigDecimal ma60 = amtMa60[j];
+                if (k.getAmt().compareTo(ma60.multiply(new BigDecimal("10"))) > 0) {
+                    log.info("match amt x10 amt={} ma60={} {}", BDUtil.amtHuman(k.getAmt()), BDUtil.amtHuman(ma60), JSON.toJSONString(k));
+                    //计算后续60日涨幅
+                    List<BigDecimal> priceList = new ArrayList<>();
+                    for (int l = j + 1; l < Math.min(j + 30, ks.size()); l++) {
+                        priceList.add(ks.get(l).getClose());
+                    }
+                    BigDecimal[] priceArray = priceList.toArray(new BigDecimal[0]);
+
+                    Collections.sort(priceList);
+                    BigDecimal min = priceList.get(0);
+                    BigDecimal max = priceList.get(priceList.size() - 1);
+
+                    BigDecimal pctMax = max.subtract(k.getClose()).divide(k.getClose(), 3, RoundingMode.HALF_UP);
+                    BigDecimal pctMin = min.subtract(k.getClose()).divide(k.getClose(), 3, RoundingMode.HALF_UP);
+
+                    int maxI = -1;
+                    int minI = -1;
+                    for (int l = 0; l < priceArray.length; l++) {
+                        if (priceArray[l].compareTo(max) == 0) {
+                            maxI = l;
+                        }
+                        if (priceArray[l].compareTo(min) == 0) {
+                            minI = l;
+                        }
+                    }
+
+                    log.info("price={} pctMax={} maxI={} pctMin={} minI={}",
+                            k.getTradeDate() + "_" + k.getClose(), BDUtil.p100(pctMax) + "_" + max, maxI, BDUtil.p100(pctMin) + "_" + min, minI);
+
+
+                    EmDailyK k1 = ks.get(j + 1);
+                    BigDecimal openP = k1.getOpen().subtract(k.getClose()).divide(k.getClose(), 2, RoundingMode.HALF_UP);
+                    BigDecimal closeP = k1.getClose().subtract(k.getClose()).divide(k.getClose(), 2, RoundingMode.HALF_UP);
+                    String content = k.getTradeDate() + "," + k.getCode() + "," + k.getName() + "," + k.getClose() + "," + k.getPct() + "," + BDUtil.amtHuman(k.getAmt()) + "," + BDUtil.amtHuman(ma60) + "," + BDUtil.p100(openP) + "," + k1.getOpen() + "," + BDUtil.p100(closeP) + "," + BDUtil.p100(k1.getClose()) + ","+ BDUtil.p100(closeP.subtract(openP).setScale(4,RoundingMode.HALF_UP)) + "," + BDUtil.p100(pctMax) + "," + maxI + "," + BDUtil.p100(pctMin) + "," + minI + "\n";
+                    FileUtil.writeToFile("x10_5.csv", content);
+
+                    j += 5;
+                }
+            }
+        }
+    }
 }
