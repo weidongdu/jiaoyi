@@ -64,12 +64,12 @@ public class K {
      * 开盘时间
      * 默认就是交易日
      */
-    private long tsOpen;
+    private Long tsOpen;
 
     /**
      * 收盘时间
      */
-    private long tsClose;
+    private Long tsClose;
 
 
     public BigDecimal[] ochl(){

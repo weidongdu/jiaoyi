@@ -21,6 +21,7 @@
         <okhttp.version>4.11.0</okhttp.version>
         <lombok-version>1.18.26</lombok-version>
         <easyexcel.version>3.3.1</easyexcel.version>
+        <mysql.version>8.0.32</mysql.version>
 
     </properties>
 
@@ -72,6 +73,12 @@
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-jpa</artifactId>
                 <version>${spring-boot.version}</version>
+            </dependency>
+            <!-- mysql 连接类 -->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.version}</version>
             </dependency>
 
 

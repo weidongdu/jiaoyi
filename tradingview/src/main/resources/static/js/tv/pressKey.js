@@ -210,8 +210,8 @@ $(document).keydown(function (e) {
     }
 
 
-});
 
+});
 function mock() {
     console.log('k', k);
     console.log('v', v);

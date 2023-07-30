@@ -77,7 +77,10 @@ public class EmClient {
         if (code.startsWith("6")) {
             secid = "1." + code;
         }
-
+        //http://22.push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.000001&
+        // fields1=f1,f2,f3,f4,f5,f6
+        // &fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61
+        // &klt=101&fqt=1&end=20500101&lmt=120&_=1690697488144
         String url = "http://push2his.eastmoney.com/api/qt/stock/kline/get?secid=" + secid
                 + "&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6"
                 + "&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61"
@@ -93,6 +96,13 @@ public class EmClient {
                     "&klt=101&fqt=1&end=20500101&lmt=1000000";
         }
 
+        if (code.startsWith("index")) {
+            code = code.substring("index".length());
+            url = "http://22.push2his.eastmoney.com/api/qt/stock/kline/get?secid=" + code
+                    + "&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6" +
+                    "&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61" +
+                    "&klt=101&fqt=1&end=20500101&lmt=10000";
+        }
 
         if (COUNT.incrementAndGet() % 10 == 0) {
             try {
@@ -431,7 +441,7 @@ public class EmClient {
             }
             BigDecimal[] array = ks.stream().map(EmDailyK::getAmt).toList().toArray(new BigDecimal[0]);
             BigDecimal[] ma60 = MaUtil.ma(60, array, 2);
-            if (ks.get(ks.size()-1).getAmt().compareTo(BDUtil.B10.multiply(ma60[ma60.length-1])) > 0) {
+            if (ks.get(ks.size() - 1).getAmt().compareTo(BDUtil.B10.multiply(ma60[ma60.length - 1])) > 0) {
                 x10.add(emCList);
             }
         }
