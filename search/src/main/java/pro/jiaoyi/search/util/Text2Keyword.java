@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import pro.jiaoyi.common.util.CollectionsUtil;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
+import pro.jiaoyi.search.config.CutModeEnum;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -28,8 +29,8 @@ public class Text2Keyword {
     @Value("${jieba.url}")
     private String jiebaUrl;
 
-    public List<String> text2KeywordList(String text) {
-        String send = send(text);
+    public List<String> text2KeywordList(String text, CutModeEnum mode) {
+        String send = send(text, mode);
         log.info("jieba result: {}", send);
         JSONObject json = JSONObject.parseObject(send);
         if (json.containsKey("keywords")) {
@@ -50,8 +51,8 @@ public class Text2Keyword {
     }
 
 
-    public Map<String, Integer> text2KeywordMap(String text) {
-        List<String> list = text2KeywordList(text);
+    public Map<String, Integer> text2KeywordMap(String text, CutModeEnum mode) {
+        List<String> list = text2KeywordList(text, mode);
         if (list == null || list.isEmpty()) {
             return Collections.emptyMap();
         }
@@ -91,11 +92,18 @@ public class Text2Keyword {
         ]
     }
      */
-    public String send(String text) {
+    public String send(String text, CutModeEnum mode) {
         JSONObject jsonObject = textJson(text);
+        jsonObject.put("mode", mode == null ? CutModeEnum.cut_for_search : mode);
         byte[] bytes = okHttpUtil.postJsonForBytes(jiebaUrl, null, jsonObject.toJSONString());
 
         return new String(bytes);
     }
 
+    public static void main(String[] args) {
+        JSONObject jsonObject = new JSONObject();
+
+        jsonObject.put("mode", CutModeEnum.cut_all_True);
+        System.out.println(jsonObject.toJSONString()    );
+    }
 }

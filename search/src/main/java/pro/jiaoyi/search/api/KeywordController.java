@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pro.jiaoyi.common.model.ApiResult;
+import pro.jiaoyi.search.config.CutModeEnum;
 import pro.jiaoyi.search.util.Text2Keyword;
 
 import java.util.List;
@@ -20,8 +21,10 @@ public class KeywordController {
     @Autowired
     private Text2Keyword text2Keyword;
     @GetMapping("/text")
-    public ApiResult text(String text) {
-        Map<String, Integer> map = text2Keyword.text2KeywordMap(text);
+    public ApiResult text(String text,String mode) {
+        CutModeEnum cutModeEnum = CutModeEnum.getByName(mode);
+
+        Map<String, Integer> map = text2Keyword.text2KeywordMap(text,cutModeEnum);
         return ApiResult.success(map);
     }
 }

@@ -21,12 +21,31 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         # 将POST请求的内容解析为JSON格式
         json_data = json.loads(post_data.decode('utf-8'))
-
         text = json_data['text'];
-        seg_list = jieba.cut_for_search(text)  # 搜索引擎模式
-        # print(", ".join(seg_list))
+        cutMode = json_data['mode'];
+        print("cutMode"+cutMode);
 
-        keywords = list(seg_list);
+        keywords = [];
+
+        if 'cut_all_True' == cutMode:
+            seg_list = jieba.cut(text, cut_all=True)
+            keywords = list(seg_list);
+
+            print("cut_all=True");
+            print(", ".join(seg_list))
+        elif 'cut_all_False' == cutMode:
+            seg_list = jieba.cut(text, cut_all=False)
+            keywords = list(seg_list);
+            print("cut_all=False");
+            print(", ".join(seg_list))
+        else:
+            seg_list = jieba.cut_for_search(text)  # 搜索引擎模式
+            keywords = list(seg_list);
+            print("cut_for_search");
+
+
+
+        print(keywords);
         # 构造响应数据
         response_data = {'text': text , 'keywords': keywords}
 
