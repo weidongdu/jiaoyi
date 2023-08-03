@@ -60,7 +60,7 @@ public class BDUtil {
             return b.divide(B1Y, 2, RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP).toPlainString() + "亿";
         }
         if (b.compareTo(B1W) > 0) {
-            return b.divide(B1W, 2, RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP).toPlainString() + "万";
+            return b.divide(B1W, 2, RoundingMode.HALF_UP).setScale(0, RoundingMode.HALF_UP).toPlainString() + "万";
         }
 
         return b.setScale(2, RoundingMode.HALF_UP).toPlainString();

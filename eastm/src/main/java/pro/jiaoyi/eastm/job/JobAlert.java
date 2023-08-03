@@ -82,16 +82,20 @@ public class JobAlert {
 
     public void updateIndex() {
         INDEXSET.clear();
-        INDEXSET.addAll(emClient.getIndex(IndexEnum.HS300.getUrl()).stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
-        INDEXSET.addAll(emClient.getIndex(IndexEnum.CYCF.getUrl()).stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
-        INDEXSET.addAll(emClient.getIndex(IndexEnum.ZZ500.getUrl()).stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
-        INDEXSET.addAll(emClient.getIndex1000().stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
+//        INDEXSET.addAll(emClient.getIndex(IndexEnum.HS300.getUrl()).stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
+//        INDEXSET.addAll(emClient.getIndex(IndexEnum.CYCF.getUrl()).stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
+//        INDEXSET.addAll(emClient.getIndex(IndexEnum.ZZ500.getUrl()).stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
+//        INDEXSET.addAll(emClient.getIndex1000().stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
 
     }
 
+
+
     @Scheduled(fixedRate = 1000 * 10L)
     public void run() {
-        if (!EmRealTimeClient.tradeTime()) return;
+        if (!EmRealTimeClient.tradeTime()) {
+            return;
+        }
 
         if (INDEXSET.isEmpty()) {
             updateIndex();

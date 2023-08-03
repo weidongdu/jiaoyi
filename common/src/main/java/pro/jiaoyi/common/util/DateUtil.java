@@ -54,6 +54,14 @@ public class DateUtil {
         return formatter.format(instant.atZone(ZoneId.systemDefault()));
     }
 
+    public static LocalDate tsToLocalDate(long ts){
+        /*
+         * timestamp -> LocalDate
+         */
+        String pattern = PATTERN_yyyy_MM_dd;
+        return strToLocalDate(tsToStr(ts, pattern), pattern);
+    }
+
     public static void main(String[] args) {
         LocalDateTime now = LocalDateTime.now();
         System.out.println(now.toString());

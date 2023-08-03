@@ -7,6 +7,7 @@ import com.alibaba.fastjson2.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.model.KPeriod;
@@ -39,12 +40,17 @@ public class EmClient {
     @Autowired
     private OkHttpUtil okHttpUtil;
 
+    @Value("${project.dir}")
+    private String projectDir;
+
     public static final BigDecimal B100 = new BigDecimal("100");
     public static final BigDecimal B1000 = new BigDecimal("1000");
 
     //获取日线行情数据
     public List<EmDailyK> getDailyKs(String code, LocalDate end, int lmt, boolean force) {
-        if (code == null) return Collections.emptyList();
+        if (code == null) {
+            return Collections.emptyList();
+        }
 
         if (code.startsWith("BK")) {
             code = "90." + code;
@@ -58,8 +64,11 @@ public class EmClient {
                 return emDailyKS;
             }
 
+
             //查本地文件
             String path = "kline/" + DateUtil.today() + "/" + key + ".json";
+            path = projectDir + "/" + path;
+
             if (FileUtil.fileCheck(path)) {
                 //读取文件
                 log.info("hit local file for code:{}", path);
@@ -77,10 +86,7 @@ public class EmClient {
         if (code.startsWith("6")) {
             secid = "1." + code;
         }
-        //http://22.push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.000001&
-        // fields1=f1,f2,f3,f4,f5,f6
-        // &fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61
-        // &klt=101&fqt=1&end=20500101&lmt=120&_=1690697488144
+
         String url = "http://push2his.eastmoney.com/api/qt/stock/kline/get?secid=" + secid
                 + "&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6"
                 + "&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61"
@@ -114,7 +120,6 @@ public class EmClient {
         }
 
         byte[] bytes = okHttpUtil.getForBytes(url, headerMap);
-
 
         if (bytes.length > 0) {
             String s = new String(bytes);
@@ -193,6 +198,7 @@ public class EmClient {
 
             String key = DateUtil.today() + "-" + code;
             String path = "kline/" + DateUtil.today() + "/" + key + ".json";
+            path = projectDir + "/" + path;
             if (!FileUtil.fileCheck(path)) {
                 //不存在 且 在每天15:00之后
                 if (LocalTime.now().isAfter(LocalTime.of(15, 0))
