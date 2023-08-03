@@ -5,11 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import pro.jiaoyi.common.util.CollectionsUtil;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /*
 将一段文本转换成关键词列表
@@ -46,10 +49,24 @@ public class Text2Keyword {
         return Collections.emptyList();
     }
 
-    public Map<String, Integer> text2KeywordMap(String text, List<String> stopWords, int topN) {
 
-        return Collections.emptyMap();
+    public Map<String, Integer> text2KeywordMap(String text) {
+        List<String> list = text2KeywordList(text);
+        if (list == null || list.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, Integer> map = list.stream()
+                .collect(Collectors.toMap(
+                        str -> str,              // 键是列表中的字符串
+                        str -> 1,                // 初始值为1
+                        Integer::sum             // 如果键已存在，则将值加1
+                ));
+
+        return CollectionsUtil.sortByValue(map, false);
+
     }
+
 
     private JSONObject textJson(String text) {
         JSONObject jsonObject = new JSONObject();

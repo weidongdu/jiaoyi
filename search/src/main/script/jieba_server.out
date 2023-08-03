@@ -4,3 +4,9 @@ Loading model from cache /var/folders/tf/3mg3r4n917b2402qd717vqr80000gn/T/jieba.
 Loading model cost 0.371 seconds.
 Prefix dict has been built successfully.
 127.0.0.1 - - [03/Aug/2023 16:49:55] "POST /jieba HTTP/1.1" 200 -
+127.0.0.1 - - [03/Aug/2023 17:04:58] "POST /jieba HTTP/1.1" 200 -
+127.0.0.1 - - [03/Aug/2023 17:05:02] "POST /jieba HTTP/1.1" 200 -
+127.0.0.1 - - [03/Aug/2023 17:05:08] "POST /jieba HTTP/1.1" 200 -
+127.0.0.1 - - [03/Aug/2023 17:12:32] "POST /jieba HTTP/1.1" 200 -
+127.0.0.1 - - [03/Aug/2023 17:12:53] "POST /jieba HTTP/1.1" 200 -
+127.0.0.1 - - [03/Aug/2023 17:16:00] "POST /jieba HTTP/1.1" 200 -
