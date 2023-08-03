@@ -1,0 +1,6 @@
+127.0.0.1 - - [03/Aug/2023 16:07:08] "POST /jieba HTTP/1.1" 200 -
+Building prefix dict from the default dictionary ...
+Loading model from cache /var/folders/tf/3mg3r4n917b2402qd717vqr80000gn/T/jieba.cache
+Loading model cost 0.371 seconds.
+Prefix dict has been built successfully.
+127.0.0.1 - - [03/Aug/2023 16:49:55] "POST /jieba HTTP/1.1" 200 -
