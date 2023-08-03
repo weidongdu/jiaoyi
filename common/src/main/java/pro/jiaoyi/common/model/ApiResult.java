@@ -28,6 +28,7 @@ public class ApiResult<T> {
 
     public static <T> ApiResult<T> success(T data) {
         return new ApiResult<>(200, "success", data);
+
     }
 
     public static <T> ApiResult<T> success(String msg, T data) {
