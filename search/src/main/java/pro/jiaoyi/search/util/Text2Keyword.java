@@ -99,6 +99,9 @@ public class Text2Keyword {
 
         return new String(bytes);
     }
+    public String send(String text) {
+        return send(text, CutModeEnum.cut_for_search);
+    }
 
     public static void main(String[] args) {
         JSONObject jsonObject = new JSONObject();
