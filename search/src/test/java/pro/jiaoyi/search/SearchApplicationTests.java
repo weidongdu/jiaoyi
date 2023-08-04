@@ -3,12 +3,15 @@ package pro.jiaoyi.search;
 import com.alibaba.fastjson.JSON;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import pro.jiaoyi.search.dao.entity.SearchResultEntity;
@@ -223,7 +226,17 @@ class SearchApplicationTests {
         String title = driver.getTitle();
         log.info("title:{}", title);
 
-        driver.manage().timeouts().implicitlyWait(Duration.ofMillis(500));
+//        driver.manage().timeouts().implicitlyWait(Duration.ofMillis(500));
+
+        //显示等待 超时
+        WebElement revealed = driver.findElement(By.id("revealed"));
+        Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+
+        driver.findElement(By.id("reveal")).click();
+        wait.until(d -> revealed.isDisplayed());
+
+        revealed.sendKeys("Displayed");
+
 
         WebElement textBox = driver.findElement(By.name("my-text"));
         WebElement submitButton = driver.findElement(By.cssSelector("button"));
@@ -234,6 +247,33 @@ class SearchApplicationTests {
         WebElement message = driver.findElement(By.id("message"));
         String value = message.getText();
 
+        driver.quit();
+    }
+
+
+    @Test
+    public void explicit() {
+        System.setProperty("webdriver.chrome.driver", "/Users/dwd/Downloads/search/chromedriver-mac-arm64/chromedriver");
+
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("user-data-dir=/Users/dwd/Downloads/search/user_profile");
+        options.addArguments("--remote-allow-origins=*");
+
+
+        WebDriver driver = new ChromeDriver(options);
+
+        driver.get("https://www.selenium.dev/selenium/web/dynamic.html");
+        WebElement revealed = driver.findElement(By.id("revealed"));
+        Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        //最大等待时间 10s 超时 , 具体等待时间由实际情况决定
+
+        driver.findElement(By.id("reveal")).click();
+        log.info("1");
+        wait.until(d -> revealed.isDisplayed());
+        log.info("2");
+
+        revealed.sendKeys("Displayed");
+        Assertions.assertEquals("Displayed", revealed.getDomProperty("value"));
         driver.quit();
     }
 }
