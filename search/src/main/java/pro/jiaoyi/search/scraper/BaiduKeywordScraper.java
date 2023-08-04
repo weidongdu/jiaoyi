@@ -54,7 +54,7 @@ public class BaiduKeywordScraper implements Scraper {
 
     }
 
-    public void mobile(String keyword, int pn) {
+    public SearchResult mobile(String keyword, int pn) {
         //需要的参数
         //ie=utf-8
         //pn=10 第2页 不写默认第一页
@@ -66,7 +66,7 @@ public class BaiduKeywordScraper implements Scraper {
         byte[] bytes = okHttpUtil.getForBytes(url, MOBILE_HEADERS);
         if (bytes.length == 0) {
             log.error("百度关键词抓取失败");
-            return;
+            return null;
         }
 
         String html = new String(bytes);
@@ -78,7 +78,7 @@ public class BaiduKeywordScraper implements Scraper {
         Element results = doc.getElementById("results");
         if (results == null) {
             log.error("百度关键词抓取失败");
-            return;
+            return null;
         }
 
 
@@ -86,7 +86,7 @@ public class BaiduKeywordScraper implements Scraper {
         Elements results_es = results.select(".c-result.result");
         if (results_es.isEmpty()) {
             log.info("no result");
-            return;
+            return null;
         }
 
         SearchResult sr = new SearchResult(keyword, BAIDU.name(), PlatEnum.MOBILE.name(), SearchTypeEnum.RESULT.name());
@@ -193,6 +193,7 @@ public class BaiduKeywordScraper implements Scraper {
             }
         }
         log.info("sr={}", sr);
+        return sr;
     }
 
     /**
