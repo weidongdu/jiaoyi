@@ -41,4 +41,7 @@ public class SearchResultEntity {
 
     private LocalDateTime createTime;//下拉框
     private LocalDateTime updateTime;//下拉框
+
+    @Column(length = 1024)
+    private String remark;//备注
 }

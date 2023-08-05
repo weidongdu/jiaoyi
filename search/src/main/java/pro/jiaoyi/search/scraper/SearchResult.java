@@ -36,6 +36,7 @@ public class SearchResult {
         private String realUrl;//真实url
         private int page;//搜索结果页数
         private int rank;//搜索结果排名
+        private String remark;//备注
     }
 }
 

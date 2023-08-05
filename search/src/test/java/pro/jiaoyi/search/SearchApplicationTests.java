@@ -18,6 +18,7 @@ import pro.jiaoyi.search.dao.entity.SearchResultEntity;
 import pro.jiaoyi.search.dao.repo.SearchResultRepo;
 import pro.jiaoyi.search.scraper.BaiduKeywordScraper;
 import pro.jiaoyi.search.scraper.SearchResult;
+import pro.jiaoyi.search.util.SeleniumUtil;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -34,122 +35,123 @@ class SearchApplicationTests {
     @Resource
     private BaiduKeywordScraper baiduKeywordScraper;
 
-    @Test
-    public void test() {
-        ArrayList<SearchResult> l1 = new ArrayList<>();
+//    @Test
+//    public void test() {
+//        ArrayList<SearchResult> l1 = new ArrayList<>();
+//
+//        String keyword = "招股书";
+//        for (int i = 0; i < 3; i++) {
+//            SearchResult sr = baiduKeywordScraper.mobile(keyword, i + 1);
+//            if (sr == null) {
+//                continue;
+//            }
+//            l1.add(sr);
+//        }
+//
+//
+//        HashSet<String> rwSet = new HashSet<>();
+//        for (SearchResult sr : l1) {
+//            rwSet.addAll(sr.getKeywordRelated());
+//        }
+//
+//        ArrayList<SearchResult> l2 = new ArrayList<>();
+//        for (String word : rwSet) {
+//            for (int i = 0; i < 3; i++) {
+//                SearchResult sr = baiduKeywordScraper.mobile(word, i + 1);
+//                if (sr == null) {
+//                    continue;
+//                }
+//                l2.add(sr);
+//            }
+//        }
+//
+//    }
 
-        String keyword = "招股书";
-        for (int i = 0; i < 3; i++) {
-            SearchResult sr = baiduKeywordScraper.mobile(keyword, i + 1);
-            if (sr == null) {
-                continue;
-            }
-            l1.add(sr);
-        }
-
-
-        HashSet<String> rwSet = new HashSet<>();
-        for (SearchResult sr : l1) {
-            rwSet.addAll(sr.getKeywordRelated());
-        }
-
-        ArrayList<SearchResult> l2 = new ArrayList<>();
-        for (String word : rwSet) {
-            for (int i = 0; i < 3; i++) {
-                SearchResult sr = baiduKeywordScraper.mobile(word, i + 1);
-                if (sr == null) {
-                    continue;
-                }
-                l2.add(sr);
-            }
-        }
-
-    }
-
-    public void extend(String keyword, int page, int level) {
-
-        List<SearchResult> l1 = new ArrayList<>();
-        for (int i = 0; i < page; i++) {
-            SearchResult sr = baiduKeywordScraper.mobile(keyword, page);
-            if (sr == null) {
-                continue;
-            }
-            l1.add(sr);
-        }
-
-        HashSet<String> rwSet = new HashSet<>();
-        for (SearchResult sr : l1) {
-            rwSet.addAll(sr.getKeywordRelated());
-        }
-
-        rwSet.remove(keyword);
-        if (level == 1) {
-            return;
-        }
-
-        List<SearchResult> l2 = new ArrayList<>();
-        for (String word : rwSet) {
-            for (int i = 0; i < page; i++) {
-                SearchResult sr = baiduKeywordScraper.mobile(word, page);
-                if (sr == null) {
-                    continue;
-                }
-                l2.add(sr);
-            }
-        }
-
-        HashSet<String> rwSet2 = new HashSet<>();
-        for (SearchResult sr : l2) {
-            rwSet2.addAll(sr.getKeywordRelated());
-        }
-
-        rwSet2.remove(keyword);
-        rwSet2.removeAll(rwSet);
-
-        if (level == 2) {
-            return;
-        }
-
-        List<SearchResult> l3 = new ArrayList<>();
-        for (String word : rwSet2) {
-            for (int i = 0; i < page; i++) {
-                SearchResult sr = baiduKeywordScraper.mobile(word, page);
-                if (sr == null) {
-                    continue;
-                }
-                l3.add(sr);
-            }
-        }
-
-        HashSet<String> rwSet3 = new HashSet<>();
-        for (SearchResult sr : l3) {
-            rwSet3.addAll(sr.getKeywordRelated());
-        }
-
-        rwSet3.remove(keyword);
-        rwSet3.removeAll(rwSet);
-        rwSet3.removeAll(rwSet2);
-
-        if (level == 3) {
-            return;
-        }
-
-
-    }
+//    public void extend(String keyword, int page, int level) {
+//
+//        List<SearchResult> l1 = new ArrayList<>();
+//        for (int i = 0; i < page; i++) {
+//            SearchResult sr = baiduKeywordScraper.mobile(keyword, page);
+//            if (sr == null) {
+//                continue;
+//            }
+//            l1.add(sr);
+//        }
+//
+//        HashSet<String> rwSet = new HashSet<>();
+//        for (SearchResult sr : l1) {
+//            rwSet.addAll(sr.getKeywordRelated());
+//        }
+//
+//        rwSet.remove(keyword);
+//        if (level == 1) {
+//            return;
+//        }
+//
+//        List<SearchResult> l2 = new ArrayList<>();
+//        for (String word : rwSet) {
+//            for (int i = 0; i < page; i++) {
+//                SearchResult sr = baiduKeywordScraper.mobile(word, page);
+//                if (sr == null) {
+//                    continue;
+//                }
+//                l2.add(sr);
+//            }
+//        }
+//
+//        HashSet<String> rwSet2 = new HashSet<>();
+//        for (SearchResult sr : l2) {
+//            rwSet2.addAll(sr.getKeywordRelated());
+//        }
+//
+//        rwSet2.remove(keyword);
+//        rwSet2.removeAll(rwSet);
+//
+//        if (level == 2) {
+//            return;
+//        }
+//
+//        List<SearchResult> l3 = new ArrayList<>();
+//        for (String word : rwSet2) {
+//            for (int i = 0; i < page; i++) {
+//                SearchResult sr = baiduKeywordScraper.mobile(word, page);
+//                if (sr == null) {
+//                    continue;
+//                }
+//                l3.add(sr);
+//            }
+//        }
+//
+//        HashSet<String> rwSet3 = new HashSet<>();
+//        for (SearchResult sr : l3) {
+//            rwSet3.addAll(sr.getKeywordRelated());
+//        }
+//
+//        rwSet3.remove(keyword);
+//        rwSet3.removeAll(rwSet);
+//        rwSet3.removeAll(rwSet2);
+//
+//        if (level == 3) {
+//            return;
+//        }
+//
+//
+//    }
 
     @Autowired
     private SearchResultRepo searchResultRepo;
 
     @Test
     public void baidu() {
-        extend1("招股书","招股书", 3, 3);
+        extend1("招股书", "招股书", 3, 3);
     }
 
     public void extend1(String master, String keyword, int page, int level) {
         HashSet<String> rwSet = new HashSet<>();
         HashSet<String> previousRwSet = new HashSet<>();
 
-
+        WebDriver driver = SeleniumUtil.getDriver();
+        driver.get("https://m.baidu.com/s?word=%E7%99%BE%E5%BA%A6%E4%B8%80%E4%B8%8B&ts=0&t_kt=0&ie=utf-8&rsv_iqid=7921659044293865617&rsv_t=ac96ml5NRi9bqFY4gn6MhG%252BgsIQiOjVh8BeSwfoSSnFi%252BmwOcmz9&sa=is_1&rsv_pq=7921659044293865617&rsv_sug4=1691159333747&tj=1&ss=110&inputT=1691159333882&sugid=166791193111814&rq=baidu");
         for (int currentLevel = 0; currentLevel < level; currentLevel++) {
             List<SearchResult> l = new ArrayList<>();
             // If it's the first iteration, use the specified keyword.
@@ -157,7 +159,12 @@ class SearchApplicationTests {
             Set<String> words = currentLevel == 0 ? Collections.singleton(keyword) : rwSet;
             for (String word : words) {
                 for (int i = 0; i < page; i++) {
-                    SearchResult sr = baiduKeywordScraper.mobile(word, i + 1);
+                    try {
+                        Thread.sleep(1000 * 5);
+                    } catch (InterruptedException e) {
+                        log.error("Thread.sleep error", e);
+                    }
+                    SearchResult sr = baiduKeywordScraper.mobile(driver, word, i + 1);
                     if (sr != null) {
                         l.add(sr);
                         for (SearchResult.Item item : sr.getItems()) {
@@ -174,21 +181,16 @@ class SearchApplicationTests {
                             entity.setPage(item.getPage());//搜索结果页数
                             entity.setOrderRank(item.getRank());//搜索结果排名
                             entity.setKeywordRelated(JSON.toJSONString(sr.getKeywordRelated()));//相关搜索
+
                             LocalDateTime now = LocalDateTime.now();
                             entity.setCreateTime(now);//下拉框
                             entity.setUpdateTime(now);//下拉框
 
+                            entity.setRemark(item.getRemark());
                             log.info("entity:{}", entity);
                             searchResultRepo.save(entity);
                         }
                     }
-
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        log.error("Thread.sleep() error", e);
-                    }
-
 
                 }
             }
@@ -206,7 +208,6 @@ class SearchApplicationTests {
             previousRwSet.addAll(rwSet);
         }
     }
-
 
 
     @Test

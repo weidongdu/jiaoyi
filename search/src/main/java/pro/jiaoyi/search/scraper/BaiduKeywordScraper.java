@@ -9,15 +9,24 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
 import pro.jiaoyi.search.config.PlatEnum;
 import pro.jiaoyi.search.config.SearchTypeEnum;
+import pro.jiaoyi.search.util.SeleniumUtil;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.Duration;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static pro.jiaoyi.search.config.SourceEnum.BAIDU;
 
@@ -54,30 +63,53 @@ public class BaiduKeywordScraper implements Scraper {
 
     }
 
-    public SearchResult mobile(String keyword, int pn) {
+    public SearchResult mobile(WebDriver driver, String keyword, int pn) {
         //需要的参数
         //ie=utf-8
         //pn=10 第2页 不写默认第一页
         //word=招股书
-        String url = "https://www.baidu.com/s?word=" + keyword + "&ie=utf-8";
+        String url = "https://m.baidu.com/s?word=" + keyword + "&ie=utf-8";
         if (pn > 1) {
             url += "&pn=" + (pn - 1) * 10;
         }
-        byte[] bytes = okHttpUtil.getForBytes(url, MOBILE_HEADERS);
-        if (bytes.length == 0) {
-            log.error("百度关键词抓取失败");
+
+//        WebDriver driver = SeleniumUtil.getDriver();
+//        driver.get(url);
+
+
+//        byte[] bytes = okHttpUtil.getForBytes(url, MOBILE_HEADERS);
+//        if (bytes.length == 0) {
+//            log.error("百度关键词抓取失败");
+//            return null;
+//        }
+
+        String html = null;
+        try {
+            html = getDocFromWebDriver(keyword, pn, driver);
+        } catch (Exception e) {
+            log.error("百度关键词抓取失败 getDocFromWebDriver", e);
             return null;
         }
 
-        String html = new String(bytes);
+//        String html = new String(bytes);
         Document doc = Jsoup.parse(html);
+        if ("百度安全验证".equalsIgnoreCase(doc.title())) {
+            log.error("百度关键词抓取失败[百度安全验证]");
+            try {
+                Thread.sleep(1000 * 20);
+            } catch (InterruptedException e) {
+                log.error("百度关键词抓取失败", e);
+            }
+            return null;
+        }
+
         doc.select("head").remove();
         doc.select("script").remove();
         doc.select("style").remove();
 
         Element results = doc.getElementById("results");
         if (results == null) {
-            log.error("百度关键词抓取失败");
+            log.error("百度关键词抓取失败[results == null]");
             return null;
         }
 
@@ -179,6 +211,10 @@ public class BaiduKeywordScraper implements Scraper {
             item.setPage(pn);//搜索结果页数
             item.setRank(jsonObject.getInteger("order"));//搜索结果排名
 
+            JSONObject remark = new JSONObject();
+            remark.put("tpl", tpl);
+            item.setRemark(remark.toJSONString());//备注
+
             sr.getItems().add(item);
         }
 
@@ -221,4 +257,43 @@ public class BaiduKeywordScraper implements Scraper {
     }
 
 
+    public String getDocFromWebDriver(String keyword, int pn, WebDriver driver) {
+        //显示等待 超时
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+        //baidu 反爬虫
+
+        if (pn == 1) {
+            WebElement kw = driver.findElement(By.id("kw"));
+            kw.clear();
+            kw.sendKeys(keyword);
+            driver.findElement(By.id("se-bn")).click();
+
+        } else {
+            //下一页
+
+            // 将WebDriver实例转换为JavascriptExecutor实例
+            JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+
+            // 执行JavaScript代码
+            // 滚动页面
+            jsExecutor.executeScript("window.scrollTo(0, document.body.scrollHeight);");
+
+            driver.findElement(By.id("page-controller"))
+                    .findElement(By.cssSelector("a")).click();
+        }
+
+        wait.until(d -> d.findElement(By.id("results")));
+        return driver.getPageSource();
+    }
+
+    public String getDocFromWebDriver(String url) {
+        WebDriver driver = SeleniumUtil.getDriver();
+        driver.get(url);
+        //显示等待 超时
+        Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+//
+//        wait.until(d -> results != null);
+
+        return driver.getPageSource();
+    }
 }
