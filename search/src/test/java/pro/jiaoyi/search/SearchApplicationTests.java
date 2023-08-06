@@ -5,9 +5,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.Wait;
@@ -143,7 +141,7 @@ class SearchApplicationTests {
 
     @Test
     public void baidu() {
-        extend1("招股书", "招股书", 3, 3);
+        extend1("咖啡", "咖啡", 3, 3);
     }
 
     public void extend1(String master, String keyword, int page, int level) {
@@ -158,38 +156,56 @@ class SearchApplicationTests {
             // For subsequent iterations, use the words from the previous rwSet.
             Set<String> words = currentLevel == 0 ? Collections.singleton(keyword) : rwSet;
             for (String word : words) {
+
                 for (int i = 0; i < page; i++) {
                     try {
-                        Thread.sleep(1000 * 5);
+                        Thread.sleep(100 * 5);
                     } catch (InterruptedException e) {
                         log.error("Thread.sleep error", e);
                     }
                     SearchResult sr = baiduKeywordScraper.mobile(driver, word, i + 1);
-                    if (sr != null) {
-                        l.add(sr);
-                        for (SearchResult.Item item : sr.getItems()) {
-                            SearchResultEntity entity = new SearchResultEntity();
-                            entity.setMaster(master);//主关键词
-                            entity.setKeyword(word);//关键词
-                            entity.setSource(sr.getSource());//baidu zhihu
-                            entity.setPlat(sr.getPlat());//pc mobile
-                            entity.setType(sr.getType());//dropdown related result
-                            entity.setTitle(item.getTitle());
-                            entity.setContent(item.getContent());
-                            entity.setUrl(item.getUrl());
-                            entity.setRealUrl(item.getRealUrl());//真实url
-                            entity.setPage(item.getPage());//搜索结果页数
-                            entity.setOrderRank(item.getRank());//搜索结果排名
-                            entity.setKeywordRelated(JSON.toJSONString(sr.getKeywordRelated()));//相关搜索
 
-                            LocalDateTime now = LocalDateTime.now();
-                            entity.setCreateTime(now);//下拉框
-                            entity.setUpdateTime(now);//下拉框
-
-                            entity.setRemark(item.getRemark());
-                            log.info("entity:{}", entity);
-                            searchResultRepo.save(entity);
+                    if (sr == null) {
+                        //判断是否为
+                        if ("百度安全验证".equalsIgnoreCase(driver.getTitle())) {
+                            driver.switchTo().newWindow(WindowType.WINDOW);
+                            String lastWindow = driver.getWindowHandle();
+                            driver.navigate().to("https://m.baidu.com/");
+                            driver.getWindowHandles().forEach(s -> {
+                                if (!s.equalsIgnoreCase(lastWindow)) {
+                                    driver.switchTo().window(s);
+                                    driver.close();
+                                }
+                            });
+                            driver.switchTo().window(lastWindow);
                         }
+                        break;
+                    }
+
+
+                    l.add(sr);
+                    for (SearchResult.Item item : sr.getItems()) {
+                        SearchResultEntity entity = new SearchResultEntity();
+                        entity.setMaster(master);//主关键词
+                        entity.setKeyword(word);//关键词
+                        entity.setSource(sr.getSource());//baidu zhihu
+                        entity.setPlat(sr.getPlat());//pc mobile
+                        entity.setType(sr.getType());//dropdown related result
+                        entity.setTitle(item.getTitle());
+                        entity.setContent(item.getContent());
+                        entity.setUrl(item.getUrl());
+                        entity.setRealUrl(item.getRealUrl());//真实url
+                        entity.setPage(item.getPage());//搜索结果页数
+                        entity.setOrderRank(item.getRank());//搜索结果排名
+                        entity.setKeywordRelated(JSON.toJSONString(sr.getKeywordRelated()));//相关搜索
+
+                        LocalDateTime now = LocalDateTime.now();
+                        entity.setCreateTime(now);//下拉框
+                        entity.setUpdateTime(now);//下拉框
+
+                        entity.setRemark(item.getRemark());
+                        log.info("entity:{}", entity);
+                        searchResultRepo.save(entity);
                     }
 
                 }
@@ -207,6 +223,9 @@ class SearchApplicationTests {
             // Save the current rwSet for the next iteration
             previousRwSet.addAll(rwSet);
         }
+
+        driver.close();//关闭当前窗口(tab)
+        driver.quit();
     }
 
 
