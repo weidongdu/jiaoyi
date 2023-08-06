@@ -17,11 +17,14 @@ import org.springframework.util.StringUtils;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
 import pro.jiaoyi.search.config.PlatEnum;
 import pro.jiaoyi.search.config.SearchTypeEnum;
+import pro.jiaoyi.search.dao.entity.BaiduKeywordSearchFailEntity;
+import pro.jiaoyi.search.dao.repo.BaiduKeywordSearchFailRepo;
 import pro.jiaoyi.search.util.SeleniumUtil;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,6 +41,8 @@ public class BaiduKeywordScraper implements Scraper {
 
     @Resource
     private OkHttpUtil okHttpUtil;
+    @Resource
+    private BaiduKeywordSearchFailRepo baiduKeywordSearchFailRepo;
 
     public static final Map<String, String> MOBILE_HEADERS = new HashMap<>();
 
@@ -86,7 +91,12 @@ public class BaiduKeywordScraper implements Scraper {
         try {
             html = getDocFromWebDriver(keyword, pn, driver);
         } catch (Exception e) {
-            log.error("百度关键词抓取失败 getDocFromWebDriver", e);
+            log.error("百度关键词抓取失败 getDocFromWebDriver keyword={}",  keyword, e);
+            BaiduKeywordSearchFailEntity db = baiduKeywordSearchFailRepo.findByKeyword(keyword);
+            if (db == null){
+                BaiduKeywordSearchFailEntity failEntity = new BaiduKeywordSearchFailEntity(keyword);
+                baiduKeywordSearchFailRepo.save(failEntity);
+            }
             return null;
         }
 

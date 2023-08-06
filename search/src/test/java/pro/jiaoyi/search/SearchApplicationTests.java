@@ -5,7 +5,10 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WindowType;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.Wait;
@@ -141,7 +144,7 @@ class SearchApplicationTests {
 
     @Test
     public void baidu() {
-        extend1("咖啡", "咖啡", 3, 3);
+        extend1("招股书", "招股书", 3, 3);
     }
 
     public void extend1(String master, String keyword, int page, int level) {
