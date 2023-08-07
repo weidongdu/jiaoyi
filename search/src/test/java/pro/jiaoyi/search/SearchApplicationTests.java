@@ -15,10 +15,13 @@ import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import pro.jiaoyi.search.dao.entity.BaiduKeywordSearchFailEntity;
 import pro.jiaoyi.search.dao.entity.SearchResultEntity;
+import pro.jiaoyi.search.dao.repo.BaiduKeywordSearchFailRepo;
 import pro.jiaoyi.search.dao.repo.SearchResultRepo;
 import pro.jiaoyi.search.scraper.BaiduKeywordScraper;
 import pro.jiaoyi.search.scraper.SearchResult;
+import pro.jiaoyi.search.util.RegUtil;
 import pro.jiaoyi.search.util.SeleniumUtil;
 
 import java.time.Duration;
@@ -141,18 +144,49 @@ class SearchApplicationTests {
 
     @Autowired
     private SearchResultRepo searchResultRepo;
+    @Autowired
+    private BaiduKeywordSearchFailRepo baiduKeywordSearchFailRepo;
+
 
     @Test
     public void baidu() {
-        extend1("招股书", "招股书", 3, 3);
+        baiduKeywordSearch("咖啡", "咖啡", 3, 3);
     }
 
-    public void extend1(String master, String keyword, int page, int level) {
+    @Test
+    public void runFail() {
+        List<BaiduKeywordSearchFailEntity> failList = baiduKeywordSearchFailRepo.findAll();
+        if (failList.isEmpty()) {
+            return;
+        }
+
+        failList.forEach(entity -> {
+            baiduKeywordSearch(entity.getKeyword(), entity.getKeyword(), 3, 2);
+
+            log.info(" delete fail id: {}", entity.getId());
+            baiduKeywordSearchFailRepo.deleteById(entity.getId());
+        });
+    }
+
+    public void baiduKeywordSearch(String master, String keyword, int page, int level) {
         HashSet<String> rwSet = new HashSet<>();
         HashSet<String> previousRwSet = new HashSet<>();
 
         WebDriver driver = SeleniumUtil.getDriver();
-        driver.get("https://m.baidu.com/s?word=%E7%99%BE%E5%BA%A6%E4%B8%80%E4%B8%8B&ts=0&t_kt=0&ie=utf-8&rsv_iqid=7921659044293865617&rsv_t=ac96ml5NRi9bqFY4gn6MhG%252BgsIQiOjVh8BeSwfoSSnFi%252BmwOcmz9&sa=is_1&rsv_pq=7921659044293865617&rsv_sug4=1691159333747&tj=1&ss=110&inputT=1691159333882&sugid=166791193111814&rq=baidu");
+        driver.get("https://m.baidu.com/s?word=%E7%99%BE%E5%BA%A6%E4%B8%80%E4%B8%8B" +
+//                "&ts=0" +
+//                "&t_kt=0" +
+                "&ie=utf-8" +
+//                "&rsv_iqid=7921659044293865617" +
+//                "&rsv_t=ac96ml5NRi9bqFY4gn6MhG%252BgsIQiOjVh8BeSwfoSSnFi%252BmwOcmz9" +
+//                "&sa=is_1" +
+//                "&rsv_pq=7921659044293865617" +
+//                "&rsv_sug4=1691159333747" +
+//                "&tj=1" +
+//                "&ss=110" +
+//                "&inputT=1691159333882" +
+//                "&sugid=166791193111814" +
+                "&rq=baidu");
         for (int currentLevel = 0; currentLevel < level; currentLevel++) {
             List<SearchResult> l = new ArrayList<>();
             // If it's the first iteration, use the specified keyword.
@@ -162,11 +196,21 @@ class SearchApplicationTests {
 
                 for (int i = 0; i < page; i++) {
                     try {
-                        Thread.sleep(100 * 5);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         log.error("Thread.sleep error", e);
                     }
-                    SearchResult sr = baiduKeywordScraper.mobile(driver, word, i + 1);
+                    SearchResult sr = null;
+                    try {
+                        sr = baiduKeywordScraper.mobile(driver, word, i + 1);
+                    } catch (Exception e) {
+                        log.error("baiduKeywordScraper.mobile error", e);
+                        //加入 fail list
+                        BaiduKeywordSearchFailEntity dbKeyword = baiduKeywordSearchFailRepo.findByKeyword(keyword);
+                        if (dbKeyword == null) {
+                            baiduKeywordSearchFailRepo.save(new BaiduKeywordSearchFailEntity(word));
+                        }
+                    }
 
                     if (sr == null) {
                         //判断是否为
@@ -198,6 +242,7 @@ class SearchApplicationTests {
                         entity.setContent(item.getContent());
                         entity.setUrl(item.getUrl());
                         entity.setRealUrl(item.getRealUrl());//真实url
+                        entity.setDomain(RegUtil.domain(item.getRealUrl()));
                         entity.setPage(item.getPage());//搜索结果页数
                         entity.setOrderRank(item.getRank());//搜索结果排名
                         entity.setKeywordRelated(JSON.toJSONString(sr.getKeywordRelated()));//相关搜索

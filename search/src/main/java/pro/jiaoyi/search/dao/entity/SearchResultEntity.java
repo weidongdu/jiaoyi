@@ -33,6 +33,7 @@ public class SearchResultEntity {
 
     @Column(length = 1024)
     private String realUrl;//真实url
+    private String domain;//域名
     private Integer page;//搜索结果页数
     private Integer orderRank;//搜索结果排名
 

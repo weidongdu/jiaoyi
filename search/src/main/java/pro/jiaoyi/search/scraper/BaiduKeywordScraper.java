@@ -87,18 +87,19 @@ public class BaiduKeywordScraper implements Scraper {
 //            return null;
 //        }
 
-        String html = null;
-        try {
-            html = getDocFromWebDriver(keyword, pn, driver);
-        } catch (Exception e) {
-            log.error("百度关键词抓取失败 getDocFromWebDriver keyword={}",  keyword, e);
-            BaiduKeywordSearchFailEntity db = baiduKeywordSearchFailRepo.findByKeyword(keyword);
-            if (db == null){
-                BaiduKeywordSearchFailEntity failEntity = new BaiduKeywordSearchFailEntity(keyword);
-                baiduKeywordSearchFailRepo.save(failEntity);
-            }
-            return null;
-        }
+        String html = getDocFromWebDriver(keyword, pn, driver);
+//        String html = null;
+//        try {
+//            html = getDocFromWebDriver(keyword, pn, driver);
+//        } catch (Exception e) {
+//            log.error("百度关键词抓取失败 getDocFromWebDriver keyword={}",  keyword, e);
+//            BaiduKeywordSearchFailEntity db = baiduKeywordSearchFailRepo.findByKeyword(keyword);
+//            if (db == null){
+//                BaiduKeywordSearchFailEntity failEntity = new BaiduKeywordSearchFailEntity(keyword);
+//                baiduKeywordSearchFailRepo.save(failEntity);
+//            }
+//            return null;
+//        }
 
 //        String html = new String(bytes);
         Document doc = Jsoup.parse(html);
