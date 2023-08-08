@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 @Entity
-@Table(name = "t_keywords_wait_to_search_entity")
+@Table(name = "t_keywords_wait_to_search")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Data
 public class KeywordsWaitToSearchEntity {
@@ -27,10 +27,10 @@ public class KeywordsWaitToSearchEntity {
     private Integer searchCount;//搜索次数
     private Integer searchCountMax;//最大搜索次数
 
-    public KeywordsWaitToSearchEntity(String source, String keyword, String masterKeyword,Integer level) {
+    public KeywordsWaitToSearchEntity(String source, String masterKeyword, String keyword, Integer level) {
         this.source = source;
-        this.keyword = keyword;
         this.masterKeyword = masterKeyword;
+        this.keyword = keyword;
         this.level = level;
         this.searchCount = 0;
         this.searchCountMax = 2;

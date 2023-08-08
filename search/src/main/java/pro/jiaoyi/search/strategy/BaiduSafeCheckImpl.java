@@ -14,7 +14,7 @@ public class BaiduSafeCheckImpl implements SafeCheck {
         //解决办法: 1,图片旋转, 识别  (目前解决不了)
         //解决办法: 2,停止, 更换ip , 保存当前状态 keyword + pn , 放入fail list;
 
-        if (driver == null || driver.getTitle() == null || !driver.getTitle().contains("百度安全验证")) {
+        if (driver == null || driver.getTitle() == null || driver.getTitle().contains("百度安全验证")) {
             return true;
         }
         return false;

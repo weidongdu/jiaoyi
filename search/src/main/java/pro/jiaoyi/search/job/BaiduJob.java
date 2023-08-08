@@ -5,10 +5,10 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import pro.jiaoyi.search.config.SourceEnum;
 import pro.jiaoyi.search.dao.entity.KeywordSearchingEntity;
-import pro.jiaoyi.search.dao.entity.KeywordsFailToSearchEntity;
 import pro.jiaoyi.search.dao.entity.KeywordsWaitToSearchEntity;
 import pro.jiaoyi.search.dao.entity.SearchResultEntity;
 import pro.jiaoyi.search.dao.repo.KeywordSearchingRepo;
@@ -32,8 +32,6 @@ public class BaiduJob {
     @Resource
     private BaiduKeywordScraper baiduKeywordScraper;
     @Resource
-    private KeywordsFailToSearchEntity keywordsFailToSearchEntity;
-    @Resource
     private KeywordsWaitToSearchRepo keywordsWaitToSearchRepo;
 
     @Resource
@@ -45,8 +43,9 @@ public class BaiduJob {
     @Resource(name = "baiduSafeCheckImpl")
     private SafeCheck baiduSafeCheckImpl;
 
-    public static final int MAX_LEVEL = 3;
+    public static final int MAX_LEVEL = 2; //从0 开始
 
+    @Scheduled(fixedDelay = 1000 * 60 * 2)
     public void run() {
 
         // 计划 3页 3级 主词 -> [主词]关联1 -> [[主词]关联1]关联1
@@ -62,7 +61,7 @@ public class BaiduJob {
         for (KeywordsWaitToSearchEntity entity : initList) { // 20 个关键词
 
             // 正在处理的关键词 放入redis 作为标记, 用于分布式环境下的任务调度
-            // 先使用代理ip 方案
+            // 先使用代理ip 方案 (手机ip)
             // 代理ip 方案失败后, 使用 serverless 方案
 
             KeywordSearchingEntity searchingEntity = keywordSearchingRepo.findBySourceAndMasterKeywordAndKeyword(BAIDU.name(), entity.getMasterKeyword(), entity.getKeyword());
@@ -82,11 +81,10 @@ public class BaiduJob {
             try {
                 // get proxy
                 Proxy proxy = null;
-                baiduKeywordSearch(entity.getMasterKeyword(), entity.getKeyword(), 2, MAX_LEVEL - entity.getLevel(), proxy);
+                baiduKeywordSearch(entity.getMasterKeyword(), entity.getKeyword(), 2, entity.getLevel(), MAX_LEVEL, proxy);
             } catch (Exception e) {
                 log.error("baiduKeywordSearch error, entity: {}", JSON.toJSONString(entity), e);
             }
-
             keywordSearchingRepo.delete(searchingEntity);
         }
 
@@ -94,7 +92,7 @@ public class BaiduJob {
     }
 
 
-    public void baiduKeywordSearch(String master, String keyword, int page, int level, Proxy proxy) {
+    public void baiduKeywordSearch(String master, String keyword, int page, int cLevel, int level, Proxy proxy) {
 
         HashSet<String> rwSet = new HashSet<>(); // 用于多级搜索, 以及去重
         HashSet<String> previousRwSet = new HashSet<>();
@@ -108,17 +106,17 @@ public class BaiduJob {
             return;
         }
 
-        if (driver.getTitle() == null || !driver.getTitle().startsWith(master)) {
-            log.error("safe check error, master: {}", master);
+        if (baiduSafeCheckImpl.safeCheck(driver)) {
+
             driver.quit();
             return;
         }
 
-        for (int currentLevel = 0; currentLevel < level; currentLevel++) {
+        for (int currentLevel = cLevel; currentLevel < level; currentLevel++) {
             List<SearchResult> l = new ArrayList<>();
             // If it's the first iteration, use the specified keyword.
             // For subsequent iterations, use the words from the previous rwSet.
-            Set<String> words = currentLevel == 0 ? Collections.singleton(keyword) : rwSet;
+            Set<String> words = currentLevel == cLevel ? Collections.singleton(keyword) : rwSet;
             for (String word : words) {
                 Integer count = searchResultRepo.countByKeywordAndSource(word, SourceEnum.BAIDU.name());
                 if (count != null && count > 0) {
@@ -166,13 +164,14 @@ public class BaiduJob {
                             //check db exist
                             KeywordsWaitToSearchEntity dbWait = keywordsWaitToSearchRepo.findBySourceAndMasterKeywordAndKeyword(BAIDU.name(), master, kr);
                             if (dbWait == null) {
-                                KeywordsWaitToSearchEntity entity = new KeywordsWaitToSearchEntity(BAIDU.name(), kr, master, level + 1);
+                                KeywordsWaitToSearchEntity entity = new KeywordsWaitToSearchEntity(BAIDU.name(), master, kr, currentLevel + 1);
                                 keywordsWaitToSearchRepo.saveAndFlush(entity);
                             }
                         }
                     }
 
                     l.add(sr);
+
                     for (SearchResult.Item item : sr.getItems()) {
                         SearchResultEntity entity = new SearchResultEntity();
                         entity.setMaster(master);//主关键词
@@ -197,16 +196,19 @@ public class BaiduJob {
                         log.info("entity:{}", entity);
                         searchResultRepo.save(entity);
 
-                        //update wait list to searched count = max + 1
-                        //标记 word 已经搜索过了 , count = max + 1
-                        KeywordsWaitToSearchEntity dbWait = keywordsWaitToSearchRepo.findBySourceAndMasterKeywordAndKeyword(BAIDU.name(), master, word);
-                        if (dbWait != null) {
-                            log.info("update wait list, keyword: {}", dbWait);
-                            dbWait.setSearchCount(dbWait.getSearchCountMax() + 1);
-                            keywordsWaitToSearchRepo.saveAndFlush(dbWait);
-                        }
+                    }
+
+                    //update wait list to searched count = max + 1
+                    //标记 word 已经搜索过了 , count = max + 1
+                    //这一步的原因是 同步本地kwSet 与 db
+                    KeywordsWaitToSearchEntity dbWait = keywordsWaitToSearchRepo.findBySourceAndMasterKeywordAndKeyword(BAIDU.name(), master, word);
+                    if (dbWait != null && dbWait.getSearchCount() < dbWait.getSearchCountMax()) {
+                        log.info("update wait list, keyword: {}", dbWait);
+                        dbWait.setSearchCount(dbWait.getSearchCountMax() + 1);
+                        keywordsWaitToSearchRepo.saveAndFlush(dbWait);
                     }
                 }
+
             }
 
             rwSet.clear();

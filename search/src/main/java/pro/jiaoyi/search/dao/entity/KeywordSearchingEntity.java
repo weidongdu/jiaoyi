@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "t_keyword_searching_entity")
+@Table(name = "t_keyword_searching")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Data
 public class KeywordSearchingEntity {
@@ -19,9 +19,13 @@ public class KeywordSearchingEntity {
     private String keyword;//关键词
     private String masterKeyword;//主关键词
 
-    public KeywordSearchingEntity(String source, String keyword, String masterKeyword) {
+    public KeywordSearchingEntity(String source, String masterKeyword, String keyword) {
         this.source = source;
         this.keyword = keyword;
         this.masterKeyword = masterKeyword;
+    }
+
+    public KeywordSearchingEntity() {
+
     }
 }

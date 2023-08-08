@@ -9,30 +9,21 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
 import pro.jiaoyi.search.config.PlatEnum;
 import pro.jiaoyi.search.config.SearchTypeEnum;
-import pro.jiaoyi.search.config.SourceEnum;
-import pro.jiaoyi.search.dao.entity.BaiduKeywordSearchFailEntity;
-import pro.jiaoyi.search.dao.entity.KeywordsFailToSearchEntity;
 import pro.jiaoyi.search.dao.entity.KeywordsWaitToSearchEntity;
-import pro.jiaoyi.search.dao.repo.BaiduKeywordSearchFailRepo;
 import pro.jiaoyi.search.dao.repo.KeywordsWaitToSearchRepo;
-import pro.jiaoyi.search.util.SeleniumUtil;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static pro.jiaoyi.search.config.SourceEnum.BAIDU;
 
@@ -42,14 +33,8 @@ import static pro.jiaoyi.search.config.SourceEnum.BAIDU;
 @Component
 @Slf4j
 public class BaiduKeywordScraper implements Scraper {
-
-    @Resource
-    private OkHttpUtil okHttpUtil;
-    @Resource
-    private BaiduKeywordSearchFailRepo baiduKeywordSearchFailRepo;
     @Resource
     private KeywordsWaitToSearchRepo keywordsWaitToSearchRepo;
-
     public static final Map<String, String> MOBILE_HEADERS = new HashMap<>();
 
     {
@@ -85,10 +70,10 @@ public class BaiduKeywordScraper implements Scraper {
 
 
     public List<KeywordsWaitToSearchEntity> getInitList() {
-        return keywordsWaitToSearchRepo.findBySourceAndSearchCountLessThanSearchCountMax(BAIDU.name());
+        return keywordsWaitToSearchRepo.qFindBySourceAndSearchCountLessThanSearchCountMax(BAIDU.name());
     }
     public KeywordsWaitToSearchEntity getRandom() {
-        return keywordsWaitToSearchRepo.findFirstBySourceAndSearchCountLessThanSearchCountMax(BAIDU.name());
+        return keywordsWaitToSearchRepo.qFindFirstBySourceAndSearchCountLessThanSearchCountMax(BAIDU.name());
     }
 
     public void pc(String keyword) {
@@ -136,7 +121,7 @@ public class BaiduKeywordScraper implements Scraper {
             SearchResult.Item item = new SearchResult.Item();
 
             String tpl = result.attr("tpl");
-            log.info("tpl={}", tpl);
+            log.debug("tpl={}", tpl);
 
             switch (tpl) {
                 case "recommend_list": {
@@ -288,7 +273,11 @@ public class BaiduKeywordScraper implements Scraper {
         // 搜索 master keyword
         //id="index-kw"
         WebElement searchInputEle = driver.findElement(By.id("index-kw"));
-        searchInputEle.click();
+
+//        Actions actions = new Actions(driver);
+//        actions.moveToElement(searchInputEle).click();
+
+//        searchInputEle.click();
         searchInputEle.sendKeys(master);
         //id="index-bn" 搜索按钮
         driver.findElement(By.id("index-bn")).click();

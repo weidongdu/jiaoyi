@@ -32,10 +32,10 @@ public class RegUtil {
                 String topLevelDomain = parts[parts.length - 1];
                 String secondLevelDomain = parts[parts.length - 2];
                 String firstLevelDomain = secondLevelDomain + "." + topLevelDomain;
-                log.info("First-level domain: {}", firstLevelDomain);
+                log.debug("First-level domain: {}", firstLevelDomain);
                 return firstLevelDomain;
             } else {
-                log.info("Invalid domain");
+                log.debug("Invalid domain");
             }
         }
         return null;
