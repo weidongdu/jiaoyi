@@ -43,7 +43,7 @@ public class BaiduJob {
     @Resource(name = "baiduSafeCheckImpl")
     private SafeCheck baiduSafeCheckImpl;
 
-    public static final int MAX_LEVEL = 2; //从0 开始
+    public static final int MAX_LEVEL = 3; //从0 开始
 
     @Scheduled(fixedDelay = 1000 * 60 * 2)
     public void run() {
@@ -64,10 +64,25 @@ public class BaiduJob {
             // 先使用代理ip 方案 (手机ip)
             // 代理ip 方案失败后, 使用 serverless 方案
 
+            //判断 level 是否已经达到max
+            if (entity.getLevel() >= MAX_LEVEL) {
+                log.info("level >= MAX_LEVEL, pass, update entity: {}", JSON.toJSONString(entity));
+                // 更新状态
+                entity.setSearchCount(entity.getSearchCountMax() + 2);
+                keywordsWaitToSearchRepo.saveAndFlush(entity);
+                continue;
+            }
+
             KeywordSearchingEntity searchingEntity = keywordSearchingRepo.findBySourceAndMasterKeywordAndKeyword(BAIDU.name(), entity.getMasterKeyword(), entity.getKeyword());
             if (searchingEntity == null) {
                 searchingEntity = new KeywordSearchingEntity(BAIDU.name(), entity.getMasterKeyword(), entity.getKeyword());
-                keywordSearchingRepo.saveAndFlush(searchingEntity);
+                try {
+                    keywordSearchingRepo.saveAndFlush(searchingEntity);
+                } catch (Exception e) {
+                    //相当于获取分布式锁失败
+                    log.info("keyword is searching by other job, pass, entity: {}", JSON.toJSONString(entity));
+                    continue;
+                }
             } else {
                 log.info("keyword is searching by other job, pass, entity: {}", JSON.toJSONString(entity));
                 continue;
@@ -107,7 +122,6 @@ public class BaiduJob {
         }
 
         if (baiduSafeCheckImpl.safeCheck(driver)) {
-
             driver.quit();
             return;
         }

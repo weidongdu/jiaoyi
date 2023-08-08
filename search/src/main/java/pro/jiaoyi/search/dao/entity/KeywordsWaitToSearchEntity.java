@@ -16,7 +16,7 @@ public class KeywordsWaitToSearchEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Integer level;//0 , 1 ,2
+    private Integer level;//0,1,2,3
     private String source;//BAIDU
     private String keyword;//关键词
     private String masterKeyword;//主关键词
