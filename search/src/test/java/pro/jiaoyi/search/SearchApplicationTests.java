@@ -1,6 +1,7 @@
 package pro.jiaoyi.search;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -15,6 +16,7 @@ import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import pro.jiaoyi.search.config.SourceEnum;
 import pro.jiaoyi.search.dao.entity.BaiduKeywordSearchFailEntity;
 import pro.jiaoyi.search.dao.entity.SearchResultEntity;
 import pro.jiaoyi.search.dao.repo.BaiduKeywordSearchFailRepo;
@@ -153,6 +155,54 @@ class SearchApplicationTests {
         baiduKeywordSearch("咖啡", "咖啡", 3, 3);
     }
 
+    /*
+    继续
+     */
+    @Test
+    public void related() {
+        List<SearchResultEntity> all = searchResultRepo.findAll();
+        if (all.isEmpty()) {
+            return;
+        }
+
+        HashSet<String> keywordSet = new HashSet<>();
+        for (SearchResultEntity entity : all) {
+            keywordSet.add(entity.getKeyword());
+            try {
+                List<String> list = JSONArray.parseArray(entity.getKeywordRelated(), String.class);
+                keywordSet.addAll(list);
+            } catch (Exception e) {
+                log.error("get keyword related error {}", entity);
+            }
+        }
+
+
+        ArrayList<String> keywords = new ArrayList<>(keywordSet);
+        ArrayList<String> kr = new ArrayList<>();//包含master
+        ArrayList<String> nkr = new ArrayList<>();//不包含master
+
+        String master = "咖啡";
+        for (String keyword : keywords) {
+            if (keyword.contains(master)) {
+                kr.add(keyword);
+            } else {
+                nkr.add(keyword);
+            }
+        }
+        kr.addAll(nkr);
+
+        for (int i = 0; i < kr.size(); i++) {
+            log.info("keyword {} index = {}/{}", kr.get(i), i, keywords.size());
+            String keyword = keywords.get(i);
+            try {
+                baiduKeywordSearch("咖啡", keyword, 3, 2);
+            } catch (Exception e) {
+                log.error("baidu search exception {}", e.getMessage(), e);
+            }
+        }
+    }
+
+
     @Test
     public void runFail() {
         List<BaiduKeywordSearchFailEntity> failList = baiduKeywordSearchFailRepo.findAll();
@@ -193,6 +243,11 @@ class SearchApplicationTests {
             // For subsequent iterations, use the words from the previous rwSet.
             Set<String> words = currentLevel == 0 ? Collections.singleton(keyword) : rwSet;
             for (String word : words) {
+                Integer count = searchResultRepo.countByKeywordAndSource(word, SourceEnum.BAIDU.name());
+                if (count != null && count > 0) {
+                    log.info("keyword: {} already exist", word);
+                    continue;
+                }
 
                 for (int i = 0; i < page; i++) {
                     try {
@@ -215,16 +270,24 @@ class SearchApplicationTests {
                     if (sr == null) {
                         //判断是否为
                         if ("百度安全验证".equalsIgnoreCase(driver.getTitle())) {
-                            driver.switchTo().newWindow(WindowType.WINDOW);
-                            String lastWindow = driver.getWindowHandle();
-                            driver.navigate().to("https://m.baidu.com/");
                             driver.getWindowHandles().forEach(s -> {
-                                if (!s.equalsIgnoreCase(lastWindow)) {
-                                    driver.switchTo().window(s);
-                                    driver.close();
-                                }
+//                                if (!s.equalsIgnoreCase(lastWindow)) {
+                                driver.switchTo().window(s);
+                                driver.close();
+//                                }
                             });
-                            driver.switchTo().window(lastWindow);
+                            try {
+                                log.info("sleep 5 min");
+                                Thread.sleep(1000 * 60 * 5);
+                            } catch (InterruptedException e) {
+                                log.error("Thread.sleep error", e);
+                            }
+
+                            driver.switchTo().newWindow(WindowType.WINDOW);
+//                            String lastWindow = driver.getWindowHandle();
+                            driver.navigate().to("https://m.baidu.com/");
+
+//                            driver.switchTo().window(lastWindow);
                         }
                         break;
                     }
@@ -274,6 +337,7 @@ class SearchApplicationTests {
 
         driver.close();//关闭当前窗口(tab)
         driver.quit();
+
     }
 
 

@@ -17,8 +17,12 @@ import org.springframework.util.StringUtils;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
 import pro.jiaoyi.search.config.PlatEnum;
 import pro.jiaoyi.search.config.SearchTypeEnum;
+import pro.jiaoyi.search.config.SourceEnum;
 import pro.jiaoyi.search.dao.entity.BaiduKeywordSearchFailEntity;
+import pro.jiaoyi.search.dao.entity.KeywordsFailToSearchEntity;
+import pro.jiaoyi.search.dao.entity.KeywordsWaitToSearchEntity;
 import pro.jiaoyi.search.dao.repo.BaiduKeywordSearchFailRepo;
+import pro.jiaoyi.search.dao.repo.KeywordsWaitToSearchRepo;
 import pro.jiaoyi.search.util.SeleniumUtil;
 
 import java.net.URI;
@@ -43,6 +47,8 @@ public class BaiduKeywordScraper implements Scraper {
     private OkHttpUtil okHttpUtil;
     @Resource
     private BaiduKeywordSearchFailRepo baiduKeywordSearchFailRepo;
+    @Resource
+    private KeywordsWaitToSearchRepo keywordsWaitToSearchRepo;
 
     public static final Map<String, String> MOBILE_HEADERS = new HashMap<>();
 
@@ -63,56 +69,39 @@ public class BaiduKeywordScraper implements Scraper {
         MOBILE_HEADERS.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1");
     }
 
+    public void init(String master,List<String> keywordList) {
+        //算了 为了后面准确度, 这一步人工来做吧
+        HashSet<String> set = new HashSet<>(keywordList);
+        for (String keyword : set) {
+            KeywordsWaitToSearchEntity db = keywordsWaitToSearchRepo.findBySourceAndMasterKeywordAndKeyword(BAIDU.name(), master, keyword);
+            if (db == null) {
+                //不论层级, 确保关键词 只搜索一次
+                KeywordsWaitToSearchEntity entity = new KeywordsWaitToSearchEntity(BAIDU.name(), master, keyword,0);
+                keywordsWaitToSearchRepo.save(entity);
+            }
+        }
+    }
+
+
+
+    public List<KeywordsWaitToSearchEntity> getInitList() {
+        return keywordsWaitToSearchRepo.findBySourceAndSearchCountLessThanSearchCountMax(BAIDU.name());
+    }
+    public KeywordsWaitToSearchEntity getRandom() {
+        return keywordsWaitToSearchRepo.findFirstBySourceAndSearchCountLessThanSearchCountMax(BAIDU.name());
+    }
+
     public void pc(String keyword) {
 
     }
 
     public SearchResult mobile(WebDriver driver, String keyword, int pn) {
-        //需要的参数
-        //ie=utf-8
-        //pn=10 第2页 不写默认第一页
+        //pn=10 第2页(pn -1 )* 10 不写默认第一页
         //word=招股书
-        String url = "https://m.baidu.com/s?word=" + keyword + "&ie=utf-8";
-        if (pn > 1) {
-            url += "&pn=" + (pn - 1) * 10;
-        }
-
-//        WebDriver driver = SeleniumUtil.getDriver();
-//        driver.get(url);
-
-
-//        byte[] bytes = okHttpUtil.getForBytes(url, MOBILE_HEADERS);
-//        if (bytes.length == 0) {
-//            log.error("百度关键词抓取失败");
-//            return null;
-//        }
 
         String html = getDocFromWebDriver(keyword, pn, driver);
-//        String html = null;
-//        try {
-//            html = getDocFromWebDriver(keyword, pn, driver);
-//        } catch (Exception e) {
-//            log.error("百度关键词抓取失败 getDocFromWebDriver keyword={}",  keyword, e);
-//            BaiduKeywordSearchFailEntity db = baiduKeywordSearchFailRepo.findByKeyword(keyword);
-//            if (db == null){
-//                BaiduKeywordSearchFailEntity failEntity = new BaiduKeywordSearchFailEntity(keyword);
-//                baiduKeywordSearchFailRepo.save(failEntity);
-//            }
-//            return null;
-//        }
 
-//        String html = new String(bytes);
         Document doc = Jsoup.parse(html);
-        if ("百度安全验证".equalsIgnoreCase(doc.title())) {
-            log.error("百度关键词抓取失败[百度安全验证]");
-            try {
-                Thread.sleep(1000 * 20);
-            } catch (InterruptedException e) {
-                log.error("百度关键词抓取失败", e);
-            }
-            return null;
-        }
-
         doc.select("head").remove();
         doc.select("script").remove();
         doc.select("style").remove();
@@ -269,7 +258,7 @@ public class BaiduKeywordScraper implements Scraper {
 
     public String getDocFromWebDriver(String keyword, int pn, WebDriver driver) {
         //显示等待 超时
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         //baidu 反爬虫
 
         if (pn == 1) {
@@ -277,13 +266,10 @@ public class BaiduKeywordScraper implements Scraper {
             kw.clear();
             kw.sendKeys(keyword);
             driver.findElement(By.id("se-bn")).click();
-
         } else {
             //下一页
-
             // 将WebDriver实例转换为JavascriptExecutor实例
             JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-
             // 执行JavaScript代码
             // 滚动页面
             jsExecutor.executeScript("window.scrollTo(0, document.body.scrollHeight);");
@@ -296,16 +282,17 @@ public class BaiduKeywordScraper implements Scraper {
         return driver.getPageSource();
     }
 
-    public String getDocFromWebDriver(String url) {
-        WebDriver driver = SeleniumUtil.getDriver();
-        driver.get(url);
-        //显示等待 超时
-        Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(2));
-//
-//        wait.until(d -> results != null);
+    public void searchIndex(WebDriver driver, String master){
+        // 打开 百度 首页
+        driver.get("https://m.baidu.com/");
+        // 搜索 master keyword
+        //id="index-kw"
+        WebElement searchInputEle = driver.findElement(By.id("index-kw"));
+        searchInputEle.click();
+        searchInputEle.sendKeys(master);
+        //id="index-bn" 搜索按钮
+        driver.findElement(By.id("index-bn")).click();
 
-        return driver.getPageSource();
     }
-
 
 }

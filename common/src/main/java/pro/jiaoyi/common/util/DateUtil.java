@@ -8,6 +8,7 @@ public class DateUtil {
     public static final String PATTERN_yyyyMMdd_HH_mm_ss = "yyyyMMdd_HH:mm:ss";
     public static final String PATTERN_yyyyMMdd = "yyyyMMdd";
     public static final String PATTERN_yyyyMMdd_HHmm = "yyyyMMdd_HHmm";
+    public static final String PATTERN_yyyyMMdd_HHmmss = "yyyyMMdd_HHmmss";
     public static final String PATTERN_yyyy_MM_dd = "yyyy-MM-dd";
     public static final String PATTERN_HH_mm_ss = "HH:mm:ss";
 
