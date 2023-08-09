@@ -54,24 +54,24 @@ public class BaiduKeywordScraper implements Scraper {
         MOBILE_HEADERS.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1");
     }
 
-    public void init(String master,List<String> keywordList) {
+    public void init(String master, List<String> keywordList) {
         //算了 为了后面准确度, 这一步人工来做吧
         HashSet<String> set = new HashSet<>(keywordList);
         for (String keyword : set) {
             KeywordsWaitToSearchEntity db = keywordsWaitToSearchRepo.findBySourceAndMasterKeywordAndKeyword(BAIDU.name(), master, keyword);
             if (db == null) {
                 //不论层级, 确保关键词 只搜索一次
-                KeywordsWaitToSearchEntity entity = new KeywordsWaitToSearchEntity(BAIDU.name(), master, keyword,0);
+                KeywordsWaitToSearchEntity entity = new KeywordsWaitToSearchEntity(BAIDU.name(), master, keyword, 0);
                 keywordsWaitToSearchRepo.save(entity);
             }
         }
     }
 
 
-
-    public List<KeywordsWaitToSearchEntity> getInitList() {
-        return keywordsWaitToSearchRepo.qFindBySourceAndSearchCountLessThanSearchCountMax(BAIDU.name());
+    public List<KeywordsWaitToSearchEntity> getInitList(int maxLevel,int limit) {
+        return keywordsWaitToSearchRepo.qFindBySourceAndSearchCountLessThanSearchCountMax(BAIDU.name(), maxLevel, limit);
     }
+
     public KeywordsWaitToSearchEntity getRandom() {
         return keywordsWaitToSearchRepo.qFindFirstBySourceAndSearchCountLessThanSearchCountMax(BAIDU.name());
     }
@@ -267,7 +267,7 @@ public class BaiduKeywordScraper implements Scraper {
         return driver.getPageSource();
     }
 
-    public void searchIndex(WebDriver driver, String master){
+    public void searchIndex(WebDriver driver, String master) {
         // 打开 百度 首页
         driver.get("https://m.baidu.com/");
         // 搜索 master keyword

@@ -7,15 +7,19 @@ import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.search.config.SourceEnum;
 import pro.jiaoyi.search.dao.entity.KeywordSearchingEntity;
 import pro.jiaoyi.search.dao.entity.KeywordsWaitToSearchEntity;
+import pro.jiaoyi.search.dao.entity.SafeCheckEntity;
 import pro.jiaoyi.search.dao.entity.SearchResultEntity;
 import pro.jiaoyi.search.dao.repo.KeywordSearchingRepo;
 import pro.jiaoyi.search.dao.repo.KeywordsWaitToSearchRepo;
+import pro.jiaoyi.search.dao.repo.SafeCheckRepo;
 import pro.jiaoyi.search.dao.repo.SearchResultRepo;
 import pro.jiaoyi.search.scraper.BaiduKeywordScraper;
 import pro.jiaoyi.search.scraper.SearchResult;
+import pro.jiaoyi.search.strategy.BaiduSafeCheckImpl;
 import pro.jiaoyi.search.strategy.SafeCheck;
 import pro.jiaoyi.search.util.RegUtil;
 import pro.jiaoyi.search.util.SeleniumUtil;
@@ -42,11 +46,33 @@ public class BaiduJob {
 
     @Resource(name = "baiduSafeCheckImpl")
     private SafeCheck baiduSafeCheckImpl;
+    @Resource
+    private SafeCheckRepo safeCheckRepo;
 
     public static final int MAX_LEVEL = 3; //从0 开始
 
-    @Scheduled(fixedDelay = 1000 * 60 * 2)
+    @Scheduled(fixedRate = 1000 * 60) // 1分钟
+    public void safeJob() {
+        SafeCheckEntity db = safeCheckRepo.findBySource(BAIDU.name());
+        if (db != null) {
+            long stopTs = System.currentTimeMillis() - DateUtil.toTimestamp(db.getCreateTime());
+            if (stopTs > BaiduSafeCheckImpl.STOP_TIME_MS) {
+                log.info("百度安全验证 暂停结束 {}", db);
+                safeCheckRepo.delete(db);
+            }
+        }
+    }
+
+    @Scheduled(fixedDelay = 1000 * 60)
     public void run() {
+        SafeCheckEntity db = safeCheckRepo.findBySource(BAIDU.name());
+        if (db != null ){
+            long stopTs = System.currentTimeMillis() - DateUtil.toTimestamp(db.getCreateTime());
+            if (stopTs < BaiduSafeCheckImpl.STOP_TIME_MS) {
+                log.info("百度安全验证 暂停中 {}", db);
+                return;
+            }
+        }
 
         // 计划 3页 3级 主词 -> [主词]关联1 -> [[主词]关联1]关联1
         // 第一层 本地提取
@@ -55,7 +81,7 @@ public class BaiduJob {
         // 加上 分词提到结构  预计 一百万个关键词
         // 去重 + 意义过滤 一百万个关键词 -> 1万个关有效键词
 
-        List<KeywordsWaitToSearchEntity> initList = baiduKeywordScraper.getInitList();
+        List<KeywordsWaitToSearchEntity> initList = baiduKeywordScraper.getInitList(MAX_LEVEL, 10);
         log.info("initList size: {}", initList.size());
 
         for (KeywordsWaitToSearchEntity entity : initList) { // 20 个关键词
@@ -83,6 +109,7 @@ public class BaiduJob {
                     log.info("keyword is searching by other job, pass, entity: {}", JSON.toJSONString(entity));
                     continue;
                 }
+
             } else {
                 log.info("keyword is searching by other job, pass, entity: {}", JSON.toJSONString(entity));
                 continue;

@@ -13,9 +13,11 @@ public interface KeywordsWaitToSearchRepo extends JpaRepository<KeywordsWaitToSe
     List<KeywordsWaitToSearchEntity> findBySource(String name);
 
     @Query(nativeQuery = true, value = " SELECT * FROM t_keywords_wait_to_search t " +
-            "WHERE t.source = ?1 and t.search_count < t.search_count_max " +
-            "limit 10")
-    List<KeywordsWaitToSearchEntity> qFindBySourceAndSearchCountLessThanSearchCountMax(String name);
+            "WHERE t.source = ?1 " +
+            "and t.search_count < t.search_count_max " +
+            "and t.level < ?2 " +
+            "limit ?3")
+    List<KeywordsWaitToSearchEntity> qFindBySourceAndSearchCountLessThanSearchCountMax(String name, int maxLevel, int limit);
 
     @Query(nativeQuery = true, value = " SELECT * FROM t_keywords_wait_to_search t WHERE t.source = ?1 and t.search_count < t.search_count_max limit 1")
     KeywordsWaitToSearchEntity qFindFirstBySourceAndSearchCountLessThanSearchCountMax(String name);
