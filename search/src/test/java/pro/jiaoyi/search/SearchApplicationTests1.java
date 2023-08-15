@@ -26,7 +26,7 @@ class SearchApplicationTests1 {
     @Test
     public void baidu() {
 
-        String master = ("master");
+        String master = "咖啡";
         List<String> keywords = genKeywords();
         //基础词 拓展
         baiduKeywordScraper.init(master, keywords);
@@ -257,4 +257,7 @@ class SearchApplicationTests1 {
         list.add("咖啡渣可以吸甲醛吗");
         return list;
     }
+
+
+
 }

@@ -10,36 +10,32 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class SeleniumUtil {
-    public static WebDriver getDriver() {
 
-//        System.setProperty("webdriver.chrome.driver", "/home/dwd/dev/chromedriver-linux64/chromedriver");
-        System.setProperty("webdriver.chrome.driver", "/Users/dwd/Downloads/search/chromedriver-mac-arm64/chromedriver");
-        ChromeOptions options = getChromeOptions();
+    //    public static final String WEB_DRIVER_PATH = "/home/ubuntu/github/run/chromedriver-linux64/chromedriver";
+    public static final String WEB_DRIVER_PATH = "/Users/dwd/Downloads/search/chromedriver-mac-arm64/chromedriver";
+
+    public static WebDriver getDriver(Boolean headless) {
+        System.setProperty("webdriver.chrome.driver", WEB_DRIVER_PATH);
+        ChromeOptions options = getChromeOptions(headless);
         return new ChromeDriver(options);
     }
 
-    public static WebDriver getDriver(Proxy proxy) {
+    public static WebDriver getDriver(Proxy proxy, Boolean headless) {
 
-        if (proxy == null) return getDriver();
-
-        System.setProperty("webdriver.chrome.driver", "/Users/dwd/Downloads/search/chromedriver-mac-arm64/chromedriver");
-//        ChromeOptions options = new ChromeOptions();
-//        Proxy proxy = new Proxy();
-//        proxy.setHttpProxy("<HOST:PORT>");
-        ChromeOptions options = getChromeOptions();
+        if (proxy == null) return getDriver(headless);
+        System.setProperty("webdriver.chrome.driver", WEB_DRIVER_PATH);
+        ChromeOptions options = getChromeOptions(headless);
         options.setCapability("proxy", proxy);
-
-
         return new ChromeDriver(options);
     }
 
-    public static ChromeOptions getChromeOptions(){
+    public static ChromeOptions getChromeOptions(Boolean headless) {
         ChromeOptions options = new ChromeOptions();
 
-//        options.addArguments("--headless");
-        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateUtil.PATTERN_yyyyMMdd_HHmmss));
-        options.addArguments("user-data-dir=/Users/dwd/Downloads/search/user_profile" + "/"+ time);
+        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateUtil.PATTERN_yyyyMMdd_HHmm));
+        options.addArguments("user-data-dir=/Users/dwd/dev/GitHub/jiaoyi/search/tmp/user_profile" + "/" + time);
         options.addArguments("--remote-allow-origins=*");
+        if (headless) options.addArguments("--headless");
         return options;
     }
 

@@ -16,6 +16,7 @@ import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.FileUtil;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
 import pro.jiaoyi.eastm.config.IndexEnum;
+import pro.jiaoyi.eastm.config.VipIndexEnum;
 import pro.jiaoyi.eastm.model.*;
 import pro.jiaoyi.eastm.util.EmMaUtil;
 
@@ -57,7 +58,8 @@ public class EmClient {
         }
         if (!force) {
             //查本地缓存
-            String key = DateUtil.today() + "-" + code;
+            String dateStr = DateUtil.tradeDate();
+            String key = dateStr + "-" + code;
             List<EmDailyK> emDailyKS = DATE_KLINE_MAP.get(key);
             if (emDailyKS != null && emDailyKS.size() > 0) {
                 log.info("hit local cache for code:{}", key);
@@ -66,7 +68,7 @@ public class EmClient {
 
 
             //查本地文件
-            String path = "kline/" + DateUtil.today() + "/" + key + ".json";
+            String path = "kline/" + dateStr + "/" + key + ".json";
             path = projectDir + "/" + path;
 
             if (FileUtil.fileCheck(path)) {
@@ -196,8 +198,9 @@ public class EmClient {
             log.info("获取日线行情数据 size={} start={} end={}", size, s1, s2);
             DATE_KLINE_MAP.put(DateUtil.today() + "-" + code, list);
 
-            String key = DateUtil.today() + "-" + code;
-            String path = "kline/" + DateUtil.today() + "/" + key + ".json";
+            String dateStr = DateUtil.tradeDate();
+            String key = dateStr + "-" + code;
+            String path = "kline/" + dateStr + "/" + key + ".json";
             path = projectDir + "/" + path;
             if (!FileUtil.fileCheck(path)) {
                 //不存在 且 在每天15:00之后
@@ -274,14 +277,12 @@ public class EmClient {
             }
         }
         List<EmCList> clist = getClist(1, 10000);
-
-        long day15 = new Date().getTime() - 15 * 24 * 60 * 60 * 1000;
         if (clist.size() > 0) {
             List<EmCList> list = clist.stream().filter(e -> !(
                     e.getF12Code().startsWith("8")
                             || e.getF14Name().contains("ST")
-                            || e.getF14Name().contains("退")
-            )).toList();
+                            || e.getF14Name().contains("退"))
+            ).toList();
 
             //超过 每天 9:31 之后的数据 在放入缓存
             if (LocalTime.now().isAfter(LocalTime.of(9, 31))) {

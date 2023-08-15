@@ -8,6 +8,7 @@ import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.FileUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.config.IndexEnum;
+import pro.jiaoyi.eastm.config.VipIndexEnum;
 import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
 import pro.jiaoyi.eastm.util.EmMaUtil;
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 @Slf4j
@@ -64,7 +66,7 @@ public class TvService {
 
         List<EmCList> index = emClient.getIndex(indexEnum, sync);
         if (sort) {
-            if (index != null && index.size() > 0){
+            if (index != null && index.size() > 0) {
                 try {
                     index.sort(Comparator.comparing(EmCList::getF100bk));
                 } catch (Exception e) {
@@ -75,9 +77,26 @@ public class TvService {
         return index;
     }
 
+    private static AtomicLong COUNTER = new AtomicLong(0);
+
     public Map<String, List<String>> getAllIndex(boolean sync) {
+        if (COUNTER.getAndIncrement() == 0) {
+            //init
+            List<EmDailyK> index = emClient.getDailyKs(VipIndexEnum.index_000001.getCode(), LocalDate.now(), 500, false);
+            if (index.size() > 0) {
+                List<EmCList> list = emClient.getClistDefaultSize(true);
+                for (EmCList em : list) {
+                    emClient.getDailyKs(em.getF12Code(), LocalDate.now(), 500, false);
+                }
+            }
+        }
+
         HashMap<String, List<String>> map = new HashMap<>();
         IndexEnum[] values = IndexEnum.values();
+
+        //这里改一下, 改成 默认获取全部信息
+
+
         for (IndexEnum value : values) {
             List<EmCList> lists = getIndex(value.getType(), true, sync);
 

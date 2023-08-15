@@ -11,7 +11,7 @@ public enum IndexEnum {
     IndexAll_Filter("indexAll", "4.指数成份(过滤)", ""),
     IndexAll_Component("IndexAll_Filter", "4.指数成份(全)", ""),
     O_TP02("tp02", "5.2个点之上", ""),
-    O_TP7("tp7", "6.7个点之上", ""),
+    O_TP7("tp7", "6.7个点之上(5日内)", ""),
     OPEN_HIGH("open_high", "高开0.5-3", ""),
     ALL("all", "全部", ""),
     O_BK("bk", "板块", "http://92.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=100&po=1&np=1&fltt=2&invt=2&wbp2u=6502094531899276|0|1|0|web&fid=f3&fs=m:90+t:2+f:!50&fields=f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f14,f15,f16,f17,f18,f22,f23,f100"),

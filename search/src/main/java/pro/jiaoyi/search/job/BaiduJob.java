@@ -5,6 +5,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import pro.jiaoyi.common.util.DateUtil;
@@ -52,6 +53,7 @@ public class BaiduJob {
     public static final int MAX_LEVEL = 3; //从0 开始
 
     @Scheduled(fixedRate = 1000 * 60) // 1分钟
+    @Async
     public void safeJob() {
         SafeCheckEntity db = safeCheckRepo.findBySource(BAIDU.name());
         if (db != null) {
@@ -123,7 +125,9 @@ public class BaiduJob {
             try {
                 // get proxy
                 Proxy proxy = null;
-                baiduKeywordSearch(entity.getMasterKeyword(), entity.getKeyword(), 2, entity.getLevel(), MAX_LEVEL, proxy);
+                if (entity.getLevel() < MAX_LEVEL) {
+                    baiduKeywordSearch(entity.getMasterKeyword(), entity.getKeyword(), 2, entity.getLevel(), MAX_LEVEL, proxy);
+                }
             } catch (Exception e) {
                 log.error("baiduKeywordSearch error, entity: {}", JSON.toJSONString(entity), e);
             }
@@ -139,7 +143,7 @@ public class BaiduJob {
         HashSet<String> rwSet = new HashSet<>(); // 用于多级搜索, 以及去重
         HashSet<String> previousRwSet = new HashSet<>();
 
-        WebDriver driver = proxy == null ? SeleniumUtil.getDriver() : SeleniumUtil.getDriver(proxy);
+        WebDriver driver = proxy == null ? SeleniumUtil.getDriver(true) : SeleniumUtil.getDriver(proxy,true);
         try {
             baiduKeywordScraper.searchIndex(driver, master);
         } catch (Exception e) {
@@ -165,7 +169,7 @@ public class BaiduJob {
                     // skip
                     KeywordsWaitToSearchEntity dbWait = keywordsWaitToSearchRepo.findBySourceAndMasterKeywordAndKeyword(BAIDU.name(), master, word);
                     if (dbWait != null) {
-                        log.info("delete keyword: {}", dbWait);
+                        log.info("update keyword: {}", dbWait);
                         dbWait.setSearchCount(dbWait.getSearchCountMax() + 1);
                         keywordsWaitToSearchRepo.saveAndFlush(dbWait);
                     }
@@ -184,7 +188,7 @@ public class BaiduJob {
                         // update db
                         KeywordsWaitToSearchEntity dbWait = keywordsWaitToSearchRepo.findBySourceAndMasterKeywordAndKeyword(BAIDU.name(), master, word);
                         if (dbWait != null) {
-                            log.info("delete keyword: {}", dbWait);
+                            log.info("update keyword: {}", dbWait);
                             dbWait.setSearchCount(dbWait.getSearchCount() + 1);
                             keywordsWaitToSearchRepo.saveAndFlush(dbWait);
                         }
@@ -234,7 +238,7 @@ public class BaiduJob {
                         entity.setUpdateTime(now);//下拉框
 
                         entity.setRemark(item.getRemark());
-                        log.info("entity:{}", entity);
+                        log.debug("entity:{}", entity);
                         searchResultRepo.save(entity);
 
                     }

@@ -2,6 +2,7 @@ package pro.jiaoyi.common.util;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 public class DateUtil {
@@ -11,7 +12,6 @@ public class DateUtil {
     public static final String PATTERN_yyyyMMdd_HHmmss = "yyyyMMdd_HHmmss";
     public static final String PATTERN_yyyy_MM_dd = "yyyy-MM-dd";
     public static final String PATTERN_HH_mm_ss = "HH:mm:ss";
-
 
 
     public static LocalDateTime strToLocalDateTime(String str, String pattern) {
@@ -45,8 +45,25 @@ public class DateUtil {
         return LocalDate.now().toString().replace("-", "");
     }
 
+    public static String dateStr(LocalDate l) {
+        return l.toString().replace("-", "");
+    }
 
-    public static String tsToStr(long ts, String pattern){
+    public static String tradeDate() {
+//        return "20230814";
+
+        String dateStr = DateUtil.today();
+        if (LocalDate.now().getDayOfWeek().getValue() == 6) {
+            dateStr = DateUtil.dateStr(LocalDate.now().minusDays(1));
+        }
+        if (LocalDate.now().getDayOfWeek().getValue() == 7) {
+            dateStr = DateUtil.dateStr(LocalDate.now().minusDays(2));
+        }
+        return dateStr;
+    }
+
+
+    public static String tsToStr(long ts, String pattern) {
         /*
          * timestamp -> string pattern=pattern
          */
@@ -55,7 +72,7 @@ public class DateUtil {
         return formatter.format(instant.atZone(ZoneId.systemDefault()));
     }
 
-    public static LocalDate tsToLocalDate(long ts){
+    public static LocalDate tsToLocalDate(long ts) {
         /*
          * timestamp -> LocalDate
          */
@@ -63,10 +80,14 @@ public class DateUtil {
         return strToLocalDate(tsToStr(ts, pattern), pattern);
     }
 
+    public static Integer daysDiff(LocalDateTime localDateTime) {
+        return (int) ChronoUnit.DAYS.between(localDateTime, LocalDateTime.now());
+    }
+
     public static void main(String[] args) {
         LocalDateTime now = LocalDateTime.now();
         System.out.println(now.toString());
-        System.out.println(LocalDateTime.now().toString().substring(0,16));
+        System.out.println(LocalDateTime.now().toString().substring(0, 16));
     }
 
 }

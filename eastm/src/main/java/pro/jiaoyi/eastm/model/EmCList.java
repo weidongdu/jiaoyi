@@ -25,5 +25,6 @@ public class EmCList {
     private BigDecimal f22Speed;//涨速//        "f22": -0.25,
     private BigDecimal f23Pb;//市净率//        "f23": 0.61
     private String f100bk;//所属板块//        "f100": "银行"
+    private String tradeDate;//交易日
 
 }

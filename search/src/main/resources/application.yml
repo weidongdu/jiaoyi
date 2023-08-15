@@ -21,10 +21,14 @@ jieba:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/jiaoyi?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&useSSL=true
-    username: root
-    #    password: mysqlroot
-    password: 12345678
+#    url: jdbc:mysql://localhost:3306/jiaoyi?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&useSSL=true
+#    username: root
+#    #    password: mysqlroot
+#    password: 12345678
+#
+    url: jdbc:mysql://rm-cn-uax3cavow000diqo.rwlb.rds.aliyuncs.com:3306/jiaoyi?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&useSSL=true
+    username: aliroot
+    password: Mysql@aliroot
     driver-class-name: com.mysql.cj.jdbc.Driver
   # JPA 相关
   jpa:

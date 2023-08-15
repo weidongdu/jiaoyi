@@ -638,13 +638,14 @@ class EastmApplicationTests {
 
     @Test
     public void getAll() {
+
         List<EmCList> list = emClient.getClistDefaultSize(false);
 
-        LocalDate end = LocalDate.now().minusDays(1);
+        LocalDate end = LocalDate.now();//.minusDays(1);
         long endTs = DateUtil.toTimestamp(end);
 
         for (EmCList emCList : list) {
-            List<EmDailyK> dailyKs = emClient.getDailyKs(emCList.getF12Code(), LocalDate.now(), 500, false);
+            List<EmDailyK> dailyKs = emClient.getDailyKs(emCList.getF12Code(), end, 500, false);
             int size = dailyKs.size();
             if (size == 0) {
                 continue;
@@ -719,13 +720,13 @@ class EastmApplicationTests {
                 entity.setVl250(BDUtil.BN1);
             } else {
                 BigDecimal amt = entity.getAmt();
-                List<BigDecimal> l5 = dailyKs.subList(i+1 - 5, i+1).stream().map(EmDailyK::getAmt).sorted().toList();//.toArray(new BigDecimal[0]);
-                List<BigDecimal> l10 = dailyKs.subList(i+1 - 10, i+1).stream().map(EmDailyK::getAmt).sorted().toList();//.toArray(new BigDecimal[0]);
-                List<BigDecimal> l20 = dailyKs.subList(i+1 - 20, i+1).stream().map(EmDailyK::getAmt).sorted().toList();//.toArray(new BigDecimal[0]);
-                List<BigDecimal> l30 = dailyKs.subList(i+1 - 30, i+1).stream().map(EmDailyK::getAmt).sorted().toList();//.toArray(new BigDecimal[0]);
-                List<BigDecimal> l60 = dailyKs.subList(i+1 - 60, i+1).stream().map(EmDailyK::getAmt).sorted().toList();//.toArray(new BigDecimal[0]);
-                List<BigDecimal> l120 = dailyKs.subList(i+1 - 120, i+1).stream().map(EmDailyK::getAmt).sorted().toList();//.toArray(new BigDecimal[0]);
-                List<BigDecimal> l250 = dailyKs.subList(i+1 - 250, i+1).stream().map(EmDailyK::getAmt).sorted().toList();//.toArray(new BigDecimal[0]);
+                List<BigDecimal> l5 = dailyKs.subList(i + 1 - 5, i + 1).stream().map(EmDailyK::getAmt).sorted().toList();//.toArray(new BigDecimal[0]);
+                List<BigDecimal> l10 = dailyKs.subList(i + 1 - 10, i + 1).stream().map(EmDailyK::getAmt).sorted().toList();//.toArray(new BigDecimal[0]);
+                List<BigDecimal> l20 = dailyKs.subList(i + 1 - 20, i + 1).stream().map(EmDailyK::getAmt).sorted().toList();//.toArray(new BigDecimal[0]);
+                List<BigDecimal> l30 = dailyKs.subList(i + 1 - 30, i + 1).stream().map(EmDailyK::getAmt).sorted().toList();//.toArray(new BigDecimal[0]);
+                List<BigDecimal> l60 = dailyKs.subList(i + 1 - 60, i + 1).stream().map(EmDailyK::getAmt).sorted().toList();//.toArray(new BigDecimal[0]);
+                List<BigDecimal> l120 = dailyKs.subList(i + 1 - 120, i + 1).stream().map(EmDailyK::getAmt).sorted().toList();//.toArray(new BigDecimal[0]);
+                List<BigDecimal> l250 = dailyKs.subList(i + 1 - 250, i + 1).stream().map(EmDailyK::getAmt).sorted().toList();//.toArray(new BigDecimal[0]);
 
                 entity.setVl5(new BigDecimal(l5.indexOf(amt)).divide(new BigDecimal(l5.size() - 1), 4, RoundingMode.HALF_UP));
                 entity.setVl10(new BigDecimal(l10.indexOf(amt)).divide(new BigDecimal(l10.size() - 1), 4, RoundingMode.HALF_UP));
