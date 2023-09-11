@@ -641,7 +641,7 @@ class EastmApplicationTests {
 
         List<EmCList> list = emClient.getClistDefaultSize(false);
 
-        LocalDate end = LocalDate.now();//.minusDays(1);
+        LocalDate end = LocalDate.now();//.minusDays(2);
         long endTs = DateUtil.toTimestamp(end);
 
         for (EmCList emCList : list) {

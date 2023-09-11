@@ -52,7 +52,17 @@ public class DateUtil {
     public static String tradeDate() {
 //        return "20230814";
 
+        LocalTime localTimePre = LocalTime.of(9, 0, 0); // 定义当天的零点
+//        LocalTime localTimeEnd = LocalTime.of(15, 0, 0); // 定义当天的零点
+
+        LocalDateTime pre = LocalDateTime.of(LocalDate.now(), localTimePre);
+//        LocalDateTime end = LocalDateTime.of(LocalDate.now(), localTimeEnd);
         String dateStr = DateUtil.today();
+        if (LocalDateTime.now().isBefore(pre)){
+            dateStr = dateStr(LocalDate.now().minusDays(1));
+        }
+
+
         if (LocalDate.now().getDayOfWeek().getValue() == 6) {
             dateStr = DateUtil.dateStr(LocalDate.now().minusDays(1));
         }
@@ -88,6 +98,8 @@ public class DateUtil {
         LocalDateTime now = LocalDateTime.now();
         System.out.println(now.toString());
         System.out.println(LocalDateTime.now().toString().substring(0, 16));
+
+        System.out.println(tradeDate());
     }
 
 }

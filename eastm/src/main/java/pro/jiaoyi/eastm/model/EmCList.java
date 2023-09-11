@@ -3,6 +3,7 @@ package pro.jiaoyi.eastm.model;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 @Data
 public class EmCList {
@@ -27,4 +28,16 @@ public class EmCList {
     private String f100bk;//所属板块//        "f100": "银行"
     private String tradeDate;//交易日
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EmCList emCList = (EmCList) o;
+        return Objects.equals(f12Code, emCList.f12Code) && Objects.equals(tradeDate, emCList.tradeDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(f12Code, tradeDate);
+    }
 }

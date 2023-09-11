@@ -53,6 +53,19 @@ public class OkHttpUtil {
         return builder.build();
     }
 
+    public Request buildRequest(String url, Map<String, String> headers, Map<String, String> params) {
+        if (params != null && params.size() > 0) {
+            StringBuilder urlBuilder = new StringBuilder(url + "?");
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                urlBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+            }
+            url = urlBuilder.toString();
+            url = url.substring(0, url.length() - 1);
+        }
+
+        return buildRequest(url, headers);
+    }
+
     public Request buildRequest(String url, Map<String, String> headers, RequestBody body) {
         Request.Builder reqBuilder = new Request.Builder().url(url);
         if (headers != null) {
@@ -60,7 +73,6 @@ public class OkHttpUtil {
         }
         return reqBuilder.post(body).build();
     }
-
 
 
     public Request buildRequest(String url, Map<String, String> headerMap, String method) {
@@ -121,6 +133,10 @@ public class OkHttpUtil {
 
     public byte[] getForBytes(String url, Map<String, String> headers) {
         Request request = buildRequest(url, headers);
+        return sendDefault(request);
+    }
+    public byte[] getForBytes(String url, Map<String, String> headers, Map<String, String> params) {
+        Request request = buildRequest(url, headers,params);
         return sendDefault(request);
     }
 

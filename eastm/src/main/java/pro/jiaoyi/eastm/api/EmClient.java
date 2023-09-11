@@ -1,7 +1,7 @@
 package pro.jiaoyi.eastm.api;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,6 @@ import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.FileUtil;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
 import pro.jiaoyi.eastm.config.IndexEnum;
-import pro.jiaoyi.eastm.config.VipIndexEnum;
 import pro.jiaoyi.eastm.model.*;
 import pro.jiaoyi.eastm.util.EmMaUtil;
 
@@ -398,6 +397,8 @@ public class EmClient {
                 return getClistDefaultSize(false);
             case BIXUAN:
                 return must(sync);
+            case EM_MA_UP:
+                return xuanguCList();
             case HS300:
                 return getIndex(IndexEnum.HS300.getUrl());
             case CYCF:
@@ -494,15 +495,27 @@ public class EmClient {
         return Collections.emptyList();
     }
 
+
+    public List<EmCList> getIndex1990() {
+        HashSet<EmCList> indexSet = new HashSet<>();
+        indexSet.addAll(getIndex(IndexEnum.HS300.getUrl()));
+        indexSet.addAll(getIndex(IndexEnum.CYCF.getUrl()));
+        indexSet.addAll(getIndex(IndexEnum.ZZ500.getUrl()));
+        indexSet.addAll(getIndex1000());
+
+        return new ArrayList<>(indexSet);
+    }
+
+
     public List<EmCList> must(int lastOffSet) {
+        List<EmCList> index1990 = getIndex1990();
+        List<String> indexCodes = index1990.stream().map(EmCList::getF12Code).toList();
 
         List<EmCList> list = getClistDefaultSize(false);
         List<EmCList> fList = list.stream().filter(e ->
-                e.getF3Pct().compareTo(BigDecimal.ZERO) > 0
-                        && e.getF3Pct().compareTo(B5) < 0
-                        && e.getF6Amt().compareTo(B5000W) > 0
+                indexCodes.contains(e.getF12Code())
+                        && e.getF6Amt().compareTo(B1_5Y) > 0
                         && e.getF8Turnover().compareTo(B10) < 0
-                        && !e.getF12Code().startsWith("8")
                         && !e.getF14Name().contains("ST")
                         && !e.getF14Name().contains("退")
         ).toList();
@@ -588,23 +601,26 @@ public class EmClient {
     }
 
     private List<EmCList> getIndexAll() {
-        log.info("getIndexAll 指数成份");
-        List<EmCList> index = getIndex(IndexEnum.CYCF.getUrl());
-        index.addAll(getIndex(IndexEnum.HS300.getUrl()));
-        index.addAll(getIndex(IndexEnum.ZZ500.getUrl()));
-        index.addAll(getIndex1000());
+//        log.info("getIndexAll 指数成份");
+//        List<EmCList> index =  getIndex(IndexEnum.CYCF.getUrl());
+//        index.addAll(getIndex(IndexEnum.HS300.getUrl()));
+//        index.addAll(getIndex(IndexEnum.ZZ500.getUrl()));
+//        index.addAll(getIndex1000());
+        log.info("get All 成份");
+
+        List<EmCList> index = getClistDefaultSize(false);
 
         HashSet<String> codeSet = new HashSet<>(index.stream().map(EmCList::getF12Code).toList());
         List<EmCList> list = getClistDefaultSize(false);
-        BigDecimal B_2 = new BigDecimal("-2");
-        BigDecimal B5000_0000 = new BigDecimal("50000000");
+        BigDecimal B_1 = new BigDecimal("-2");
+        BigDecimal B15000_0000 = new BigDecimal("150000000");
 
         List<EmCList> filterList = list.stream().filter(c ->
                         codeSet.contains(c.getF12Code())
-                                && c.getF3Pct().compareTo(B_2) > 0
+                                && c.getF3Pct().compareTo(B_1) > 0
                                 && !c.getF14Name().contains("退")
-                                //成交额大于 5000万
-                                && c.getF6Amt().compareTo(B5000_0000) > 0)
+                                //成交额大于1y5000万
+                                && c.getF6Amt().compareTo(B15000_0000) > 0)
                 .toList();
 
         try {
@@ -774,6 +790,99 @@ public class EmClient {
             total = total.add(amt);
         }
         return total.divide(BigDecimal.valueOf(avg), 0, RoundingMode.HALF_UP);
+    }
+
+
+    /**
+     * 选股器
+     *
+     * @return
+     */
+    public List<EmCList> xuanguCList() {
+        List<EmCList> list = this.getClistDefaultSize(false);
+        List<String> xuangu = xuangu();
+        return new ArrayList<>(list.stream().filter(e -> xuangu.contains(e.getF12Code())).toList());
+    }
+
+    public List<String> xuangu() {
+        String IS_SZ50 = "(IS_SZ50=\"是\")";
+        String IS_HS300 = "(IS_HS300=\"是\")";
+        String IS_ZZ500 = "(IS_ZZ500=\"是\")";
+        String IS_ZZ1000 = "(IS_ZZ1000=\"是\")";
+        String IS_CY50 = "(IS_CY50=\"是\")";
+        String IS_KC50 = "(IS_KC50=\"是\")";
+
+        List<String> list = List.of(IS_SZ50, IS_HS300, IS_ZZ500, IS_ZZ1000, IS_CY50, IS_KC50);
+        Set<String> codes = new HashSet<>();
+        for (String s : list) {
+            log.info("xuangu {}", s);
+            codes.addAll(xuangu(s));
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return new ArrayList<>(codes);
+    }
+
+    private List<String> xuangu(String index) {
+        String url = "https://data.eastmoney.com/dataapi/xuangu/list";
+        Map<String, String> params = new HashMap<>();
+        Map<String, String> headers = new HashMap<>();
+
+        params.put("ps", "200");
+        params.put("p", "1");
+        params.put("sty", "SECUCODE,SECURITY_CODE,SECURITY_NAME_ABBR,NEW_PRICE,CHANGE_RATE,VOLUME_RATIO,HIGH_PRICE,LOW_PRICE,PRE_CLOSE_PRICE,VOLUME,DEAL_AMOUNT,TURNOVERRATE,DEAL_AMOUNT,LONG_AVG_ARRAY,INDEX");
+        params.put("filter", "(DEAL_AMOUNT>=150000000)(LONG_AVG_ARRAY=\"1\")" + index);
+        params.put("source", "SELECT_SECURITIES");
+        params.put("client", "WEB");
+
+
+        headers.put("Accept", "application/json, text/javascript, */*; q=0.01");
+        headers.put("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
+        headers.put("Cache-Control", "no-cache");
+        headers.put("Connection", "keep-alive");
+        headers.put("Content-Type", "application/json");
+        headers.put("Pragma", "no-cache");
+        headers.put("Referer", "https://data.eastmoney.com/xuangu/");
+        headers.put("Sec-Fetch-Dest", "empty");
+        headers.put("Sec-Fetch-Mode", "cors");
+        headers.put("Sec-Fetch-Site", "same-origin");
+        headers.put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36");
+        headers.put("X-Requested-With", "XMLHttpRequest");
+        headers.put("sec-ch-ua", "\"Chromium\";v=\"116\", \"Not)A;Brand\";v=\"24\", \"Google Chrome\";v=\"116\"");
+        headers.put("sec-ch-ua-mobile", "?0");
+        headers.put("sec-ch-ua-platform", "\"macOS\"");
+
+        byte[] bytes = okHttpUtil.getForBytes(url, headers, params);
+        if (bytes.length == 0) return Collections.emptyList();
+
+        String s = new String(bytes);
+        JSONObject jsonObject = JSONObject.parseObject(s);
+
+        if (jsonObject.getIntValue("code") != 0) {
+            return Collections.emptyList();
+        }
+
+        JSONObject result = jsonObject.getJSONObject("result");
+        if (result == null) {
+            return Collections.emptyList();
+        }
+
+        Integer count = result.getInteger("count");
+        if (count == null || count == 0) {
+            return Collections.emptyList();
+        }
+
+        JSONArray dataArr = result.getJSONArray("data");
+        List<String> codes = new ArrayList<>(count);
+        for (int i = 0; i < dataArr.size(); i++) {
+            JSONObject jsonObj = dataArr.getJSONObject(i);
+            String code = jsonObj.getString("SECURITY_CODE");
+            codes.add(code);
+        }
+        return codes;
     }
 
 
