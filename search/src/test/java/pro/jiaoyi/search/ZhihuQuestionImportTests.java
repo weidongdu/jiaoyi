@@ -130,7 +130,10 @@ class ZhihuQuestionImportTests {
 
         ArrayList<Long> ids = new ArrayList<>();
 
-        for (int i = 0; i < 1000; i++) {
+
+        //0828-1017 = 1970
+        //fetch time 2023-08-27 12:22:53.346943
+        for (int i = 0; i < 1970; i++) {
             int id = lastId + i + 1;
 
             ids.add((long) id);

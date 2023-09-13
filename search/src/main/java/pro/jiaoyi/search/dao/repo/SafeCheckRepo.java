@@ -9,4 +9,5 @@ import pro.jiaoyi.search.dao.entity.SafeCheckEntity;
 public interface SafeCheckRepo extends JpaRepository<SafeCheckEntity,Long>, CrudRepository<SafeCheckEntity, Long> {
 
     SafeCheckEntity findBySource(String name);
+    SafeCheckEntity findBySourceAndHost(String name, String host);
 }

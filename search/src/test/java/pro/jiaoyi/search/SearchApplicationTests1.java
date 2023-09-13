@@ -8,9 +8,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.bind.annotation.RequestBody;
 import pro.jiaoyi.common.model.ApiResult;
 import pro.jiaoyi.search.scraper.BaiduKeywordScraper;
+import pro.jiaoyi.search.util.Text2Keyword;
+import pro.jiaoyi.search.xmind.XmindUtil;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 @SpringBootTest
 @Slf4j
@@ -26,7 +30,7 @@ class SearchApplicationTests1 {
     @Test
     public void baidu() {
 
-        String master = "咖啡";
+        String master = "stable diffusion";
         List<String> keywords = genKeywords();
         //基础词 拓展
         baiduKeywordScraper.init(master, keywords);
@@ -34,230 +38,34 @@ class SearchApplicationTests1 {
 
 
     public static List<String> genKeywords() {
-        ArrayList<String> list = new ArrayList<>();
 
-
-        list.add("咖啡师资格证怎么考");
-        list.add("咖啡");
-        list.add("咖啡的功效与作用及副作用");
-        list.add("咖啡店加盟10大品牌排行");
-        list.add("咖啡英文");
-        list.add("咖啡的种类及口味");
-        list.add("咖啡店加盟");
-        list.add("咖啡品牌排行榜前十名");
-        list.add("咖啡对身体有什么好处和坏处");
-        list.add("咖啡arabica");
-        list.add("咖啡app");
-        list.add("咖啡a股上市公司有哪些");
-        list.add("咖啡ag值是什么意思");
-        list.add("咖啡app聊天软件下载");
-        list.add("咖啡asd是什么意思");
-        list.add("咖啡agf和ucc");
-        list.add("咖啡杯");
-        list.add("咖啡杯图片");
-        list.add("咖啡不能和什么一起吃");
-        list.add("咖啡伴侣");
-        list.add("咖啡保质期一般多长时间");
-        list.add("咖啡costa");
-        list.add("咖啡coffee");
-        list.add("咖啡促进新陈代谢");
-        list.add("咖啡产地排名");
-        list.add("咖啡冲泡方法");
-        list.add("咖啡萃取");
-        list.add("咖啡combo");
-        list.add("咖啡creamer");
-        list.add("咖啡产地");
-        list.add("咖啡成分有哪些");
-        list.add("咖啡dirty");
-        list.add("咖啡的功效与作用");
-        list.add("咖啡的危害");
-        list.add("咖啡豆");
-        list.add("咖啡的英文");
-        list.add("咖啡driy");
-        list.add("咖啡espresso");
-        list.add("咖啡emoji");
-        list.add("咖啡espresso什么意思");
-        list.add("咖啡eco是什么意思");
-        list.add("咖啡emoji表情");
-        list.add("咖啡ebf是什么意思");
-        list.add("咖啡esp是什么意思");
-        list.add("咖啡二合一和三合一哪个好点");
-        list.add("咖啡二次萃取");
-        list.add("咖啡儿童喝了好不好");
-        list.add("咖啡放一晚上第二天能喝吗");
-        list.add("咖啡粉");
-        list.add("咖啡粉如何冲泡咖啡");
-        list.add("咖啡放冰箱第二天能喝吗");
-        list.add("咖啡粉渣有啥用");
-        list.add("咖啡副作用");
-        list.add("咖啡发酸怎么回事");
-        list.add("咖啡粉过期了还能喝吗");
-        list.add("咖啡flat white");
-        list.add("咖啡分类");
-        list.add("咖啡过期还能喝吗?");
-        list.add("咖啡过一夜能喝吗");
-        list.add("咖啡公社");
-        list.add("咖啡g1g2代表什么意思");
-        list.add("咖啡灌肠的作用与功效");
-        list.add("咖啡隔夜还能喝吗?");
-        list.add("咖啡过敏的症状");
-        list.add("咖啡馆");
-        list.add("咖啡过期了但是密封没打开还能喝么");
-        list.add("咖啡功效");
-        list.add("咖啡喝多了对身体有什么影响吗");
-        list.add("咖啡喝多了会怎么样");
-        list.add("咖啡会不会长胖");
-        list.add("咖啡和酒能不能一起喝");
-        list.add("咖啡喝多了心慌怎么办");
-        list.add("咖啡喝多了恶心想吐怎么办");
-        list.add("咖啡和茶能一起喝吗");
-        list.add("咖啡会上火吗");
-        list.add("咖啡喝多了会不孕不育吗");
-        list.add("咖啡喝多了有什么副作用");
-        list.add("咖啡illy");
-        list.add("咖啡ip形象设计案例");
-        list.add("咖啡渣的用途");
-        list.add("咖啡渍怎么去除");
-        list.add("咖啡渍弄到白衣服上怎么办");
-        list.add("咖啡渣怎么做肥料");
-        list.add("咖啡深度烘焙 中度烘焙的区别");
-        list.add("咖啡渣");
-        list.add("咖啡减肥有效果吗");
-        list.add("咖啡加牛奶");
-        list.add("咖啡机");
-        list.add("咖啡解药性吗");
-        list.add("咖啡加蜂蜜");
-        list.add("咖啡胶囊");
-        list.add("咖啡机怎么操作");
-        list.add("咖啡加奶叫什么");
-        list.add("咖啡减肥是真的吗");
-        list.add("咖啡结块还能不能喝");
-        list.add("咖啡可以隔夜喝吗");
-        list.add("咖啡可以空腹喝吗?");
-        list.add("咖啡可以减肥吗");
-        list.add("咖啡空腹喝好还是饭后喝好");
-        list.add("咖啡可以天天喝吗?");
-        list.add("咖啡可以消肿吗");
-        list.add("咖啡可以用凉水冲么");
-        list.add("咖啡可以加蜂蜜吗");
-        list.add("咖啡可以放冰箱第二天喝吗");
-        list.add("咖啡可以提高新陈代谢吗");
-        list.add("咖啡利尿吗");
-        list.add("咖啡luckin coffee");
-        list.add("咖啡logo创意设计");
-        list.add("咖啡拉花");
-        list.add("咖啡logo");
-        list.add("咖啡里面有什么成分");
-        list.add("咖啡利尿作用强吗");
-        list.add("咖啡logo设计");
-        list.add("咖啡logo图片");
-        list.add("咖啡拉花教学");
-        list.add("咖啡manner");
-        list.add("咖啡mstand");
-        list.add("咖啡名字");
-        list.add("咖啡猫");
-        list.add("咖啡m是什么意思");
-        list.add("咖啡名字创意大全");
-        list.add("咖啡每天喝多少克合适");
-        list.add("咖啡每天喝一杯对身体有伤害吗");
-        list.add("咖啡沫子可以养花吗");
-        list.add("咖啡磨豆机");
-        list.add("咖啡能减肥吗");
-        list.add("咖啡能隔夜喝吗");
-        list.add("咖啡你冲不冲");
-        list.add("咖啡弄到衣服用什么洗的掉");
-        list.add("咖啡能提神几个小时");
-        list.add("咖啡弄到白衣服能洗掉吗");
-        list.add("咖啡能用冷水冲吗");
-        list.add("咖啡能提高新陈代谢吗");
-        list.add("咖啡浓缩是什么意思");
-        list.add("咖啡能天天喝吗");
-        list.add("咖啡o和咖啡c的区别");
-        list.add("咖啡oz是什么意思");
-        list.add("咖啡or tea");
-        list.add("咖啡one shot");
-        list.add("咖啡oz是什么单位");
-        list.add("咖啡欧蕾");
-        list.add("咖啡品牌");
-        list.add("咖啡嘌呤高吗?");
-        list.add("咖啡品种");
-        list.add("咖啡ph值多少");
-        list.add("咖啡ph值");
-        list.add("咖啡配什么食物");
-        list.add("咖啡pca证书");
-        list.add("咖啡配纯牛奶会怎么样");
-        list.add("咖啡ppt");
-        list.add("咖啡q证是什么证");
-        list.add("咖啡起源于哪个国家");
-        list.add("咖啡q grader");
-        list.add("咖啡去水肿吗");
-        list.add("咖啡起源");
-        list.add("咖啡浅烘和深烘区别");
-        list.add("咖啡去湿气吗");
-        list.add("咖啡祛湿吗");
-        list.add("咖啡热量高吗");
-        list.add("咖啡ristretto");
-        list.add("咖啡热量多少大卡");
-        list.add("咖啡热气上火吗");
-        list.add("咖啡容易发胖吗?");
-        list.add("咖啡瑞幸");
-        list.add("咖啡raw");
-        list.add("咖啡渣可以直接放在花盆里吗");
-        list.add("咖啡热量排行");
-        list.add("咖啡色分泌物是怎么回事");
-        list.add("咖啡什么时候喝最好");
-        list.add("咖啡色");
-        list.add("咖啡sca是什么");
-        list.add("咖啡酸片");
-        list.add("咖啡树");
-        list.add("咖啡色搭配什么颜色最佳");
-        list.add("咖啡酸片的作用与功效");
-        list.add("咖啡上火吗");
-        list.add("咖啡tims");
-        list.add("咖啡糖");
-        list.add("咖啡厅");
-        list.add("咖啡图片");
-        list.add("咖啡天天喝,对身体有害吗");
-        list.add("咖啡糖果的功效与作用及副作用");
-        list.add("咖啡图片真实图片");
-        list.add("咖啡图片唯美图片");
-        list.add("咖啡推荐");
-        list.add("咖啡通便吗");
-        list.add("咖啡ucc");
-        list.add("咖啡用热水还是冷水");
-        list.add("咖啡ucc是什么意思");
-        list.add("咖啡ucc和agf哪个好");
-        list.add("咖啡v型是什么意思");
-        list.add("咖啡vc可以一起喝吗");
-        list.add("咖啡v60是什么意思");
-        list.add("咖啡vietcheck在线查真伪");
-        list.add("咖啡王子一号店");
-        list.add("咖啡污渍怎么去除衣服");
-        list.add("咖啡文案");
-        list.add("咖啡文案短句干净治愈");
-        list.add("咖啡为什么会酸");
-        list.add("咖啡为什么提神");
-        list.add("咖啡文案朋友圈");
-        list.add("咖啡wbc是什么意思");
-        list.add("咖啡wbc");
-        list.add("咖啡消肿是真的嘛");
-        list.add("咖啡小孩子能喝吗");
-        list.add("咖啡消肿吗");
-        list.add("咖啡洗的掉不");
-        list.add("咖啡续命");
-        list.add("咖啡性质是凉是热");
-        list.add("咖啡续命的朋友圈怎么发");
-        list.add("咖啡效果持续多久");
-        list.add("咖啡英文名怎么写");
-        list.add("咖啡y英语怎么说");
-        list.add("咖啡有什么好处和坏处");
-        list.add("咖啡渍怎么洗");
-        list.add("咖啡怎么洗掉的小窍门");
-        list.add("咖啡种类");
-        list.add("咖啡渣可以吸甲醛吗");
-        return list;
+        String[] s1 = {"stable diffusion","ai cover怎么弄","ai edu","ai p图","ai viewer安卓下载","Ai会坏绘画","Ai会坏绘画网站","ai绘画","ai绘画 000","ai绘画 18+","ai绘画 2.5d 美女 超清壁纸","ai绘画 2.5d古风","ai绘画 2.5d模型","ai绘画 2060 12g与3060 12g","ai绘画 3050","ai绘画 3060","ai绘画 3060ti","ai绘画 3090ti和4080","ai绘画 3d模型","ai绘画 4060","ai绘画 4070","ai绘画 4070ti","ai绘画 4080","ai绘画 4090","ai绘画 4090能跑多大的画面","ai绘画 4090输出多大的图","ai绘画 4k显卡","ai绘画 5600g 3060","ai绘画 6.0","AI绘画 6g显存","AI绘画 6G显存够用吗","ai绘画 720p","ai绘画 750ti","ai绘画 760 4g","ai绘画 8g 分辨率","ai绘画 8gb显存 分辨率","ai绘画 8g显存 分辨率","ai绘画 8g显存 够用吗","ai绘画 90年代","ai绘画 90年代情侣","ai绘画 960m","ai绘画 970","AI绘画 97拳皇","AI绘画 cos卡尔蜜拉","ai绘画 cpu","ai绘画 EasyNegative","ai绘画 Ema","AI绘画 embedding","AI绘画 IPAD","ai绘画 IPA下载","ai绘画 stable diffusion","AI绘画 UI","ai绘画 V5","ai绘画 Va","ai绘画 Vag","AI绘画 阿姨","ai绘画 版权","AI绘画 二次元tag","AI绘画 二次元动漫","AI绘画 二次元风格","AI绘画 二次元男性描绘","ai绘画 好身材","ai绘画 肌肉","ai绘画 开源","ai绘画 柳神","ai绘画 免费","ai绘画 拳皇","ai绘画 头像","ai绘画 下载","ai绘画 显卡","ai绘画 真人模型","ai绘画 制服","AI绘画0.5G显存能用吗","AI绘画02","Ai绘画0到1","ai绘画18+","ai绘画18+词条","ai绘画18+关键词","ai绘画18+免费","ai绘画18+免费无审核","ai绘画18+描述","ai绘画18+破解版","ai绘画18+破解版APP","ai绘画18+软件免费","ai绘画18+图片全","ai绘画2","ai绘画2.5d","ai绘画2B","ai绘画2k要多少显存","ai绘画2下载","AI绘画37小时长途火车","ai绘画3d","ai绘画3d人物","ai绘画4k","AI绘画4K壁纸美女","ai绘画5","ai绘画5.0","ai绘画520","ai绘画580怎么用","ai绘画59","Ai绘画5D狐妖","ai绘画5个妹子的图片","ai绘画5口之家","ai绘画5月,10月","ai绘画600次","ai绘画600次迭代玩法","ai绘画6pen","ai绘画6pen软件下载","ai绘画6pen下载","ai绘画6根手指","AI绘画70年代","ai绘画80年代","ai绘画80年代儿童的笑容","ai绘画8g够用吗","ai绘画8g显存","ai绘画8g显存多大的图","ai绘画8G显存可以画多大尺寸","ai绘画90度角改半圆","ai绘画91","ai绘画9527模型","ai绘画9岁","ai绘画api接口","ai绘画app","ai绘画app哪个好用","ai绘画app排行","ai绘画app破解版","ai绘画app破解版下载","ai绘画a卡能用吗","ai绘画civiai","ai绘画controlnet","ai绘画cos","ai绘画cpu要求","ai绘画cxk","ai绘画c站","ai绘画c站全名叫什么","ai绘画diffusion","ai绘画eva","ai绘画furry","ai绘画furry关键词","ai绘画ikun","ai绘画imagex","AI绘画in queue","Ai绘画Iora","ai绘画ios","ai绘画JK","ai绘画logo","ai绘画logo生成器","ai绘画lora模型怎么用","ai绘画lora是什么意思","ai绘画lucidpic","ai绘画midjourney","ai绘画midjourney网站","ai绘画mj","ai绘画novel","ai绘画oc","AI绘画OL","ai绘画ol御姐","ai绘画prompt","ai绘画pt文件怎么用","ai绘画Q版","ai绘画q版关键词","ai绘画q版人物","ai绘画r18","ai绘画stable diffusion","ai绘画tag","ai绘画tag18+","ai绘画tag生成器","ai绘画tag网站","ai绘画u","AI绘画Ui界面有问题怎么处理","ai绘画unidream","AI绘画unidream的捐换码","ai绘画unidream破解版","AI绘画up","ai绘画v","ai绘画vae模型","ai绘画vae是什么意思啊","ai绘画vae怎么用","ai绘画vega","ai绘画Vega AI","ai绘画with","AI绘画阿狸","AI绘画艾玛沃特森","ai绘画百度","ai绘画百度文心","ai绘画百度文心官网入口","ai绘画版权问题怎么解决","ai绘画宝","AI绘画本","AI绘画比基尼","ai绘画壁纸","AI绘画不知火舞","ai绘画词条","ai绘画大师","ai绘画的弊端","ai绘画的原理","ai绘画电脑配置要求","ai绘画貂蝉","ai绘画动漫","ai绘画动漫女神壁纸","ai绘画斗罗大陆","ai绘画二次元","ai绘画二次元美女","AI绘画发型关键词","AI绘画反向提示词怎么写","ai绘画飞飞","AI绘画分享","AI绘画风格","AI绘画腹肌","ai绘画高清壁纸","ai绘画工具","ai绘画工具哪个好用","ai绘画关键词","ai绘画关键词参考汇总","ai绘画关键词瑟瑟","ai绘画关键词生成器","ai绘画关键词推荐","ai绘画官网","ai绘画国风美女","ai绘画国漫女神","ai绘画海报","ai绘画和手绘的区别","AI绘画赫敏","ai绘画画涩图的关联词","ai绘画怀孕","ai绘画会让画师失业吗","AI绘画机甲","AI绘画肌肉男","AI绘画姬小满","AI绘画家","AI绘画健身美女","ai绘画教程","AI绘画巨大娘","AI绘画卡尔蜜拉","AI绘画凯莎","AI绘画铠甲勇士","AI绘画可以卖钱吗","ai绘画可以商用吗?","AI绘画克苏鲁关键词","AI绘画刻晴泳装","AI绘画课","AI绘画口令","AI绘画来啦","ai绘画漫画","ai绘画美女壁纸","ai绘画美女用什么软件","ai绘画免费","ai绘画免费软件","ai绘画免费网站","ai绘画模型","ai绘画哪个软件比较好用","ai绘画男","ai绘画男生关键词","ai绘画男生图片","ai绘画能画r18吗","ai绘画能商用吗","ai绘画能生成涩图吗","ai绘画能赚钱吗","ai绘画宁荣荣","AI绘画拍照","AI绘画派蒙","ai绘画培训","AI绘画配置要求","AI绘画骗局","AI绘画平台","AI绘画破解版","AI绘画旗袍","AI绘画旗袍美女","AI绘画千仞雪","AI绘画侵权","ai绘画侵权吗","AI绘画清凉的云韵","AI绘画去衣关键词","ai绘画如何描述更准确","ai绘画入口","ai绘画软件","ai绘画软件midjourney","ai绘画软件stable diffusion","ai绘画软件免费","ai绘画软件免费生成","ai绘画软件免费无审核","ai绘画软件排行","ai绘画生成器","ai绘画生成器免费","ai绘画生成器免费网址","ai绘画生成器网站入口","ai绘画生成器无审核","ai绘画生成器在线","ai绘画生成器在线网站","ai绘画生成软件app免费下载","ai绘画生成图片","ai绘画是什么意思","ai绘画提示词","ai绘画头像","ai绘画头像女生","ai绘画图片","ai绘画图生图","ai绘画网页版免费","ai绘画网站","ai绘画网站免费","ai绘画网址","ai绘画文案","ai绘画文心一格","ai绘画无限制无审核","ai绘画无限制无审核免费","ai绘画西施","ai绘画下载安装","ai绘画下载手机版免费","ai绘画小程序","ai绘画小强","ai绘画小说推文","ai绘画小舞","ai绘画需要什么配置","ai绘画英文","ai绘画泳衣","ai绘画用什么软件","ai绘画用什么显卡","ai绘画有版权纠纷吗","AI绘画有版权吗","ai绘画原理","ai绘画云曦","AI绘画孕妇","ai绘画在线","ai绘画在线生成器","ai绘画在线生成网站","ai绘画怎么变现","ai绘画怎么画","ai绘画怎么弄","ai绘画怎么用","ai绘画照片","ai绘画真人","ai绘画朱竹清","ai绘画作品","sd ai","sd ai绘画","sd ai绘画 显卡","sd ai绘画软件","sd ai全称","sd ai软件","sd ai作画","sd controlnet","sd c站","sd gun 论坛","sd gundam g世代","sd has gpt only","sd hd uhd","sd hd vd什么意思","sd logo设计","sd lora模型","sd lora怎么用","sd maid高级版解锁器","sd maid清理","sd maid清理专业版","sd maid清理专业版最新","sd map是什么","sd mj","sd mj ai绘图软件","sd prompt","sd roop","sd webui","sd xl","sd1.5模型","sd2.0","sdgun","sdgun论坛官网下载","sdgun社区","sdgun水弹论坛","sdgun水弹论坛app下载","sdxl1.0","sdxl模型","sdxl是什么意思","sd绘画ai","sd教程","sd局部重绘","sd清理","sd清理残留","sd清理残留软件","sd清理器","sd清理器高级版","sd全称","sd权限怎么打开","sd软件","sd软件ai","sd是什么意思","sd提示词大全网站","sd下载","sd小黑屋","sd原画是什么意思","sd云端部署","sstablediffusion难吗","stabilitrak维修","stability","stable defussion","stable diffuion","stable diffuion和midjourney","stable diffusion","stable diffusion 0.0.","Stable diffusion 1.4 1.5结构差异","Stable diffusion 1.5","stable diffusion 1.5 2.0区别","Stable diffusion 1050ti","Stable diffusion 12g显存","Stable diffusion 1660s","Stable diffusion 16g显存 爆显存","Stable Diffusion 2.0","Stable Diffusion 2.0 benmark","Stable Diffusion 2.0 发布","Stable Diffusion 2.0模型","Stable Diffusion 2.0下载","Stable Diffusion 2.1","Stable Diffusion 2.1 Demo","Stable Diffusion 2.1 mac部署","Stable Diffusion 2.2","Stable Diffusion 2060","stable diffusion 3.0","stable diffusion 3050","stable diffusion 3060","stable diffusion 3060 12g","stable diffusion 3060ti","stable diffusion 3070","stable diffusion 3080ti","stable diffusion 3090","stable diffusion 3d","stable diffusion 3d模型","Stable Diffusion 4.0","Stable Diffusion 4000 A100","stable diffusion 4060","Stable Diffusion 4060ti","Stable Diffusion 4070","Stable Diffusion 4070ti","Stable Diffusion 4090","Stable Diffusion 4090 a6000","Stable Diffusion 5700","Stable Diffusion 60年代","Stable Diffusion 6800h","Stable Diffusion 6G显存","Stable Diffusion 750ti","Stable Diffusion 7840h","Stable Diffusion 7月更新","Stable Diffusion 81274D13","Stable Diffusion 8G 显存 图片 大小","Stable Diffusion 8g显存能跑多大的图","stable diffusion 9009","stable diffusion 90年代","stable diffusion 95%","stable diffusion 95%卡","stable diffusion 96%","stable diffusion 960m","stable diffusion 960显卡","stable diffusion 970","stable diffusion 980显卡可以吗","stable diffusion 99%","stable diffusion ai","stable diffusion ai绘画","Stable Diffusion AI绘画下载","stable diffusion ai下载","stable diffusion amd显卡","stable diffusion api","stable diffusion api调用","stable diffusion api文档","stable diffusion app","stable diffusion a卡","stable diffusion checkpoint","stable diffusion clip","stable diffusion c站","stable diffusion docker","Stable diffusion embedding","stable diffusion For photoshop","stable diffusion github","stable Diffusion GRisk GUI","stable Diffusion GRisk GUI安装","Stable Diffusion i53230m","Stable Diffusion icon 图标训练","Stable Diffusion image2image","Stable Diffusion img2img","Stable Diffusion img2img 换脸","Stable Diffusion inpainting","Stable Diffusion ios","Stable Diffusion ios 插件","Stable Diffusion ipad","Stable Diffusion ip形象设计","Stable Diffusion Java","stable diffusion lora","stable diffusion lora训练","stable diffusion lora怎么用","stable diffusion mac","stable diffusion mac安装","stable diffusion mac可以用吗","stable diffusion midjourney","stable Diffusion niji风格","stable Diffusion novel ai","stable diffusion online","stable diffusion outpainting","stable Diffusion plugin","stable diffusion prompt","stable diffusion tag","stable diffusion Ubuntu","stable diffusion Ubuntu 7860","stable diffusion Ubuntu AMD 不动","stable diffusion Ubuntu 启动命令","stable diffusion Ubuntu本地部署","stable diffusion UHD显卡","stable diffusion UI","stable diffusion UI模型","stable diffusion unet","stable Diffusion v4如何安装","stable diffusion vae","Stable Diffusion web","stable diffusion webui","stable diffusion webui下载","stable diffusion 安装","Stable Diffusion 不生成图片","stable diffusion 插件","stable diffusion 电脑配置","stable diffusion 电脑配置推荐","stable diffusion 多人","stable diffusion 多显卡 局域网共享","Stable diffusion 二次元风格改成真人风格","stable diffusion 二维码美化","stable diffusion 二维码美化眼","stable diffusion 翻译","stable diffusion 放大算法","stable diffusion 高清修复","stable diffusion 固定角色","stable diffusion 关键词","stable diffusion 官网","stable diffusion 核显","stable diffusion 换脸","stable diffusion 换衣服","stable diffusion 基础模型","stable diffusion 建筑","stable diffusion 教程","stable diffusion 局域网","stable diffusion 局域网访问","Stable Diffusion 开源","Stable Diffusion 可以画插画吗?","stable diffusion 抠图","Stable Diffusion 扩散模型","Stable Diffusion 离线","stable diffusion 两张图融合","stable diffusion 免费吗","stable diffusion 模型","stable diffusion 模型融合","stable diffusion 模型网站","stable diffusion 内存要求","stable Diffusion 能支持的最低显卡型号","stable diffusion 排队中","stable Diffusion 如何 训练","stable diffusion 软件","stable Diffusion 锐龙","stable diffusion 手指修复","stable diffusion 双显卡","stable diffusion 算法","stable diffusion 腾讯云","stable diffusion 梯子","stable diffusion 图生图","stable diffusion 推荐显卡","Stable diffusion 网站","stable diffusion 文字","stable diffusion 显卡","stable diffusion 移动端","stable diffusion 硬件要求","stable diffusion 预处理器","stable diffusion 原理","stable diffusion 原理详解","stable diffusion 源码解读","stable diffusion 云部署","stable diffusion 中文","stable diffusion安装","stable diffusion电脑配置","stable diffusion官网","stable diffusion官网下载","stable diffusion和midjourney","stable diffusion和midjourney区别","stable diffusion换脸","stable diffusion教程","stable diffusion模型","stable diffusion配置要求","stable diffusion破解版","stable diffusion软件","stable diffusion软件下载","stable diffusion手机版","stable diffusion手机版下载","stable diffusion网页版","stable diffusion下载","stable diffusion显卡排行","stable diffusion显卡推荐","stable diffusion用什么显卡","stable diffusion在线平台","stable diffusion怎么读","stable diffusion怎么下载","stable diffusion最低配置","stable diffuson","stable diffussion","stable diffution教程","stable diffution模型","stable difusion","stable difuusion","stable dooble","stable doodle","stable doodle官网","stablediffusion","stablediffusion ai绘画","stablediffusion ai绘画下载","stablediffusion1.0","stablediffusion1.0下载","stablediffusion1.5模型","stablediffusion4060带得动吗?","stablediffusion4g显存","stablediffusion5.0","stablediffusion5.0下载","stablediffusion50%不动了","stablediffusion5g显存","stablediffusion6g训练","stablediffusion8g显存","stablediffusionlora模型的作用","Stablediffusionnsfw","stablediffusiono 4090","stablediffusiono 4090. 3090.","stablediffusiononline怎么用?","stablediffusionui进阶","stablediffusionV4","stablediffusion安装教程","stablediffusion安卓版","stablediffusion吧","stablediffusion版本怎么看","stablediffusion版权商用","stablediffusion保存的图片在哪","stablediffusion爆显存","stablediffusion本地部署","stablediffusion本地部署和网页版区别?","stablediffusion本地搭建","stablediffusion笔记本电脑能用吗?","stablediffusion不清晰","stablediffusion部署","stablediffusion部署到服务器","stablediffusion采样方法","stablediffusion采样方法哪个好","stablediffusion采样方法选哪个","stablediffusion采样方法有什么区别","stablediffusion插件controlnet","stablediffusion程序崩溃","stablediffusion出图慢","stablediffusion词库","stablediffusion大模型放在哪个文件夹","stablediffusion大模型推荐","stablediffusion电脑配置要求","stablediffusion迭代步数","stablediffusion对CPU有要求吗","stablediffusion鹅厂落地文章","stablediffusion二次元","stablediffusion二次元模型","stablediffusion二次元照片头像","stablediffusion二次元转三次元","stablediffusion二维码","stablediffusion发音","stablediffusion法术解析","stablediffusion反推错误","stablediffusion反向词","stablediffusion反向关键词","stablediffusion放大算法哪个好","stablediffusion分辨率","stablediffusion风景模型","stablediffusion付费吗","stablediffusion固定人物","stablediffusion关键词列表","stablediffusion官方","stablediffusion官网","stablediffusion官网免费中文","stablediffusion官网入口","stablediffusion官网下载","stablediffusion和midjourney","stablediffusion和midjourney的区别","stablediffusion和midjourney哪个好","stablediffusion和webui区别","stablediffusion后期处理","stablediffusion画好的画存放在哪个位置","stablediffusion换背景","stableDiffusion教程","StableDiffusion接口","StableDiffusion接口免费吗","StableDiffusion界面翻译","stablediffusion局部重绘","stablediffusion卡在95进度","stablediffusion可以18+吗","stablediffusion可以18R吗","stablediffusion可以安装在移动硬盘里么","stablediffusion可以画你懂的","stablediffusion可以换脸吗","stablediffusion蓝屏","stablediffusion离线","stablediffusion脸部崩坏","stablediffusion流水效果","stablediffusion论坛","stablediffusion论文","stablediffusion免费吗","stablediffusion模型存放位置","stablediffusion模型大小","stablediffusion模型加载不出来","stablediffusion模型切换不了","stablediffusion模型怎么导入","stablediffusion内存不足","stablediffusion内存要多大","stablediffusion能用a卡吗","stablediffusion能做什么","stablediffusion培训","stablediffusion配置要求","stablediffusion批量生图","stablediffusion苹果电脑能用吗","stablediffusion破解版","stablediffusion破解版下载","stablediffusion破解中文版","stablediffusion如何安装","stablediffusion如何下载","stablediffusion入门显卡","stablediffusion软件","stablediffusion软件下载","stablediffusion身体模型","stablediffusion生成不了图片","stablediffusion生成的图片没有了","stablediffusion生成的图在哪个文件夹","stablediffusion生成图片巨慢","stablediffusion生成图片没反应","stablediffusion收费吗","stablediffusion手机版","stablediffusion手机可以用吗","stablediffusion算大模型吗","stablediffusion图库浏览器","stablediffusion图片保存在哪","stablediffusion图生图,脸部不变","stablediffusion图生图参数","stablediffusion图生图怎么用","stablediffusion网页版","stablediffusion网页打不开","stablediffusion喂图多少张","stablediffusion文生图怎么调用","stablediffusion无法生成","stablediffusion无法生成图片","stablediffusion下载","stablediffusion显卡排行","stablediffusion要连接外网吗","stablediffusion要钱吗","stablediffusion要学多久","stablediffusion一键安装包","stablediffusion以图生图","stablediffusion云端部署","stablediffusion在线版","stablediffusion在线绘图","stablediffusion怎么安装","stablediffusion怎么出全身图","stablediffusion怎么打开","stablediffusion怎么读","stablediffusion怎么画多人","stablediffusion怎么卸载干净","stablediffusion怎么用","stablediffusion招聘","stablediffusion支持多显卡","stablediffusion怎么让脸不变","stablediffusion怎么画好抠图","stablediffusion怎么图生图","stable diffusion怎么去除衣服","stable diffusion怎么训练","stable diffusion怎么换脸","stable diffusion怎么画r18","stable diffusion怎么更新","stable diffusion怎么用","stable diffusion怎么3D风格描述","stable diffusion怎么ai换脸","stablediffusion怎么安装模型","stablediffusion怎么按键卡住","stablediffusion怎么安装插件","stablediffusion怎么变现","stable diffusion怎么保存设置","stable diffusion怎么保存","stable diffusion怎么保存图片","stable diffusion怎么变动漫","stable diffusion怎么保存tag","stable diffusion怎么避免爆显存","stable diffusion怎么本地部署","stable diffusion怎么把模型放其他硬盘","stable diffusion怎么把两个人变到一张图里","stable diffusion怎么操作","stable diffusion怎么彻底卸载","stable diffusion怎么操作都报错","stable diffusion怎么充值","stable diffusion怎么重启","stable diffusion怎么创作好看的图片","stable diffusion怎么重置设置","stable diffusion怎么出图","stable diffusion怎么出高相数图片","stable diffusion怎么打开","stable diffusion怎么导入模型","stable diffusion怎么垫图","stable diffusion怎么调分辨率","stable diffusion怎么登录","stable diffusion怎么读区图片信息","stable diffusion怎么调清晰度","stable diffusion怎么调中文","stable diffusion怎么定制","stable diffusion怎么二次元","stable diffusion怎么翻译","stablediffusion怎么分别描述一张图里的两…","stablediffusion怎么放大图片","stablediffusion怎么反推关键词","stable diffusion怎么给衣服换上模特","stablediffusion怎么改脸","stablediffusion怎么改中文","stablediffusion怎么给草图上色","stablediffusion怎么关闭无限生成","stablediffusion怎么改模型","stablediffusion怎么高清","stablediffusion怎么改成中文字","stablediffusion怎么改成中文","stable diffusion怎么画两个人","stable diffusion怎么画真人","stablediffusion怎么画线稿","stablediffusion怎么换衣服","stablediffusion怎么画瑟瑟图","stablediffusion怎么画蛇尾人","stablediffusion怎么换模型","stable diffusion怎么进","stable diffusion怎么进入","stable diffusion怎么加模型","stable diffusion怎么加载lora","stable diffusion怎么加权重","stable diffusion怎么解决手指问题","stable diffusion怎么加载模型","stable diffusion怎么将两张图片融合","stable diffusion怎么建立mod","stable diffusion怎么加入模型","stablediffusion怎么扩展","stablediffusion怎么看生成过程","stablediffusion怎么看图片信息","stablediffusion怎么看cuda启动","stablediffusion怎么抠图","stable diffusion怎么联系官方","stable diffusion怎么连接微信","stable diffusion怎么来做小说推文","stable diffusion怎么描述","stablediffusion怎么买","stable diffusion怎么念","stablediffusion怎么批量改头发颜色","stablediffusion怎么判断显卡","stable diffusion怎么run不了","stablediffusion怎么让图片人物抬手","stablediffusion怎么融合","stablediffusion怎么删除预设tag","stablediffusion怎么收费","stable diffusion怎么设置中文","stable diffusion怎么生成真人","stable diffusion怎么删除","stable diffusion怎么删除插件","stable diffusion怎么输写","stable diffusion怎么输入指令","stable diffusion怎么删除模型","stable diffusion怎么生成二次元","stable diffusion怎么添加模型","stable diffusion怎么退出","stable diffusion怎么提高出图速度","stable diffusion怎么提高分辨率","stable diffusion怎么添加衣服素材","stable diffusion怎么添加图片","stable diffusion怎么替换物品","stable diffusion怎么调教","stable diffusion怎么涂抹","stablediffusion怎么用lora","stablediffusion怎么运行","stablediffusion怎么预览大模型","stablediffusion怎么用模型","stablediffusion怎么用关键词绘画出国漫人物","stable diffusion怎么赚钱","stable diffusion怎么在手机上用","stable diffusion怎么自己训练模型","stable diffusion怎么注册","stable diffusion怎么装","stable diffusion怎么做景观","stable diffusion怎么做动画","stable diffusion怎么挣钱","stable diffusion怎么做婴儿预测图","stable diffusion怎么做宝宝头像图片","stablediffusion怎么保持画出动漫人物一致","stablediffusion怎么把衣服去掉","stablediffusion怎么把图片分图层导出","stablediffusion怎么保存设置","stablediffusion怎么保存图片","stablediffusion怎么不画手","stablediffusion怎么不改脸","stablediffusion怎么变清晰","stablediffusion怎么把黑白照变彩色","stablediffusion怎么吃满显卡","stablediffusion怎么查看版本","stablediffusion怎么创建公共链接","stablediffusion怎么出图快","stablediffusion怎么才能得到自己想要的图","stablediffusion怎么导入模型","stablediffusion怎么登录","stablediffusion怎么导入图片","stablediffusion怎么得到8k图片","stablediffusion怎么登陆","stablediffusion怎么调高分辨率","stablediffusion怎么调中文","stuff怎么用","stablediffusion怎么更新","stablediffusion怎么固定模型风格","stablediffusion怎么画真人","stablediffusion怎么换脸","stablediffusion怎么画两个人","stablediffusion怎么画服装","stablediffusion怎么建大模型","stablediffusion怎么加模型","stablediffusion怎么进","stablediffusion怎么进行面部修复","stablediffusion怎么加载模型","stablediffusion怎么禁用nsfw过滤器","stablediffusion怎么看版本","stable fiber","stablediffusion怎么念","stablediffusion怎么生成没有人的照片","stablediffusion怎么生成","stablediffusion怎么生成真人","stablediffusion怎么设置显存","stablediffusion怎么删除扩展","stablediffusion怎么生成古风美女照片","stablediffusion怎么删除图片","stablediffusion怎么设置权重","stablediffusion怎么添加模型","stablediffusion怎么提高画质","stablediffusion怎么提高清晰度","stablediffusion怎么提高分辨率","stablediffusion怎么调整用什么gpu加速","stablediffusion怎么喂图","stablediffusion怎么玩","stablediffusion怎么用safe","stablediffusion怎么用照片生成","stablediffusion怎么用改画风","stablediffusion怎么用中文填词","stablediffusion怎么赚钱","stablediffusion怎么自己建模型","stablediffusion怎么注册","stablediffusion怎么真人画风","stablediffusion怎么只重画不满意的地方","stablediffusion怎么做动画","stablediffusion怎么在手机上用","stablediffusion怎么载入模型","stablediffusion怎么做影楼修图","stablediffusion怎么制作logo","stable diffusion 怎么读","stablediffusion怎么训练模型","stablediffusion什么显卡","stablediffusion什么配置","stablediffusion什么物品都可以做loar吗?","stablediffusion什么模型","stablediffusion什么电脑配置","stable diffusion 什么显卡","stable diffusion 什么语言","stable diffusion 什么配置电脑好","stable diffusion 什么颜色代表什么","stablediffusion最新版本","stablediffusion最低配置要求","stable diffusion 最低配置","stable diffusion 最大分辨率","stable diffusion 作品","stable diffusion 最低显卡","stable diffusion 最新模型","stable diffusion 作者","stable diffusion 作品交流","stable diffusion 最新","stable diffusion 最好模型","stable diffusion 最低显存要求","stable diffusion 嘴型插件","stable diffusion 最高8张","stablediffusion最佳配置","stablediffusion最新消息","stablediffusion最新进展","stablediffusion最低配置","stablediffusion最低显卡","stablediffusion最大尺寸","stablediffusion最多几个人用","stablediffusion最低ai","stablediffusion最大分辨率","stablediffusion最低","stablediffusion最低要什么显卡","stablediffusion最大步数","stablediffusion最高分辨率","stablediffusion最后不报错崩图","stablediffusion最好的采样","stablediffusion最好用的模型","stablediffusion最好用的显卡","stablediffusion最好的显卡","stablediffusion最好的真人模型","stablediffusion最近更新","stablediffusion最佳真人模型","stablediffusion最快一张几秒"};
+//        String[] s1 = {"蓝海电商平台","蓝海商机","蓝海职业技术学校","蓝海市场","蓝海市场是什么意思","蓝海是什么意思","蓝海市场和红海市场的区别","蓝海赛道是什么意思","蓝海赛道","蓝海商机入口","蓝海商机一件代发","蓝海商机货源一件代发操作流程","蓝海商贸城旧货市场","蓝海商品怎么选","蓝海商城app","蓝海商品是什么商品","蓝海商学院","蓝海商机是什么意思","蓝海商城","蓝海商贸城旧货市场都星期几有交易","蓝海商品采集软件","蓝海商品的典型特征","蓝海商品怎么找","蓝海商品采集","蓝海商品特征","蓝海商贸城","抖音小店如何选蓝海商品","红海商品和蓝海商品","蓝海市场货源网站","蓝海商品","蓝海商品有哪些产品","蓝海商品 这个商品得特点就是数量较少,市场需求很大","2021蓝海商品","蓝海品类","蓝海商品词汇","蓝海商品池","蓝海商品采集软件免费","蓝海商品都有啥","蓝海商品都有哪些","蓝海商品的优势","蓝海商品汇总","蓝海商品交易中心","蓝海商品类目","蓝海商品名词解释","蓝海商品任务怎么做","蓝海商品属于什么","蓝海商品搜索工具","蓝海商品提报什么意思","蓝海商品提报有用吗","蓝海商品特征蛋糕指数","蓝海商品提报","蓝海商品需要商家发货吗","蓝海商品有什么特点","蓝海商品要重新上架吗","蓝海商品有哪些?","蓝海商品怎么下单","蓝海商品做截流是什么","蓝海商品指的是什么","蓝海商品怎么做","蓝海商品专业软件","蓝海爆款选品","蓝海产品啥意思","蓝海产品大全","蓝海产品推荐2021","2020蓝海产品有哪些","蓝海爆款","蓝海单品","蓝海货品","蓝海bcdex","bhg蓝海","蓝海商家是什么意思","蓝海产品是啥","啥叫蓝海产品","蓝海购物","蓝海产品网站","蓝海e线价格","蓝海e家app下载","蓝海e线","蓝海购是什么公司","蓝海global","蓝海类目商品","抖音蓝海商品","拼多多蓝海商品","蓝海类目商品有哪些","什么是淘宝蓝海商品","蓝海jk","蓝海ktv","蓝海购物广场品牌","蓝海品类是什么意思","蓝海产品词是什么意思","蓝海网店","蓝海商城是真的假的"};
+//        String[] s2 = {"蓝海产品是什么意思","蓝海产品有哪些","蓝海产品怎么找","蓝海产品类目清单","蓝海产品查找工具","蓝海产品和红海产品分别有什么","蓝海产品推荐","蓝海产品app","蓝海产品的意思","蓝海产品排行榜前十名","蓝海产品有哪些怎么选","蓝海产品什么意思","蓝海产品大全","蓝海产品数据分析","蓝海产品怎么选","蓝海产品2023","蓝海产品2022","蓝海产品","蓝海产品包括什么","蓝海产品表格","蓝海产品表","蓝海产品包括哪些产品","蓝海产品百货","蓝海产品榜单","蓝海产品包类有哪些","蓝海产品不需要推广吗","蓝海产品词","蓝海产品词是什么意思","蓝海产品词表","蓝海产品查询工具","蓝海产品查询","蓝海产品采集","蓝海产品错放类目","蓝海产品都有哪些","蓝海产品的优势","蓝海产品的特征","蓝海产品的优势和劣势","蓝海产品的数据特征","蓝海产品的定义","蓝海产品都有啥","蓝海产品的显著特征包括","蓝海产品都有哪些图片","蓝海产品分析工具","蓝海产品方法论 良美辰","蓝海产品分析","蓝海产品服装类","蓝海产品关键词有哪些","蓝海产品工具","蓝海产品工具箱","蓝海产品公式","蓝海产品官网查询","蓝海产品工具可以借给其他人吗","蓝海产品关键词","蓝海产品更新技术是什么","蓝海产品公式怎么算","蓝海产品共有","蓝海产品好做吗","蓝海产品红海产品","蓝海产品货源大全网站","蓝海产品和红海产品有什么区别","蓝海产品货源","蓝海产品和红海产品定价有什么区别","蓝海产品合集","蓝海产品和什么有关","蓝海产品和红海产品是什么意思","蓝海产品举例","蓝海产品计算公式","蓝海产品具体名称","蓝海产品库","蓝海产品口号","蓝海产品类目","蓝海产品类目有哪些","蓝海产品列表","蓝海产品例子","蓝海产品类目具有什么特征","蓝海产品冷门","蓝海产品类目查询需要多久出结果","蓝海产品名词解释","蓝海产品免费吗","蓝海产品卖什么","蓝海产品目录","蓝海产品吗","蓝海产品名称有哪些","蓝海产品哪里找","蓝海产品内裤怎么样","蓝海产品能做多长时间","蓝海产品骗局","蓝海产品排名","蓝海产品培训费用","蓝海产品品爆款产品打造流程","蓝海产品培训课程可信吗","蓝海产品前10名","蓝海产品去哪看","蓝海产品去哪里找","蓝海产品软件","蓝海产品软件下载","蓝海产品如何找货源","蓝海产品如何找","蓝海产品如何快速测试商品的数据","蓝海产品如何寻找","蓝海产品如何做销售","蓝海产品是啥","蓝海产品数据分析哪个软件好","蓝海产品是指哪方面","蓝海产品是指","蓝海产品特点","蓝海产品推荐2022拼多多","蓝海产品推荐2023","蓝海产品淘宝","蓝海产品提报要求","蓝海产品天猫点击率怎么样","蓝海产品网站","蓝海产品外贸","蓝海产品玩法","蓝海产品选款工具","蓝海产品选品工具","蓝海产品线","蓝海产品选品技巧","蓝海产品需要删除之前的产品吗","蓝海产品需要投资多少钱","蓝海产品选品操作流程","蓝海产品洗碗机","蓝海产品销售方法","蓝海产品销量最高是什么产品","蓝海产品有哪些优势","蓝海产品有哪几种","蓝海产品一览表","蓝海产品有哪些品牌","蓝海产品有哪些类目","蓝海产品英语","蓝海产品怎么选品技巧","蓝海产品指的是","蓝海产品指的是哪些","蓝海产品在哪里找","蓝海产品怎么做","蓝海产品指的是什么","蓝海产品在哪里看","蓝海产品怎么找类目","蓝海产品在哪个软件找","电商蓝海产品","冷门蓝海产品","淘宝蓝海产品","蓝海类目是什么产品","2023年蓝海产品","怎么选蓝海产品","蓝海市场有哪些产品","蓝海产品是什么意思?","找蓝海产品","2021年蓝海产品","蓝海产品是什么产品","2021蓝海产品","2020年蓝海产品有哪些","国内蓝海产品","2020蓝海产品有哪些","蓝海bcdex","啥叫蓝海产品","bhg蓝海","最新蓝海产品","蓝海产品推荐2021","淘宝蓝海产品怎么找","蓝海品牌产品","蓝海品类有哪些","蓝海产品是指什么产品","蓝海e线价格","蓝海e家app下载","蓝海产品2021","蓝海产品啥意思","蓝海e线","品牌蓝海","蓝海产品是什么","蓝海品类","蓝海jk","蓝海爆款选品","蓝海产品有哪些?","3c蓝海产品","蓝海5000+","蓝海七色","蓝海产品都包括","零售蓝海","何为蓝海产品","什么叫蓝海产品","23年蓝海产品","怎么寻找抖店蓝海产品"};
+        HashSet<String> set = new HashSet<>();
+        set.addAll(List.of(s1));
+        return new ArrayList<>(set);
     }
 
 
+    @Resource
+    private Text2Keyword text2Keyword;
+
+
+    @Resource
+    private XmindUtil xmindUtil;
+
+
+    @Test
+    public void xmind() {
+        List<String> list = genKeywords();
+//        ArrayList<String> kwsList = new ArrayList<>();
+//        for (String keyword : list) {
+//            List<String> kws = text2Keyword.text2KeywordList(keyword);
+//            kwsList.addAll(kws);
+//        }
+
+        xmindUtil.xmind(list, 50, 3);
+    }
 
 }

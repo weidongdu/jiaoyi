@@ -25,6 +25,8 @@ import pro.jiaoyi.search.strategy.SafeCheck;
 import pro.jiaoyi.search.util.RegUtil;
 import pro.jiaoyi.search.util.SeleniumUtil;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -55,7 +57,15 @@ public class BaiduJob {
     @Scheduled(fixedRate = 1000 * 60) // 1分钟
     @Async
     public void safeJob() {
-        SafeCheckEntity db = safeCheckRepo.findBySource(BAIDU.name());
+        String ipAddress = null;
+        try {
+            InetAddress localhost = InetAddress.getLocalHost();
+            ipAddress = localhost.getHostAddress();
+        } catch (UnknownHostException e) {
+            log.error("error", e);
+        }
+
+        SafeCheckEntity db = safeCheckRepo.findBySourceAndHost(BAIDU.name(), ipAddress);
         if (db != null) {
             long stopTs = System.currentTimeMillis() - DateUtil.toTimestamp(db.getCreateTime());
             if (stopTs > BaiduSafeCheckImpl.STOP_TIME_MS) {
@@ -67,8 +77,16 @@ public class BaiduJob {
 
     @Scheduled(fixedDelay = 1000 * 60)
     public void run() {
-        SafeCheckEntity db = safeCheckRepo.findBySource(BAIDU.name());
-        if (db != null ){
+        String ipAddress = null;
+        try {
+            InetAddress localhost = InetAddress.getLocalHost();
+            ipAddress = localhost.getHostAddress();
+        } catch (UnknownHostException e) {
+            log.error("error", e);
+        }
+
+        SafeCheckEntity db = safeCheckRepo.findBySourceAndHost(BAIDU.name(),ipAddress);
+        if (db != null) {
             long stopTs = System.currentTimeMillis() - DateUtil.toTimestamp(db.getCreateTime());
             if (stopTs < BaiduSafeCheckImpl.STOP_TIME_MS) {
                 log.info("百度安全验证 暂停中 {}", db);
@@ -143,7 +161,9 @@ public class BaiduJob {
         HashSet<String> rwSet = new HashSet<>(); // 用于多级搜索, 以及去重
         HashSet<String> previousRwSet = new HashSet<>();
 
-        WebDriver driver = proxy == null ? SeleniumUtil.getDriver(true) : SeleniumUtil.getDriver(proxy,true);
+        boolean headless = true;
+
+        WebDriver driver = proxy == null ? SeleniumUtil.getDriver(headless) : SeleniumUtil.getDriver(proxy, headless);
         try {
             baiduKeywordScraper.searchIndex(driver, master);
         } catch (Exception e) {

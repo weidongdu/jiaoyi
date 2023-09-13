@@ -20,6 +20,8 @@ public class SafeCheckEntity {
     private LocalDateTime createTime;//下拉框
     private LocalDateTime updateTime;//下拉框
 
+    private String host;
+
 
     @PrePersist
     public void setDefaultTimeZonePrePersist() {

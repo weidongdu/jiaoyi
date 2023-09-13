@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import pro.jiaoyi.search.dao.repo.SearchResultRepo;
 
 @Slf4j
-@Component
+//@Component
 public class ZhihuJob {
 
     @Resource

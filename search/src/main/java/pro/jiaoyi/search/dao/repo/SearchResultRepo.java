@@ -15,4 +15,9 @@ public interface SearchResultRepo extends JpaRepository<SearchResultEntity, Long
 
 //    @Query(nativeQuery = true, value = " select t.`id` ,t.`title`, t.`keyword`,t.`page`,t.`order_rank`,t.`real_url` , t.`create_time` from `t_search_result` t where t.domain= 'zhihu.com' and t.`real_url` like 'https://www.zhihu.com/question%' order by t.`id`")
     List<SearchResultEntity> findByDomainAndPageAndOrderRank(String domain,Integer page,Integer order);
+
+    @Query(nativeQuery = true, value = " SELECT distinct keyword FROM 咖啡_t_search_result WHERE master = ?1")
+    List<String> findKeyword(String master);
+    @Query(nativeQuery = true, value = " SELECT distinct keyword_related FROM 咖啡_t_search_result WHERE master = ?1")
+    List<String> findKeywordRs(String master);
 }

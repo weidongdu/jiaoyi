@@ -21,4 +21,7 @@ public interface KeywordsWaitToSearchRepo extends JpaRepository<KeywordsWaitToSe
 
     @Query(nativeQuery = true, value = " SELECT * FROM t_keywords_wait_to_search t WHERE t.source = ?1 and t.search_count < t.search_count_max limit 1")
     KeywordsWaitToSearchEntity qFindFirstBySourceAndSearchCountLessThanSearchCountMax(String name);
+
+    @Query(nativeQuery = true, value = " SELECT distinct keyword FROM t_keywords_wait_to_search WHERE master_keyword = ?1")
+    List<String> findKeyword(String master);
 }

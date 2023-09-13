@@ -29,10 +29,16 @@ public class Text2Keyword {
     @Value("${jieba.url}")
     private String jiebaUrl;
 
+    public List<String> text2KeywordList(String text) {
+        return text2KeywordList(text, CutModeEnum.cut_for_search);
+    }
     public List<String> text2KeywordList(String text, CutModeEnum mode) {
         String send = send(text, mode);
         log.info("jieba result: {}", send);
         JSONObject json = JSONObject.parseObject(send);
+        if (json == null) {
+            return Collections.emptyList();
+        }
         if (json.containsKey("keywords")) {
             return json.getJSONArray("keywords").toJavaList(String.class);
         }

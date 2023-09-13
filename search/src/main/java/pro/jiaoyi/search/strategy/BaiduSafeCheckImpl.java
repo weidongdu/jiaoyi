@@ -8,13 +8,17 @@ import pro.jiaoyi.search.config.SourceEnum;
 import pro.jiaoyi.search.dao.entity.SafeCheckEntity;
 import pro.jiaoyi.search.dao.repo.SafeCheckRepo;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 @Slf4j
 @Component
 public class BaiduSafeCheckImpl implements SafeCheck {
 
-    public static final int STOP_TIME_MS = 1000 * 60 * 60 ;//1小时
+    public static final int STOP_TIME_MS = 1000 * 60 * 30;//1小时
     @Resource
     private SafeCheckRepo safeCheckRepo;
+
     @Override
     public Boolean safeCheck(WebDriver driver) {
         log.info("BaiduSafeCheckImpl");
@@ -27,9 +31,18 @@ public class BaiduSafeCheckImpl implements SafeCheck {
         } else {
             if (driver.getTitle().contains("百度安全验证")) {
                 log.info("百度安全验证 更换IP 或者暂停");
-                SafeCheckEntity db = safeCheckRepo.findBySource(SourceEnum.BAIDU.name());
-                if (db==null){
+                String ipAddress = null;
+                try {
+                    InetAddress localhost = InetAddress.getLocalHost();
+                    ipAddress = localhost.getHostAddress();
+                } catch (UnknownHostException e) {
+                    log.error("error", e);
+                }
+
+                SafeCheckEntity db = safeCheckRepo.findBySourceAndHost(SourceEnum.BAIDU.name(), ipAddress);
+                if (db == null) {
                     SafeCheckEntity entity = new SafeCheckEntity(SourceEnum.BAIDU.name());
+                    entity.setHost(ipAddress);
                     safeCheckRepo.save(entity);
                 }
                 return true;
