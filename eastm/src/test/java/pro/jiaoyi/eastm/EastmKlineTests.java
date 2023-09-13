@@ -5,6 +5,7 @@ import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.read.listener.ReadListener;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -191,6 +192,18 @@ class EastmKlineTests {
         for (String code : codes) {
             log.info("{} {}",code,codeNameMap.get(code));
         }
+    }
+
+
+    @Test
+    public void guba(){
+        List<String> guba = emClient.guba("601088");
+        System.out.println(guba);
 
     }
+
+
+
+
+
 }

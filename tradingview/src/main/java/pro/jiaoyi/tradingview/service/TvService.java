@@ -80,7 +80,7 @@ public class TvService {
     private static AtomicLong COUNTER = new AtomicLong(0);
 
     public Map<String, List<String>> getAllIndex(boolean sync) {
-        if (COUNTER.getAndIncrement() == 0) {
+        if (COUNTER.getAndIncrement() == 0 && sync) {
             //init
             List<EmDailyK> index = emClient.getDailyKs(VipIndexEnum.index_000001.getCode(), LocalDate.now(), 500, false);
             if (index.size() > 0) {

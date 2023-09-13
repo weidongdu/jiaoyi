@@ -6,6 +6,10 @@ import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -19,8 +23,11 @@ import pro.jiaoyi.eastm.config.IndexEnum;
 import pro.jiaoyi.eastm.model.*;
 import pro.jiaoyi.eastm.util.EmMaUtil;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
@@ -396,7 +403,7 @@ public class EmClient {
             case ALL:
                 return getClistDefaultSize(false);
             case BIXUAN:
-                return must(sync);
+                return sync ? must(sync) : Collections.emptyList();
             case EM_MA_UP:
                 return xuanguCList();
             case HS300:
@@ -427,7 +434,7 @@ public class EmClient {
 
             case O_TAMT60:
             case X10:
-                return getX10();
+                return sync ? getX10() : Collections.emptyList();
             default:
                 return Collections.emptyList();
         }
@@ -834,7 +841,7 @@ public class EmClient {
         params.put("ps", "200");
         params.put("p", "1");
         params.put("sty", "SECUCODE,SECURITY_CODE,SECURITY_NAME_ABBR,NEW_PRICE,CHANGE_RATE,VOLUME_RATIO,HIGH_PRICE,LOW_PRICE,PRE_CLOSE_PRICE,VOLUME,DEAL_AMOUNT,TURNOVERRATE,DEAL_AMOUNT,LONG_AVG_ARRAY,INDEX");
-        params.put("filter", "(DEAL_AMOUNT>=150000000)(LONG_AVG_ARRAY=\"1\")" + index);
+        params.put("filter", "(DEAL_AMOUNT>=50000000)(LONG_AVG_ARRAY=\"1\")" + index);
         params.put("source", "SELECT_SECURITIES");
         params.put("client", "WEB");
 
@@ -883,6 +890,42 @@ public class EmClient {
             codes.add(code);
         }
         return codes;
+    }
+
+    public List<String> guba(String code) {
+
+        String url = ("http://guba.eastmoney.com/list," + code + ",99.html");//
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7");
+        headers.put("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
+        headers.put("Cache-Control", "no-cache");
+        headers.put("Pragma", "no-cache");
+        headers.put("Proxy-Connection", "keep-alive");
+        headers.put("Upgrade-Insecure-Requests", "1");
+        headers.put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36");
+
+        byte[] bytes = okHttpUtil.getForBytes(url, headers);
+        if (bytes.length == 0) return Collections.emptyList();
+        String html = new String(bytes);
+        Document doc = Jsoup.parse(html);
+
+        Elements list = doc.select(".listitem");
+        if (list.size() == 0) return Collections.emptyList();
+
+        ArrayList<String> gubaList = new ArrayList<>(5);
+        for (int i = 0; i < 5; i++) {
+            Element ele = list.get(i);
+            String content = "<br>" + (i + 1) + "read=%s_title=%s";
+            Element read = ele.selectFirst(".read");
+            Element title = ele.selectFirst(".title");
+            if (read != null && title != null) {
+                content = String.format(content, read.text(), title.text().length() > 10 ? title.text().substring(0, 10) : title.text());
+                log.info(content);
+                String encodedString = URLEncoder.encode(content, StandardCharsets.UTF_8);
+                gubaList.add(encodedString);
+            }
+        }
+        return gubaList;
     }
 
 

@@ -93,10 +93,9 @@ public class EmRealTimeClient {
             JSONObject j = diff.getJSONObject(String.valueOf(i));
             EastSpeedInfo eastSpeedInfo = new EastSpeedInfo(j.getBigDecimal("f2"), j.getBigDecimal("f3"), j.getString("f12"), j.getString("f14"), j.getBigDecimal("f22"));
 
-            if (eastSpeedInfo.getSpeed_f22().compareTo(BigDecimal.ONE) > 0
-                    && eastSpeedInfo.getPct_f3().compareTo(BigDecimal.ZERO) > 0
-                    && eastSpeedInfo.getPrice_f2().compareTo(BDUtil.B50) < 0
-                    && eastSpeedInfo.getPct_f3().compareTo(new BigDecimal("2.5")) < 0
+            if (eastSpeedInfo.getSpeed_f22().compareTo(BigDecimal.ONE) > 0 //涨速 > 1
+                    && eastSpeedInfo.getPct_f3().compareTo(BigDecimal.ZERO) > 0 // 涨幅>0
+                    && eastSpeedInfo.getPrice_f2().compareTo(BDUtil.B50) < 0 //价格小于50
                     && !eastSpeedInfo.getName_f14().contains("ST")) {
                 list.add(eastSpeedInfo);
             }

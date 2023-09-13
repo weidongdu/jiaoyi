@@ -5,6 +5,9 @@ import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.read.listener.ReadListener;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -639,6 +642,8 @@ class EastmApplicationTests {
     @Test
     public void getAll() {
 
+        kLineRepo.deleteAllInBatch();
+
         List<EmCList> list = emClient.getClistDefaultSize(false);
 
         LocalDate end = LocalDate.now();//.minusDays(2);
@@ -743,5 +748,6 @@ class EastmApplicationTests {
         }
         kLineRepo.saveAll(list);
     }
+
 
 }
