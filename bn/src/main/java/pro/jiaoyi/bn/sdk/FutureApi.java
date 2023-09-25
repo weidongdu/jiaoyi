@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import pro.jiaoyi.bn.model.BnK;
 import pro.jiaoyi.bn.model.ExchangeInfo;
+import pro.jiaoyi.bn.model.OpenInterestDto;
 import pro.jiaoyi.bn.model.Ticker24hr;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
 
@@ -76,11 +77,52 @@ public class FutureApi {
 
     /**
      * 获取持仓量
+     * GET /futures/data/openInterestHist
      *
      * @param symbol
+     * @return
      */
-    public void getOI(String symbol) {
+    /*
+    参数:
 
+    名称	类型	是否必需	描述
+    symbol	STRING	YES
+    period	ENUM	YES	"5m","15m","30m","1h","2h","4h","6h","12h","1d"
+    limit	LONG	NO	default 30, max 500
+    startTime	LONG	NO
+    endTime	LONG	NO
+     */
+    /*
+    [
+    {
+         "symbol":"BTCUSDT",
+          "sumOpenInterest":"20403.12345678",// 持仓总数量
+          "sumOpenInterestValue": "176196512.12345678", // 持仓总价值
+          "timestamp":"1583127900000"
+
+     },
+
+     {
+
+         "symbol":"BTCUSDT",
+         "sumOpenInterest":"20401.36700000",
+         "sumOpenInterestValue":"149940752.14464448",
+         "timestamp":"1583128200000"
+
+        },
+
+]
+
+     */
+    public List<OpenInterestDto> getOI(String symbol) {
+        String url = BASE_URL + "/futures/data/openInterestHist";
+        url = url + "?symbol=" + symbol + "&period=5m&limit=30";
+
+        byte[] bytes = okHttpUtil.getForBytes(url, null);
+        if (bytes.length == 0) return Collections.emptyList();
+
+        String s = new String(bytes);
+        return JSONArray.parseArray(s).toJavaList(OpenInterestDto.class);
     }
 
     /**

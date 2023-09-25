@@ -7,10 +7,7 @@ import pro.jiaoyi.common.util.BDUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MaUtil {
@@ -84,6 +81,173 @@ public class MaUtil {
         return max.divide(min, 4, RoundingMode.HALF_UP);
     }
 
+
+    /**
+     * 均线多头还是空头
+     *
+     * @param list
+     * @param <T>
+     * @return
+     */
+    public static <T extends K> int maUpOrDown(List<T> list, int scale) {
+        if (list == null || list.size() < 255) {
+            return 0;
+        }
+
+        BigDecimal[] closeArr = list.stream().map(K::getClose).toList().toArray(new BigDecimal[0]);
+        BigDecimal[] ma5 = MaUtil.ma(5, closeArr, scale);
+        BigDecimal[] ma10 = MaUtil.ma(10, closeArr, scale);
+        BigDecimal[] ma20 = MaUtil.ma(20, closeArr, scale);
+        BigDecimal[] ma30 = MaUtil.ma(30, closeArr, scale);
+        BigDecimal[] ma60 = MaUtil.ma(60, closeArr, scale);
+        BigDecimal[] ma120 = MaUtil.ma(120, closeArr, scale);
+        BigDecimal[] ma250 = MaUtil.ma(250, closeArr, scale);
+
+        int last = list.size() - 1;
+
+        if (ma5[last - 1].compareTo(ma5[last]) > 0
+                && ma10[last - 1].compareTo(ma10[last]) > 0
+                && ma20[last - 1].compareTo(ma20[last]) > 0
+                && ma30[last - 1].compareTo(ma30[last]) > 0
+                && ma60[last - 1].compareTo(ma60[last]) > 0
+                && ma120[last - 1].compareTo(ma120[last]) > 0
+                && ma250[last - 1].compareTo(ma250[last]) > 0
+
+                && ma5[last - 2].compareTo(ma5[last - 1]) > 0
+                && ma10[last - 2].compareTo(ma10[last - 1]) > 0
+                && ma20[last - 2].compareTo(ma20[last - 1]) > 0
+                && ma30[last - 2].compareTo(ma30[last - 1]) > 0
+                && ma60[last - 2].compareTo(ma60[last - 1]) > 0
+                && ma120[last - 2].compareTo(ma120[last - 1]) > 0
+                && ma250[last - 2].compareTo(ma250[last - 1]) > 0
+        ) {
+            //均线向下
+            return -1;
+        }
+
+        if (ma5[last - 1].compareTo(ma5[last]) < 0
+                && ma10[last - 1].compareTo(ma10[last]) < 0
+                && ma20[last - 1].compareTo(ma20[last]) < 0
+                && ma30[last - 1].compareTo(ma30[last]) < 0
+                && ma60[last - 1].compareTo(ma60[last]) < 0
+                && ma120[last - 1].compareTo(ma120[last]) < 0
+                && ma250[last - 1].compareTo(ma250[last]) < 0
+
+                && ma5[last - 2].compareTo(ma5[last - 1]) < 0
+                && ma10[last - 2].compareTo(ma10[last - 1]) < 0
+                && ma20[last - 2].compareTo(ma20[last - 1]) < 0
+                && ma30[last - 2].compareTo(ma30[last - 1]) < 0
+                && ma60[last - 2].compareTo(ma60[last - 1]) < 0
+                && ma120[last - 2].compareTo(ma120[last - 1]) < 0
+                && ma250[last - 2].compareTo(ma250[last - 1]) < 0
+
+
+        ) {
+            //均线向上
+            return 1;
+        }
+
+        return 0;
+    }
+
+    /**
+     * 均线之上 或之下
+     *
+     * @param list
+     * @param <T>
+     * @return
+     */
+    public static <T extends K> int maAboveOrUnder(List<T> list, int scale) {
+        if (list == null || list.size() < 255) {
+            return 0;
+        }
+
+        BigDecimal[] closeArr = list.stream().map(K::getClose).toList().toArray(new BigDecimal[0]);
+        BigDecimal[] ma5 = MaUtil.ma(5, closeArr, scale);
+        BigDecimal[] ma10 = MaUtil.ma(10, closeArr, scale);
+        BigDecimal[] ma20 = MaUtil.ma(20, closeArr, scale);
+        BigDecimal[] ma30 = MaUtil.ma(30, closeArr, scale);
+        BigDecimal[] ma60 = MaUtil.ma(60, closeArr, scale);
+        BigDecimal[] ma120 = MaUtil.ma(120, closeArr, scale);
+        BigDecimal[] ma250 = MaUtil.ma(250, closeArr, scale);
+
+
+        int last = list.size() - 1;
+        BigDecimal close = list.get(last).getClose();
+        BigDecimal high = list.get(last).getHigh();
+        BigDecimal low = list.get(last).getLow();
+
+        BigDecimal[] mas = new BigDecimal[6];
+        mas[0] = ma5[last];
+        mas[1] = ma10[last];
+        mas[2] = ma20[last];
+        mas[3] = ma30[last];
+        mas[4] = ma60[last];
+        mas[5] = ma120[last];
+        Arrays.sort(mas);
+        BigDecimal min = mas[0];
+        BigDecimal max = mas[5];
+
+        BigDecimal maDiff = max.subtract(min);
+        BigDecimal diffPct = maDiff.divide(min, 4, RoundingMode.HALF_UP);
+        if (diffPct.compareTo(new BigDecimal("0.01")) > 0) {
+            return 0;
+        }
+
+
+        //1. close 在均线之上
+        if (close.compareTo(ma5[last]) > 0
+                && close.compareTo(ma10[last]) > 0
+                && close.compareTo(ma20[last]) > 0
+                && close.compareTo(ma30[last]) > 0
+                && close.compareTo(ma60[last]) > 0
+                && close.compareTo(ma120[last]) > 0
+                && close.compareTo(ma250[last]) > 0) {
+
+            BigDecimal h = BigDecimal.ZERO;
+            for (int i = last - 100; i < last; i++) {
+                if (h.compareTo(list.get(i).getHigh()) < 0) {
+                    h = list.get(i).getHigh();
+                }
+            }
+
+            //2. 当前价是最高价
+            if (high.compareTo(h) >= 0) {
+                // 5-30 ma diff pct < 1%
+                BigDecimal cDiffPct = close.subtract(max).divide(max, 4, RoundingMode.HALF_UP);
+                if (cDiffPct.compareTo(new BigDecimal("0.01")) < 0) {
+                    return 1;
+                }
+            }
+
+        }
+        if (close.compareTo(ma5[last]) < 0
+                && close.compareTo(ma10[last]) < 0
+                && close.compareTo(ma20[last]) < 0
+                && close.compareTo(ma30[last]) < 0
+                && close.compareTo(ma60[last]) < 0
+                && close.compareTo(ma120[last]) < 0
+                && close.compareTo(ma250[last]) < 0) {
+
+
+            BigDecimal l = BigDecimal.ZERO;
+            for (int i = last - 100; i < last; i++) {
+                if (l.compareTo(list.get(i).getLow()) > 0) {
+                    l = list.get(i).getLow();
+                }
+            }
+
+            if (low.compareTo(l) <= 0) {
+
+                BigDecimal cDiffPct = min.subtract(close).divide(min, 4, RoundingMode.HALF_UP);
+                if (cDiffPct.compareTo(new BigDecimal("0.01")) < 0) {
+                    return -1;
+                }
+            }
+        }
+
+        return 0;
+    }
 
     public static <T extends K> Map<String, BigDecimal[]> ma(List<T> list) {
 

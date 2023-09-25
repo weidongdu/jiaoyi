@@ -7,6 +7,7 @@ public class BDUtil {
     public static final BigDecimal B1_5Y = new BigDecimal("150000000");
     public static final BigDecimal B1Y = new BigDecimal("100000000");
     public static final BigDecimal B5000W = new BigDecimal("50000000");
+    public static final BigDecimal B2000W = new BigDecimal("20000000");
     public static final BigDecimal B1W = new BigDecimal("10000");
     public static final BigDecimal B100 = new BigDecimal("100");
     public static final BigDecimal B90 = new BigDecimal("90");
@@ -34,6 +35,7 @@ public class BDUtil {
 
     public static final BigDecimal B1_15 = new BigDecimal("1.15");
     public static final BigDecimal B1_1 = new BigDecimal("1.1");
+    public static final BigDecimal B1_2 = new BigDecimal("1.2");
     public static final BigDecimal B1_05 = new BigDecimal("1.05");
 
 

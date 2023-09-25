@@ -20,6 +20,7 @@ import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.FileUtil;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
 import pro.jiaoyi.eastm.config.IndexEnum;
+import pro.jiaoyi.eastm.config.VipIndexEnum;
 import pro.jiaoyi.eastm.model.*;
 import pro.jiaoyi.eastm.util.EmMaUtil;
 
@@ -282,10 +283,15 @@ public class EmClient {
                 return list;
             }
         }
+//        List<EmDailyK> szzs = getDailyKs(VipIndexEnum.index_000001.getCode(), LocalDate.now(), 500, false);
+//        if (szzs.size() == 0) {
+//            return Collections.emptyList();
+//        }
+
         List<EmCList> clist = getClist(1, 10000);
         if (clist.size() > 0) {
             List<EmCList> list = clist.stream().filter(e -> !(
-                    e.getF12Code().startsWith("8")
+                                e.getF12Code().startsWith("8")
                             || e.getF14Name().contains("ST")
                             || e.getF14Name().contains("退"))
             ).toList();
@@ -841,7 +847,8 @@ public class EmClient {
         params.put("ps", "200");
         params.put("p", "1");
         params.put("sty", "SECUCODE,SECURITY_CODE,SECURITY_NAME_ABBR,NEW_PRICE,CHANGE_RATE,VOLUME_RATIO,HIGH_PRICE,LOW_PRICE,PRE_CLOSE_PRICE,VOLUME,DEAL_AMOUNT,TURNOVERRATE,DEAL_AMOUNT,LONG_AVG_ARRAY,INDEX");
-        params.put("filter", "(DEAL_AMOUNT>=50000000)(LONG_AVG_ARRAY=\"1\")" + index);
+//        params.put("filter", "(DEAL_AMOUNT>=50000000)(LONG_AVG_ARRAY=\"1\")" + index);
+        params.put("filter", "(DEAL_AMOUNT>=5000000)(LONG_AVG_ARRAY=\"1\")" + index);
         params.put("source", "SELECT_SECURITIES");
         params.put("client", "WEB");
 
@@ -912,10 +919,10 @@ public class EmClient {
         Elements list = doc.select(".listitem");
         if (list.size() == 0) return Collections.emptyList();
 
-        ArrayList<String> gubaList = new ArrayList<>(5);
+        HashSet<String> gubaList = new HashSet<>(5);
         for (int i = 0; i < 5; i++) {
             Element ele = list.get(i);
-            String content = "<br>" + (i + 1) + "read=%s_title=%s";
+            String content = "<br>" + (i + 1) + "_read=%s_title=%s";
             Element read = ele.selectFirst(".read");
             Element title = ele.selectFirst(".title");
             if (read != null && title != null) {
@@ -925,7 +932,7 @@ public class EmClient {
                 gubaList.add(encodedString);
             }
         }
-        return gubaList;
+        return new ArrayList<>(gubaList);
     }
 
 

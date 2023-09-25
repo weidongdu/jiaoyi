@@ -55,7 +55,7 @@ public class EmRealTimeClient {
 
         LocalDateTime now = LocalDateTime.now();
 
-        String amStart = LocalDate.now() + "09:30:00";
+        String amStart = LocalDate.now() + "09:20:00";
         String amEnd = LocalDate.now() + "11:30:00";
 
         String pmStart = LocalDate.now() + "13:00:00";
@@ -72,7 +72,7 @@ public class EmRealTimeClient {
                 && now.isBefore(DateUtil.strToLocalDateTime(pmEnd, p))) {
             return true;
         }
-
+        log.info("不在交易时间内");
         return false;
     }
 
@@ -95,8 +95,10 @@ public class EmRealTimeClient {
 
             if (eastSpeedInfo.getSpeed_f22().compareTo(BigDecimal.ONE) > 0 //涨速 > 1
                     && eastSpeedInfo.getPct_f3().compareTo(BigDecimal.ZERO) > 0 // 涨幅>0
+                    && eastSpeedInfo.getPct_f3().compareTo(BDUtil.B5) < 0 // 涨幅 <5
                     && eastSpeedInfo.getPrice_f2().compareTo(BDUtil.B50) < 0 //价格小于50
                     && !eastSpeedInfo.getName_f14().contains("ST")) {
+
                 list.add(eastSpeedInfo);
             }
         }

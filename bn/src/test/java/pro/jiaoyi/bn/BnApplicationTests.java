@@ -38,4 +38,9 @@ class BnApplicationTests {
         }
 
     }
+
+    @Test
+    public void oi(){
+        futureApi.getOI("BTCUSDT");
+    }
 }

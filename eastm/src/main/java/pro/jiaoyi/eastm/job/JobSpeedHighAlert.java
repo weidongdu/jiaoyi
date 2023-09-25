@@ -2,8 +2,10 @@ package pro.jiaoyi.eastm.job;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.util.BDUtil;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.EmojiUtil;
@@ -79,13 +81,23 @@ public class JobSpeedHighAlert {
         updateIndex();
     }
 
-    public void updateIndex() {
-        INDEXSET.clear();
-        INDEXSET.addAll(emClient.getIndex(IndexEnum.HS300.getUrl()).stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
-        INDEXSET.addAll(emClient.getIndex(IndexEnum.CYCF.getUrl()).stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
-        INDEXSET.addAll(emClient.getIndex(IndexEnum.ZZ500.getUrl()).stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
-        INDEXSET.addAll(emClient.getIndex1000().stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
 
+    @Scheduled(fixedRate = 1 * 60 * 1000L)
+    @Async
+    public void updateIndex() {
+//        INDEXSET.clear();
+//        INDEXSET.addAll(emClient.getIndex(IndexEnum.HS300.getUrl()).stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
+//        INDEXSET.addAll(emClient.getIndex(IndexEnum.CYCF.getUrl()).stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
+//        INDEXSET.addAll(emClient.getIndex(IndexEnum.ZZ500.getUrl()).stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
+//        INDEXSET.addAll(emClient.getIndex1000().stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
+
+        if (!EmRealTimeClient.tradeTime()) {
+            return;
+        }
+        List<EmCList> emCLists = emClient.xuanguCList();
+        log.info("xuanguCList size {}", emCLists.size());
+        INDEXSET.clear();
+        INDEXSET.addAll(emCLists.stream().map(EmCList::getF12Code).collect(Collectors.toSet()));
     }
 
 
@@ -97,6 +109,10 @@ public class JobSpeedHighAlert {
 
         if (INDEXSET.isEmpty()) {
             updateIndex();
+        }
+
+        if (INDEXSET.isEmpty()) {
+            return;
         }
 
 
@@ -120,10 +136,14 @@ public class JobSpeedHighAlert {
                 return;
             }
 
+            //过滤条件:
+            //hls ma60 > 1
+            //hls 30k < 10
 
             for (EastSpeedInfo top : tops) {
                 String code = top.getCode_f12();
                 String name = top.getName_f14();
+
                 //过滤 假设涨停也无法满足条件
                 List<String> blockList = DAY_BLOCKLIST_MAP.computeIfAbsent(LocalDate.now(), k -> new ArrayList<>());
                 if (blockList.contains(code)) {
@@ -133,11 +153,58 @@ public class JobSpeedHighAlert {
 
                 log.info("run speed {} {} {}", code, name, top.getSpeed_f22());
                 List<EmDailyK> dailyKs = emClient.getDailyKs(code, LocalDate.now(), 300, true);
+
+
                 if (dailyKs.size() < 260) {
                     log.info("k size {} < 260 block code", dailyKs.size());
                     blockList.add(code);
                     continue;
                 }
+
+
+                int last = dailyKs.size() - 1;
+                BigDecimal stopF = code.startsWith("688") || code.startsWith("300") ? BDUtil.B1_2 : BDUtil.B1_1;
+
+                BigDecimal highStop = dailyKs.get(last).getPreClose().multiply(stopF).setScale(3, RoundingMode.HALF_UP);
+                //涨停价创90k新高
+                boolean highStop90 = true;
+                for (int i = last - 90; i < last; i++) {
+                    if (dailyKs.get(i).getHigh().compareTo(highStop) > 0) {
+                        log.info("涨停价不满足创90k新高 {} {} {} 涨停价={}", code, name, dailyKs.get(i).getHigh(), highStop);
+                        blockList.add(code);
+                        highStop90 = false;
+                        break;
+                    }
+                }
+
+                if (!highStop90) {
+                    continue;
+                }
+
+
+                //hls ma60 > 1
+                BigDecimal[] hsArr = dailyKs.stream().map(EmDailyK::getHsl).toList().toArray(new BigDecimal[0]);
+                BigDecimal[] hsMa60 = MaUtil.ma(60, hsArr, 4);
+                if (hsMa60[hsMa60.length - 1 - 1].compareTo(BDUtil.B1) < 0) {
+                    log.warn("日换手率 index={} {} 不满足条件(>1)", hsMa60.length - 1, hsMa60[hsMa60.length - 1]);
+                    blockList.add(code);
+                    continue;
+                }
+
+                //hls 30k 之内 < 10
+                boolean hls30k = true;
+                for (int i = hsArr.length - 1 - 30; i < hsArr.length - 1; i++) {
+                    if (hsArr[i].compareTo(BDUtil.B10) > 0) {
+                        log.warn("日换手率 {} 不满足条件(<10)", hsArr[i]);
+                        blockList.add(code);
+                        hls30k = false;
+                        break;
+                    }
+                }
+                if (!hls30k) {
+                    continue;
+                }
+
 
                 BigDecimal dayAmtTop10 = emClient.amtTop10p(dailyKs);
                 BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
@@ -158,7 +225,6 @@ public class JobSpeedHighAlert {
                 BigDecimal[] ma120 = ma.get("ma120");
                 BigDecimal[] ma250 = ma.get("ma250");
 
-                int last = dailyKs.size() - 1;
                 boolean maAbove = false;
                 boolean maUp = false;
 
@@ -169,6 +235,7 @@ public class JobSpeedHighAlert {
                         && k.getClose().compareTo(ma60[last]) > 0
                         && k.getClose().compareTo(ma120[last]) > 0
                         && k.getClose().compareTo(ma250[last]) > 0;
+
                 maUp = ma5[last - 1].compareTo(ma5[last]) < 0 &&
                         ma10[last - 1].compareTo(ma10[last]) < 0 &&
                         ma20[last - 1].compareTo(ma20[last]) < 0 &&
@@ -206,7 +273,6 @@ public class JobSpeedHighAlert {
                     continue;
                 }
 
-
                 //当前家是否为最高价
                 LocalDateTime openTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 30));
                 List<DetailTrans> open60s = DetailTransList.stream()
@@ -233,7 +299,7 @@ public class JobSpeedHighAlert {
                         //最后5个价格 有就一个是最高价
                         if (priceList.get(priceList.size() - 1 - i).compareTo(max) == 0) {
                             log.info("满足分时 二次突破 最高价 {}", max);
-                            StringBuilder content = new StringBuilder("分时放量突破" + code + "_" + name + "_" + k.getBk()
+                            StringBuilder content = new StringBuilder(code + "_" + name + "_" + k.getBk()
                                     + "<br>" + "价格=" + k.getClose() + ",涨幅=" + k.getPct()
                                     + "<br>" + "标准量=" + amtStr + ",M1=" + fx + "_" + fenshiAmtStr
                                     + "<br>" + LocalDateTime.now().toString().substring(0, 16));
