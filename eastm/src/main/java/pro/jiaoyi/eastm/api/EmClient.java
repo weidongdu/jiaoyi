@@ -825,7 +825,7 @@ public class EmClient {
         String IS_CY50 = "(IS_CY50=\"是\")";
         String IS_KC50 = "(IS_KC50=\"是\")";
 
-        List<String> list = List.of(IS_SZ50, IS_HS300, IS_ZZ500, IS_ZZ1000, IS_CY50, IS_KC50);
+        List<String> list = List.of(IS_HS300, IS_ZZ500, IS_ZZ1000, IS_CY50, IS_KC50);
         Set<String> codes = new HashSet<>();
         for (String s : list) {
             log.info("xuangu {}", s);

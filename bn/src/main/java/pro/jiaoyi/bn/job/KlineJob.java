@@ -49,7 +49,7 @@ public class KlineJob {
         ArrayList<String> dnList = new ArrayList<>();
         HashMap<String, BigDecimal> priceMap = new HashMap<>();
         HashMap<String, BigDecimal> oiMap = new HashMap<>();
-        String p = "5m";
+        String p = "30m";
         for (String symbol : topN) {
             if (BLOCK_SET.contains(symbol)) continue;
 
@@ -71,7 +71,7 @@ public class KlineJob {
                 log.info("多头{}", symbol);
                 STATS_LIST.add(new Stats(symbol, p, 1, LocalDateTime.now(), boi));
 
-                if (check30(symbol,"30m") != 1) continue;
+//                if (check30(symbol,"30m") != 1) continue;
                 if (boi.compareTo(BDUtil.B2000W) < 0) continue;
                 upList.add(symbol);
                 addCount(symbol, 1);
@@ -81,7 +81,7 @@ public class KlineJob {
                 log.info("空头{}", symbol);
                 STATS_LIST.add(new Stats(symbol, p, -1, LocalDateTime.now(), boi));
 
-                if (check30(symbol,"30m") != -1) continue;
+//                if (check30(symbol,"30m") != -1) continue;
                 if (boi.compareTo(BDUtil.B2000W) < 0) continue;
                 dnList.add(symbol);
                 addCount(symbol, -1);

@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSONObject;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import pro.jiaoyi.bn.dao.entity.PremiumIndexEntity;
 import pro.jiaoyi.bn.model.BnK;
 import pro.jiaoyi.bn.model.ExchangeInfo;
 import pro.jiaoyi.bn.model.OpenInterestDto;
@@ -145,8 +146,41 @@ public class FutureApi {
         }
 
         String s = new String(forBytes);
-        JSONObject jsonObject = JSONObject.parseObject(s);
+        JSONArray jsonArray = JSONArray.parseArray(s);
 
+    }
+
+    /*
+    最新标记价格和资金费率
+    GET /fapi/v1/premiumIndex
+    采集各大交易所数据加权平均
+    [
+        {
+            "symbol": "BTCUSDT",            // 交易对
+            "markPrice": "11793.63104562",  // 标记价格
+            "indexPrice": "11781.80495970", // 指数价格
+            "estimatedSettlePrice": "11781.16138815",  // 预估结算价,仅在交割开始前最后一小时有意义
+            "lastFundingRate": "0.00038246",    // 最近更新的资金费率
+            "nextFundingTime": 1597392000000,   // 下次资金费时间
+            "interestRate": "0.00010000",       // 标的资产基础利率
+            "time": 1597370495002               // 更新时间
+        }
+    ]
+     */
+    public List<PremiumIndexEntity> premiumIndex() {
+        String url = BASE_URL + "/fapi/v1/premiumIndex";
+        byte[] forBytes = okHttpUtil.getForBytes(url, null);
+        if (forBytes.length == 0) {
+            return Collections.emptyList();
+        }
+
+        String s = new String(forBytes);
+        JSONArray jsonArray = JSONArray.parseArray(s);
+        if (jsonArray == null || jsonArray.size() == 0) {
+            return Collections.emptyList();
+        }
+
+        return jsonArray.toJavaList(PremiumIndexEntity.class);
     }
 
 
