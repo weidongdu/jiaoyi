@@ -21,4 +21,11 @@ public interface PremiumIndexRepo extends JpaRepository<PremiumIndexEntity,Long>
     @Modifying
     @Query(nativeQuery = true, value = " DELETE FROM t_premium_index t where t.time < ?1 ")
     int deleteByDays(@Param("time") long time);
+
+
+    @Query(nativeQuery = true, value = " select a.* from t_premium_index a " +
+            " where a.`symbol` like '%USDT'" +
+            " and a.time = (select b.time from t_premium_index b order by b.id desc limit 1) " +
+            " order by a.last_funding_rate limit 300;")
+    List<PremiumIndexEntity> findFeeList();
 }

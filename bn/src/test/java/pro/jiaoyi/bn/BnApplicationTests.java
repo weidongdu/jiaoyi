@@ -3,6 +3,7 @@ package pro.jiaoyi.bn;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import pro.jiaoyi.bn.controller.FrController;
 import pro.jiaoyi.bn.dao.entity.PremiumIndexEntity;
 import pro.jiaoyi.bn.dao.repo.PremiumIndexRepo;
 import pro.jiaoyi.bn.model.BnK;
@@ -10,7 +11,9 @@ import pro.jiaoyi.bn.sdk.FutureApi;
 import pro.jiaoyi.bn.service.BnPremiumIndexService;
 import pro.jiaoyi.common.strategy.BreakOutStrategy;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @SpringBootTest
 class BnApplicationTests {
@@ -27,14 +30,20 @@ class BnApplicationTests {
 
     @Resource
     private BnPremiumIndexService bnPremiumIndexService;
+
+    @Resource
+    private FrController frController;
     @Test
     public void test() {
 //        bnPremiumIndexService.deleteByDays(0);
 
 //        for (int i = 0; i < 5; i++) {
-            bnPremiumIndexService.savePremiumIndex();
+//            bnPremiumIndexService.savePremiumIndex();
 //        }
 
+        Map<String, BigDecimal> fr =
+                frController.getFr();
+        System.out.println(fr);
 
 
 //        List<PremiumIndexEntity> list = futureApi.premiumIndex();
