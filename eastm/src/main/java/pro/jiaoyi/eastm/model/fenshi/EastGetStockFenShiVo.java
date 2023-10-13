@@ -1,5 +1,6 @@
 package pro.jiaoyi.eastm.model.fenshi;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -38,6 +39,8 @@ public class EastGetStockFenShiVo {
     private int cp;//: 15270,
     private int tc;//: 4409,
     private List<Detail> data;
+
+
 
     public String getC() {
         return c;

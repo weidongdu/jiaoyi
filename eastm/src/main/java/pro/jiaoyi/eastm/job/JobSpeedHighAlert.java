@@ -11,7 +11,6 @@ import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.EmojiUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.api.EmRealTimeClient;
-import pro.jiaoyi.eastm.config.IndexEnum;
 import pro.jiaoyi.eastm.config.WxUtil;
 import pro.jiaoyi.eastm.model.EastSpeedInfo;
 import pro.jiaoyi.eastm.model.EmCList;
@@ -394,4 +393,66 @@ public class JobSpeedHighAlert {
 
     }
 
+
+    //cron 工作日 上午 9:26分
+    @Scheduled(cron = "0 26 9 * * ?")
+//    @Scheduled(cron = "0 29 15 * * ?")
+    public void runOpen() {
+
+        if (LocalDate.now().getDayOfWeek().getValue() == 6
+                || LocalDate.now().getDayOfWeek().getValue() == 7) {
+            return;
+        }
+
+        List<EmCList> list = emClient.getClistDefaultSize(true);
+        List<EmCList> fList = list.stream().filter(
+                e -> e.getF6Amt() != null
+                        && e.getF6Amt().compareTo(BDUtil.B1Y) > 0
+                        && e.getF3Pct().compareTo(BDUtil.B1) <= 0
+                        && e.getF3Pct().compareTo(BDUtil.BN1) >= 0
+        ).toList();
+
+        if (fList.isEmpty()) {
+            return;
+        }
+
+        int notTd = 0;
+        for (EmCList emCList : fList) {
+            //判断fx
+            List<EmDailyK> ks = emClient.getDailyKs(emCList.getF12Code(), LocalDate.now(), 100, true);
+            if (ks.size() < 70) {
+                continue;
+            }
+
+            //不清楚这个时候 是否出了最新的k
+            EmDailyK k = ks.get(ks.size() - 1);
+            String td = LocalDate.now().toString().replaceAll("-", "");
+            if (td.equalsIgnoreCase(k.getTradeDate())) {
+                ks.remove(ks.size() - 1);
+            }else {
+                notTd ++;
+                if (notTd > 3){
+                    return;
+                }
+            }
+
+
+
+            //计算 amt
+            BigDecimal dayAmtTop10 = emClient.amtTop10p(ks);
+            BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
+            BigDecimal fAmt = BDUtil.b0_1.multiply(hourAmt);
+            //成交量放大倍数
+            BigDecimal fx = k.getAmt().divide(fAmt, 4, RoundingMode.HALF_UP);
+            if (fx.compareTo(BDUtil.B1) > 0) {
+                String content = k.getCode() + k.getName()
+                        + "<br>p=" + k.getClose()
+                        + "<br>pct=" + k.getPct() + "%"
+                        + "<br>fx=" + fx
+                        + "<br>amt=" + BDUtil.amtHuman(k.getAmt())
+                        + "<br>td=" + LocalDateTime.now().toString().substring(0, 16);
+                wxUtil.send(content);
+            }
+        }
+    }
 }

@@ -1,10 +1,6 @@
 package pro.jiaoyi.eastm;
 
-import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.context.AnalysisContext;
-import com.alibaba.excel.read.listener.ReadListener;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -14,37 +10,21 @@ import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.util.BDUtil;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.FileUtil;
-import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.api.EmRealTimeClient;
 import pro.jiaoyi.eastm.config.IndexEnum;
-import pro.jiaoyi.eastm.config.VipIndexEnum;
 import pro.jiaoyi.eastm.dao.entity.KLineEntity;
 import pro.jiaoyi.eastm.dao.repo.KLineRepo;
-import pro.jiaoyi.eastm.model.EastSpeedInfo;
 import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
-import pro.jiaoyi.eastm.model.excel.Index1000XlsData;
-import pro.jiaoyi.eastm.model.fenshi.DetailTrans;
 import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiTrans;
 import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiVo;
+import pro.jiaoyi.eastm.service.FenshiService;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static pro.jiaoyi.common.strategy.BreakOutStrategy.SIDE_MAP;
 
 @SpringBootTest
 @Slf4j
@@ -186,24 +166,152 @@ class EastmKlineTests {
 
 
     @Test
-    public void xuangu(){
+    public void xuangu() {
         List<String> codes = emClient.xuangu();
         Map<String, String> codeNameMap = emClient.getCodeNameMap(false);
         for (String code : codes) {
-            log.info("{} {}",code,codeNameMap.get(code));
+            log.info("{} {}", code, codeNameMap.get(code));
         }
     }
 
 
     @Test
-    public void guba(){
+    public void guba() {
         List<String> guba = emClient.guba("601088");
         System.out.println(guba);
 
     }
 
 
+    @Resource
+    private EmRealTimeClient emRealTimeClient;
 
+    @Test
+    public void fenShi() {
+//        String code = "688016";
+
+        //这里做一个测试
+        //1, 开盘放量
+//        List<EmCList> index = emClient.getIndex(IndexEnum.EM_MA_UP, true);
+        List<EmCList> index = emClient.getClistDefaultSize(true);
+        for (EmCList emCList : index) {
+            String code = emCList.getF12Code();
+            EastGetStockFenShiVo fEastGetStockFenShiVo = emRealTimeClient.getFenshiByCode(code);
+            if (fEastGetStockFenShiVo == null) continue;
+            EastGetStockFenShiTrans trans = EastGetStockFenShiTrans.trans(fEastGetStockFenShiVo);
+            if (trans == null) continue;
+            log.info("开盘 open {} vol={} amt={}", trans.getOpenPrice(), trans.getOpenVol(), trans.getOpenAmt());
+            if (trans.getOpenAmt() == null) continue;
+
+            List<EmDailyK> ks = emClient.getDailyKs(code, LocalDate.now(), 200, true);
+            if (ks.size() < 100) continue;
+            ks.remove(ks.size() - 1);
+            //计算 amt
+            BigDecimal dayAmtTop10 = emClient.amtTop10p(ks);
+            BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
+            BigDecimal fAmt = BDUtil.b0_1.multiply(hourAmt);
+            //成交量放大倍数
+            BigDecimal fx = trans.getOpenAmt().divide(hourAmt, 4, RoundingMode.HALF_UP);
+
+
+            //code=301085 name=亚康股份 openPct=1.0404 amt top10p=709323427 hourAmt=177330857 fAmt=17733085.7 openAmt=14602884.000 fx=0.0823 pct=7.54
+            //code=301095 name=广立微 openPct=1.0187 amt top10p=667663826 hourAmt=166915957 fAmt=16691595.7 openAmt=3205190.000 fx=0.0192 pct=10.51
+            //条件 fx > 0.01
+            if (fx.compareTo(BDUtil.b0_01) < 0) continue;
+            BigDecimal diff = emCList.getF2Close().subtract(emCList.getF17Open()).divide(emCList.getF17Open(), 4, RoundingMode.HALF_UP);
+            log.info("code={} name={} openPct={} amt top10p={} hourAmt={} fAmt={} openAmt={} fx={} pct={}", code, emCList.getF14Name()
+                    , trans.getOpenPrice().divide(trans.getClosePre(), 4, RoundingMode.HALF_UP), dayAmtTop10, hourAmt, fAmt, trans.getOpenAmt(), fx, emCList.getF3Pct());
+            log.error("match fx={} close-open={} {}", fx, diff.multiply(BDUtil.B100), emCList);
+
+        }
+
+    }
+
+    @Resource
+    private FenshiService fenshiService;
+
+    @Test
+    public void save() {
+
+        String dir = "/Users/dwd/Downloads/search/mj/20220610";
+        FileUtil.readDirectoryFilesAbsPath(dir);
+        List<EmCList> list = emClient.getClistDefaultSize(true);
+        for (EmCList emCList : list) {
+//            if (emCList.getF3Pct().compareTo(BDUtil.B7) < 0) {
+//
+//                if (emCList.getF17Open().compareTo(BigDecimal.ZERO) > 0
+//                        && emCList.getF18Close().subtract(emCList.getF17Open())
+//                        .divide(emCList.getF17Open(), 4, RoundingMode.HALF_UP).compareTo(BDUtil.b0_05) > 0){
+//                    //例外情况 低开高走 5% 以上
+//                }else {
+//                    continue;
+//                }
+//            }
+
+            String code = emCList.getF12Code();
+
+
+            try {
+                EastGetStockFenShiVo fEastGetStockFenShiVo = emRealTimeClient.getFenshiByCode(code);
+                if (fEastGetStockFenShiVo == null) continue;
+                EastGetStockFenShiTrans trans = EastGetStockFenShiTrans.trans(fEastGetStockFenShiVo);
+                if (trans == null) continue;
+                if (trans.getOpenAmt() == null
+                        || trans.getOpenAmt().compareTo(BDUtil.B1Y) < 0) continue;
+
+
+                fenshiService.saveOrUpdate(trans,null);
+            } catch (Exception e) {
+                log.error("save error {}", e.getMessage(), e);
+            }
+
+        }
+
+
+    }
+    @Test
+    public void save1() {
+
+        String td = "20220825";
+        String dir = "/Users/dwd/Downloads/search/mj/"+td;
+        List<String> list = FileUtil.readDirectoryFilesAbsPath(dir);
+        for (String path : list) {
+
+            try {
+                EastGetStockFenShiVo fEastGetStockFenShiVo = emRealTimeClient.getFenshiByCodeFromLocal("", path,true);
+                if (fEastGetStockFenShiVo == null) continue;
+                EastGetStockFenShiTrans trans = EastGetStockFenShiTrans.trans(fEastGetStockFenShiVo);
+                if (trans == null) continue;
+                if (trans.getOpenAmt() == null
+                        || trans.getOpenAmt().compareTo(BDUtil.B1000W) < 0) continue;
+
+
+                String code = trans.getCode();
+                List<EmDailyK> ks = emClient.getDailyKs(code, LocalDate.now(), 500, true);
+                if (ks.size() < 500) continue;
+                int index = 0;
+                for (int i = 0; i < ks.size(); i++) {
+                    String tradeDate = ks.get(i).getTradeDate();
+                    if (tradeDate.equalsIgnoreCase(td)){
+                        index = i;
+                        break;
+                    }
+                }
+
+                if (index > 0){
+                    ks = ks.subList(0,index+1);
+                }
+
+                //计算 amt
+                fenshiService.saveOrUpdate(trans,ks);
+            } catch (Exception e) {
+                log.error("save error {}", e.getMessage(), e);
+            }
+
+        }
+
+
+    }
 
 
 }

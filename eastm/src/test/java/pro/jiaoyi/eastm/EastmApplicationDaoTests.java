@@ -10,9 +10,7 @@ import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.FileUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.dao.entity.KLineEntity;
-import pro.jiaoyi.eastm.dao.entity.UserEntity;
 import pro.jiaoyi.eastm.dao.repo.KLineRepo;
-import pro.jiaoyi.eastm.dao.repo.UserRepo;
 import pro.jiaoyi.eastm.model.EmCList;
 
 import java.math.BigDecimal;

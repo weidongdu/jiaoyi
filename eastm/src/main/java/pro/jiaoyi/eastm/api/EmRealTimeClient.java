@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import pro.jiaoyi.common.strategy.BreakOutStrategy;
 import pro.jiaoyi.common.util.BDUtil;
 import pro.jiaoyi.common.util.DateUtil;
+import pro.jiaoyi.common.util.FileUtil;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
 import pro.jiaoyi.eastm.model.EastSpeedInfo;
 import pro.jiaoyi.eastm.model.EmDailyK;
@@ -239,6 +240,31 @@ public class EmRealTimeClient {
         try {
             byte[] bytes = okHttpUtil.getForBytes(url(code), hMap);
             String body = new String(bytes, Charset.defaultCharset());
+            JSONObject data = JSONObject.parseObject(body).getJSONObject("data");
+            log.info("body length={}", body.length());
+
+            if (data != null) {
+                EastGetStockFenShiVo vo = data.toJavaObject(EastGetStockFenShiVo.class);
+                return vo;
+            }
+
+        } catch (Exception e) {
+            log.warn("get fenshi exception {} {}", e.getMessage(), e);
+        }
+
+        return null;
+    }
+
+    public EastGetStockFenShiVo getFenshiByCodeFromLocal(String code, String path, boolean absPath) {
+
+        try {
+            String abs = "";
+            if (absPath) {
+                abs = path;
+            } else {
+                abs = path + "/" + code + ".txt";
+            }
+            String body = FileUtil.readFromFile(abs);
             JSONObject data = JSONObject.parseObject(body).getJSONObject("data");
             log.info("body length={}", body.length());
 

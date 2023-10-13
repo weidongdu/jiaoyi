@@ -8,6 +8,7 @@ public class BDUtil {
     public static final BigDecimal B1Y = new BigDecimal("100000000");
     public static final BigDecimal B5000W = new BigDecimal("50000000");
     public static final BigDecimal B2000W = new BigDecimal("20000000");
+    public static final BigDecimal B1000W = new BigDecimal("10000000");
     public static final BigDecimal B1W = new BigDecimal("10000");
     public static final BigDecimal B100 = new BigDecimal("100");
     public static final BigDecimal B90 = new BigDecimal("90");
@@ -49,7 +50,9 @@ public class BDUtil {
     public static final BigDecimal b0_2 = new BigDecimal("0.2");
     public static final BigDecimal b0_1 = new BigDecimal("0.1");
     public static final BigDecimal b0_05 = new BigDecimal("0.05");
+    public static final BigDecimal b0_03 = new BigDecimal("0.03");
     public static final BigDecimal b0_02 = new BigDecimal("0.02");
+    public static final BigDecimal b0_01 = new BigDecimal("0.01");
     public static final BigDecimal BN1 = new BigDecimal("-1");
 
 
@@ -58,6 +61,7 @@ public class BDUtil {
     }
 
     public static String amtHuman(BigDecimal b) {
+        if (b == null) return "0";
         if (b.compareTo(B1Y) > 0) {
             return b.divide(B1Y, 2, RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP).toPlainString() + "亿";
         }

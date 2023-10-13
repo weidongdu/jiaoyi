@@ -45,7 +45,36 @@ public class EastGetStockFenShiTrans {
     private int totalCount;//: 4409,
     private List<DetailTrans> data;
 
-//    public void f(int mm) {
+
+    private BigDecimal openPrice;//开盘价
+    private BigDecimal openVol;//开盘量
+    private BigDecimal openAmt;//开盘额
+
+    public void setOpenPrice(BigDecimal openPrice) {
+        this.openPrice = openPrice;
+    }
+
+    public void setOpenVol(BigDecimal openVol) {
+        this.openVol = openVol;
+    }
+
+    public void setOpenAmt(BigDecimal openAmt) {
+        this.openAmt = openAmt;
+    }
+
+    public BigDecimal getOpenPrice() {
+        return openPrice;
+    }
+
+    public BigDecimal getOpenVol() {
+        return openVol;
+    }
+
+    public BigDecimal getOpenAmt() {
+        return openAmt;
+    }
+
+    //    public void f(int mm) {
 //        f(mm, null);
 //    }
 //
@@ -288,6 +317,9 @@ public class EastGetStockFenShiTrans {
         fs.setClosePre(new BigDecimal(cps.substring(0, cps.length() - 3) + "." + cps.substring(cps.length() - 3)));
         fs.setTotalCount(vo.getTc());
 
+        BigDecimal openPrice = BigDecimal.ZERO;
+        BigDecimal openVol = BigDecimal.ZERO;
+        BigDecimal openAmt = BigDecimal.ZERO;
         if (vo.getTc() > 0) {
             ArrayList<DetailTrans> list = new ArrayList<>(vo.getTc());
             for (Detail d : vo.getData()) {
@@ -302,6 +334,7 @@ public class EastGetStockFenShiTrans {
                     ts += " " + sts.substring(0, 2) + ":" + sts.substring(2, 4) + ":" + sts.substring(4);
                 }
 
+
                 LocalDateTime parse = LocalDateTime.parse(ts, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                 detailTrans.setTs(parse.toInstant(ZoneOffset.ofHours(8)).toEpochMilli());
                 String ps = String.valueOf(d.getP());
@@ -309,6 +342,15 @@ public class EastGetStockFenShiTrans {
 
                 detailTrans.setVol(d.getV());
                 detailTrans.setBs(d.getBs());
+
+                if (sts.equals("92500")){ //竞价解读
+                    openPrice = detailTrans.getPrice();
+                    openVol = BigDecimal.valueOf(d.getV());
+                    openAmt = openPrice.multiply(openVol).multiply(BigDecimal.valueOf(100));
+                    fs.setOpenPrice(openPrice);
+                    fs.setOpenVol(openVol);
+                    fs.setOpenAmt(openAmt);
+                }
 
                 list.add(detailTrans);
             }
