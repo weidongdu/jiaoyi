@@ -1,9 +1,11 @@
 package pro.jiaoyi.eastm;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
@@ -13,7 +15,9 @@ import pro.jiaoyi.common.util.FileUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.api.EmRealTimeClient;
 import pro.jiaoyi.eastm.config.IndexEnum;
+import pro.jiaoyi.eastm.dao.entity.FenshiSimpleEntity;
 import pro.jiaoyi.eastm.dao.entity.KLineEntity;
+import pro.jiaoyi.eastm.dao.repo.FenshiSimpleRepo;
 import pro.jiaoyi.eastm.dao.repo.KLineRepo;
 import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
@@ -24,7 +28,9 @@ import pro.jiaoyi.eastm.service.FenshiService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @SpringBootTest
 @Slf4j
@@ -195,6 +201,8 @@ class EastmKlineTests {
 //        List<EmCList> index = emClient.getIndex(IndexEnum.EM_MA_UP, true);
         List<EmCList> index = emClient.getClistDefaultSize(true);
         for (EmCList emCList : index) {
+            if (emCList.getF3Pct().compareTo(BDUtil.B7) < 0) continue;
+
             String code = emCList.getF12Code();
             EastGetStockFenShiVo fEastGetStockFenShiVo = emRealTimeClient.getFenshiByCode(code);
             if (fEastGetStockFenShiVo == null) continue;
@@ -217,12 +225,13 @@ class EastmKlineTests {
             //code=301085 name=亚康股份 openPct=1.0404 amt top10p=709323427 hourAmt=177330857 fAmt=17733085.7 openAmt=14602884.000 fx=0.0823 pct=7.54
             //code=301095 name=广立微 openPct=1.0187 amt top10p=667663826 hourAmt=166915957 fAmt=16691595.7 openAmt=3205190.000 fx=0.0192 pct=10.51
             //条件 fx > 0.01
-            if (fx.compareTo(BDUtil.b0_01) < 0) continue;
+//            if (fx.compareTo(BDUtil.b0_01) < 0) continue;
             BigDecimal diff = emCList.getF2Close().subtract(emCList.getF17Open()).divide(emCList.getF17Open(), 4, RoundingMode.HALF_UP);
             log.info("code={} name={} openPct={} amt top10p={} hourAmt={} fAmt={} openAmt={} fx={} pct={}", code, emCList.getF14Name()
                     , trans.getOpenPrice().divide(trans.getClosePre(), 4, RoundingMode.HALF_UP), dayAmtTop10, hourAmt, fAmt, trans.getOpenAmt(), fx, emCList.getF3Pct());
             log.error("match fx={} close-open={} {}", fx, diff.multiply(BDUtil.B100), emCList);
 
+            fenshiService.saveOrUpdate(trans, null);
         }
 
     }
@@ -237,16 +246,16 @@ class EastmKlineTests {
         FileUtil.readDirectoryFilesAbsPath(dir);
         List<EmCList> list = emClient.getClistDefaultSize(true);
         for (EmCList emCList : list) {
-//            if (emCList.getF3Pct().compareTo(BDUtil.B7) < 0) {
-//
-//                if (emCList.getF17Open().compareTo(BigDecimal.ZERO) > 0
-//                        && emCList.getF18Close().subtract(emCList.getF17Open())
-//                        .divide(emCList.getF17Open(), 4, RoundingMode.HALF_UP).compareTo(BDUtil.b0_05) > 0){
-//                    //例外情况 低开高走 5% 以上
-//                }else {
-//                    continue;
-//                }
-//            }
+            if (emCList.getF3Pct().compareTo(BDUtil.B7) < 0) {
+
+                if (emCList.getF17Open().compareTo(BigDecimal.ZERO) > 0
+                        && emCList.getF18Close().subtract(emCList.getF17Open())
+                        .divide(emCList.getF17Open(), 4, RoundingMode.HALF_UP).compareTo(BDUtil.b0_05) > 0) {
+                    //例外情况 低开高走 5% 以上
+                } else {
+                    continue;
+                }
+            }
 
             String code = emCList.getF12Code();
 
@@ -260,7 +269,7 @@ class EastmKlineTests {
                         || trans.getOpenAmt().compareTo(BDUtil.B1Y) < 0) continue;
 
 
-                fenshiService.saveOrUpdate(trans,null);
+                fenshiService.saveOrUpdate(trans, null);
             } catch (Exception e) {
                 log.error("save error {}", e.getMessage(), e);
             }
@@ -269,16 +278,48 @@ class EastmKlineTests {
 
 
     }
+
     @Test
     public void save1() {
+        save1("20221107");
+        save1("20221108");
+        save1("20221109");
+        save1("20221110");
+        save1("20221111");
+        save1("20221114");
+        save1("20221115");
+        save1("20221117");
+        save1("20221118");
+        save1("20221121");
+        save1("20221122");
+        save1("20221123");
+        save1("20221125");
+        save1("20221129");
+        save1("20221130");
 
-        String td = "20220825";
-        String dir = "/Users/dwd/Downloads/search/mj/"+td;
+
+        save1("20221201");
+        save1("20221202");
+        save1("20221206");
+        save1("20221207");
+        save1("20221208");
+        save1("20221212");
+        save1("20221213");
+        save1("20221214");
+
+    }
+
+    public void save1(String td) {
+
+//        String td = "20220830";
+        String dir = "/Users/dwd/Downloads/search/mj/" + td;
         List<String> list = FileUtil.readDirectoryFilesAbsPath(dir);
+
+
         for (String path : list) {
 
             try {
-                EastGetStockFenShiVo fEastGetStockFenShiVo = emRealTimeClient.getFenshiByCodeFromLocal("", path,true);
+                EastGetStockFenShiVo fEastGetStockFenShiVo = emRealTimeClient.getFenshiByCodeFromLocal("", path, true);
                 if (fEastGetStockFenShiVo == null) continue;
                 EastGetStockFenShiTrans trans = EastGetStockFenShiTrans.trans(fEastGetStockFenShiVo);
                 if (trans == null) continue;
@@ -292,18 +333,18 @@ class EastmKlineTests {
                 int index = 0;
                 for (int i = 0; i < ks.size(); i++) {
                     String tradeDate = ks.get(i).getTradeDate();
-                    if (tradeDate.equalsIgnoreCase(td)){
+                    if (tradeDate.equalsIgnoreCase(td)) {
                         index = i;
                         break;
                     }
                 }
 
-                if (index > 0){
-                    ks = ks.subList(0,index+1);
+                if (index > 0) {
+                    ks = ks.subList(0, index + 1);
                 }
 
                 //计算 amt
-                fenshiService.saveOrUpdate(trans,ks);
+                fenshiService.saveOrUpdate(trans, ks);
             } catch (Exception e) {
                 log.error("save error {}", e.getMessage(), e);
             }
@@ -311,6 +352,226 @@ class EastmKlineTests {
         }
 
 
+    }
+
+    @Resource
+    private FenshiSimpleRepo fenshiSimpleRepo;
+
+    @Test
+    public void fenshiSimple() {
+        String td = LocalDate.now().toString().replaceAll("-", "");
+        HashSet<EmCList> set = new HashSet<>();
+        List<EmCList> emList = emClient.getClistDefaultSize(true);
+
+        AtomicInteger counter = new AtomicInteger(0);
+
+        for (EmCList e : emList) {
+            try {
+                if (counter.getAndIncrement() % 10 == 0) Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                log.error("sleep 1s");
+            }
+            String code = e.getF12Code();
+            int i = fenshiSimpleRepo.countByCodeAndTradeDate(code, td);
+            if (i > 0) continue;
+
+            EastGetStockFenShiVo fEastGetStockFenShiVo = emRealTimeClient.getFenshiByCode(code);
+            if (fEastGetStockFenShiVo == null) {
+                set.add(e);
+                continue;
+            }
+
+            EastGetStockFenShiTrans trans = EastGetStockFenShiTrans.trans(fEastGetStockFenShiVo);
+            if (trans == null) {
+                set.add(e);
+                continue;
+            }
+
+            saveToFenshiSimple(td, e, trans);
+        }
+
+
+        for (EmCList e : set) {
+            try {
+                if (counter.getAndIncrement() % 10 == 0) Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                log.error("sleep 1s");
+            }
+            String code = e.getF12Code();
+            int i = fenshiSimpleRepo.countByCodeAndTradeDate(code, td);
+            if (i > 0) continue;
+
+            EastGetStockFenShiVo fEastGetStockFenShiVo = emRealTimeClient.getFenshiByCode(code);
+            if (fEastGetStockFenShiVo == null) {
+                continue;
+            }
+
+            EastGetStockFenShiTrans trans = EastGetStockFenShiTrans.trans(fEastGetStockFenShiVo);
+            if (trans == null) {
+                continue;
+            }
+
+            saveToFenshiSimple(td, e, trans);
+        }
+
+
+    }
+
+    private void saveToFenshiSimple(String td, EmCList e, EastGetStockFenShiTrans trans) {
+
+        try {
+            FenshiSimpleEntity fenshiSimpleEntity = new FenshiSimpleEntity();
+            BeanUtils.copyProperties(e, fenshiSimpleEntity);
+            fenshiSimpleEntity.setData(JSON.toJSONString(trans));
+
+            fenshiSimpleEntity.setId(null);//Long id;
+            fenshiSimpleEntity.setCode(trans.getCode());//String code;
+            fenshiSimpleEntity.setName(trans.getName());//String name;
+            fenshiSimpleEntity.setClosePre(trans.getClosePre());//BigDecimal open;//当前价
+            fenshiSimpleEntity.setOpen(trans.getOpenPrice());//BigDecimal open;//当前价
+            fenshiSimpleEntity.setOpenVol(trans.getOpenVol());//BigDecimal openVol;//开盘量
+            fenshiSimpleEntity.setOpenAmt(trans.getOpenAmt());//BigDecimal openAmt;//开盘额
+            fenshiSimpleEntity.setCreateTime(LocalDateTime.now());//LocalDateTime createTime;//创建时间
+            fenshiSimpleEntity.setTradeDate(td);
+            fenshiSimpleRepo.saveAndFlush(fenshiSimpleEntity);
+        } catch (Exception ex) {
+            log.error("{}", ex.getMessage());
+        }
+    }
+
+    @Test
+    public void update() {
+        String td = LocalDate.now().toString().replaceAll("-", "");
+
+        List<EmCList> list = emClient.getClistDefaultSize(true);
+        for (EmCList emCList : list) {
+            FenshiSimpleEntity dbEntity = fenshiSimpleRepo.findByCodeAndTradeDate(emCList.getF12Code(), td);
+            if (dbEntity == null) continue;
+
+            String data = dbEntity.getData();
+            JSONObject jsonObject = JSONObject.parseObject(data);
+            BigDecimal closePre = jsonObject.getBigDecimal("closePre");
+            dbEntity.setClosePre(closePre);
+            fenshiSimpleRepo.saveAndFlush(dbEntity);
+        }
+
+    }
+
+    @Test
+    public void update1() {
+        String td = LocalDate.now().minusDays(1).toString().replaceAll("-", "");
+        String tdPre = LocalDate.now().minusDays(1).minusDays(1).toString().replaceAll("-", "");
+
+        List<EmCList> list = emClient.getClistDefaultSize(true);
+        for (EmCList emCList : list) {
+            log.info(emCList.getF12Code());
+            FenshiSimpleEntity dbEntity = fenshiSimpleRepo.findByCodeAndTradeDate(emCList.getF12Code(), td);
+            if (dbEntity == null) continue;
+
+            FenshiSimpleEntity dbEntityPre = fenshiSimpleRepo.findByCodeAndTradeDate(emCList.getF12Code(), tdPre);
+            if (dbEntityPre == null) continue;
+
+            if (dbEntity.getOpenAmt() == null
+                    || dbEntityPre.getOpenAmt() == null
+                    || dbEntityPre.getOpenAmt().compareTo(BigDecimal.ZERO) == 0) {
+                dbEntity.setOpenAmtPre(BigDecimal.ZERO);
+                dbEntity.setOpenAmtPreFx(BigDecimal.ZERO);
+            }else {
+
+                dbEntity.setOpenAmtPre(dbEntityPre.getOpenAmt());
+                dbEntity.setOpenAmtPreFx(dbEntity.getOpenAmt()
+                        .divide(dbEntityPre.getOpenAmt(), 4, RoundingMode.HALF_UP));
+            }
+
+
+            try {
+                BigDecimal openPct = dbEntity.getF17Open().subtract(dbEntity.getClosePre()).divide(dbEntity.getClosePre(), 4, RoundingMode.HALF_UP);
+                BigDecimal holdPct = dbEntity.getF2Close().subtract(dbEntity.getF17Open()).divide(dbEntity.getF17Open(), 4, RoundingMode.HALF_UP);
+                dbEntity.setOpenPct(openPct);//openPct;//开盘幅度 (open - closePre )/ closePre
+                dbEntity.setHoldPct(holdPct);//holdPct;//开盘幅度 (close - open )/ open
+            } catch (Exception e) {
+
+                dbEntity.setOpenPct(BigDecimal.valueOf(-100));//openPct;//开盘幅度 (open - closePre )/ closePre
+                dbEntity.setHoldPct(BigDecimal.valueOf(-100));//holdPct;//开盘幅度 (close - open )/ open
+            }
+
+            List<EmDailyK> ks = emClient.getDailyKs(dbEntity.getCode(), LocalDate.now(), 100, false);
+            ks.remove(ks.size()-1);
+            ks.remove(ks.size()-1);
+
+            //计算 amt
+            try {
+                BigDecimal dayAmtTop10 = emClient.amtTop10p(ks);
+                BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
+                BigDecimal fAmt = BDUtil.b0_1.multiply(hourAmt);
+                //成交量放大倍数
+                dbEntity.setFAmt(fAmt);
+                dbEntity.setFAmtFx(dbEntity.getOpenAmt().divide(fAmt, 4, RoundingMode.HALF_UP));
+            } catch (Exception e) {
+                dbEntity.setFAmt(BigDecimal.ZERO);
+                dbEntity.setFAmtFx(BigDecimal.ZERO);
+            }
+
+            fenshiSimpleRepo.saveAndFlush(dbEntity);
+        }
+
+    }
+
+
+    @Test
+    public void filter() {
+        List<EmCList> list = emClient.getClistDefaultSize(true);
+        List<String> dbLists = fenshiSimpleRepo.findCodesByOpenAmt(BDUtil.B5000W);
+
+        HashSet<String> set = new HashSet<>(dbLists);
+
+        ArrayList<EmCList> filterList = new ArrayList<>();
+        for (EmCList emCList : list) {
+            if (!set.contains(emCList.getF12Code())){
+                continue;
+            }
+
+            List<FenshiSimpleEntity> dbList = fenshiSimpleRepo.findByCode(emCList.getF12Code());
+            if (dbList == null || dbList.size() < 2) continue;
+
+            List<FenshiSimpleEntity> sortList = dbList.stream().sorted(Comparator.comparingLong(FenshiSimpleEntity::getId)).toList();
+            int size = sortList.size();
+
+            for (int i = size - 1; i > 0; i--) {
+                FenshiSimpleEntity item = sortList.get(i);
+                FenshiSimpleEntity item1 = sortList.get(i - 1);
+                if (item.getOpenAmt() != null && item1.getOpenAmt() != null) {
+                    if (item.getOpenAmt().compareTo(BDUtil.B5000W) > 0
+                            && item.getOpenAmt().compareTo(item1.getOpenAmt()) > 0) {
+                        filterList.add(emCList);
+                    }
+                }
+            }
+        }
+
+        System.out.println("filter list");
+        for (EmCList emCList : filterList) {
+            System.out.println(JSON.toJSONString(emCList));
+        }
+
+    }
+
+
+    @Test
+    public void famt(){
+        String code = "600520";
+        List<EmDailyK> ks = emClient.getDailyKs(code, LocalDate.now(), 500, true);
+        ks.remove(ks.size()-1);
+
+        //计算 amt
+        BigDecimal dayAmtTop10 = emClient.amtTop10p(ks);
+        BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
+        BigDecimal fAmt = BDUtil.b0_1.multiply(hourAmt);
+
+        System.out.println(fAmt);
+//        if (fAmt.compareTo(BDUtil.B5000W) > 0 || fAmt.compareTo(BDUtil.B1000W) < 0) {
+//            continue;
+//        }
     }
 
 

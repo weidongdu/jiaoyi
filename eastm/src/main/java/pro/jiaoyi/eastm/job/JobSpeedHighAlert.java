@@ -1,5 +1,7 @@
 package pro.jiaoyi.eastm.job;
 
+import com.alibaba.fastjson.JSON;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -12,6 +14,8 @@ import pro.jiaoyi.common.util.EmojiUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.api.EmRealTimeClient;
 import pro.jiaoyi.eastm.config.WxUtil;
+import pro.jiaoyi.eastm.dao.entity.FenshiSimpleEntity;
+import pro.jiaoyi.eastm.dao.repo.FenshiSimpleRepo;
 import pro.jiaoyi.eastm.model.EastSpeedInfo;
 import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
@@ -20,8 +24,11 @@ import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiTrans;
 import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiVo;
 import pro.jiaoyi.eastm.util.EmMaUtil;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -46,9 +53,9 @@ public class JobSpeedHighAlert {
         TIP += "<br>" + EmojiUtil.DOWN + "卖出: 小幅整理期,震荡底部";
         TIP += "<br>" + EmojiUtil.DOWN + "卖出: 趋势未结束,底仓持有";
         TIP += "<br>" + EmojiUtil.DOWN + "卖出: 交易有盈利,浮动止盈";
-        TIP += "<br>" + EmojiUtil.UP + "买入: 计划外的票,谨慎开仓";
-        TIP += "<br>" + EmojiUtil.UP + "买入: 高开再新高,量同步新高";
-        TIP += "<br>" + EmojiUtil.UP + "买入: 仓位要控制,不要贪多";
+        TIP += "<br>" + EmojiUtil.UP + "买入: 计划外的,谨慎开仓";
+        TIP += "<br>" + EmojiUtil.UP + "买入: 高开新高,量也要高";
+        TIP += "<br>" + EmojiUtil.UP + "买入: 仓位控制,不要贪多";
     }
 
     @Autowired
@@ -394,9 +401,12 @@ public class JobSpeedHighAlert {
     }
 
 
+    @Resource
+    private FenshiSimpleRepo fenshiSimpleRepo;
+
     //cron 工作日 上午 9:26分
     @Scheduled(cron = "0 26 9 * * ?")
-//    @Scheduled(cron = "0 29 15 * * ?")
+//    @Scheduled(fixedRate = 1000)
     public void runOpen() {
 
         if (LocalDate.now().getDayOfWeek().getValue() == 6
@@ -405,54 +415,113 @@ public class JobSpeedHighAlert {
         }
 
         List<EmCList> list = emClient.getClistDefaultSize(true);
+
         List<EmCList> fList = list.stream().filter(
-                e -> e.getF6Amt() != null
-                        && e.getF6Amt().compareTo(BDUtil.B1Y) > 0
-                        && e.getF3Pct().compareTo(BDUtil.B1) <= 0
-                        && e.getF3Pct().compareTo(BDUtil.BN1) >= 0
+                e -> {
+                    boolean a = e.getF6Amt() != null
+                            && e.getF6Amt().compareTo(BDUtil.B5000W) > 0
+                            && e.getF3Pct().compareTo(BDUtil.B1) <= 0
+                            && e.getF3Pct().compareTo(BDUtil.BN1) >= 0;
+                    return a;
+//                    if (a) {
+//                        //判断昨天集合竞价
+//                        FenshiSimpleEntity db = fenshiSimpleRepo.findByCodeAndTradeDate(e.getF12Code(), LocalDate.now().minusDays(1).toString().replaceAll("-", ""));
+//                        if (db != null
+//                                && (db.getOpenAmt() == null || e.getF6Amt().compareTo(db.getOpenAmt()) > 0)) {
+//                            return true;
+//                        }
+//
+//                    }
+//                    return false;
+
+                }
         ).toList();
 
         if (fList.isEmpty()) {
             return;
         }
 
+
+        log.info("runOpen size {}", fList.size());
         int notTd = 0;
         for (EmCList emCList : fList) {
+            //判断昨天集合竞价
+            log.info("runOpen code {}", JSON.toJSONString(emCList));
+
             //判断fx
-            List<EmDailyK> ks = emClient.getDailyKs(emCList.getF12Code(), LocalDate.now(), 100, true);
-            if (ks.size() < 70) {
+            List<EmDailyK> ks = emClient.getDailyKs(emCList.getF12Code(), LocalDate.now(), 300, true);
+            if (ks.size() < 300) {
+                log.info("runOpen code {} size < 300", emCList.getF12Code());
                 continue;
             }
 
+
             //不清楚这个时候 是否出了最新的k
             EmDailyK k = ks.get(ks.size() - 1);
+
             String td = LocalDate.now().toString().replaceAll("-", "");
+
             if (td.equalsIgnoreCase(k.getTradeDate())) {
                 ks.remove(ks.size() - 1);
-            }else {
-                notTd ++;
-                if (notTd > 3){
+            } else {
+                notTd++;
+                if (notTd > 3) {
                     return;
                 }
             }
 
+            Map<String, BigDecimal[]> ma = MaUtil.ma(ks);
+            BigDecimal[] ma5 = ma.get("ma5");
+            BigDecimal[] ma10 = ma.get("ma10");
+            BigDecimal[] ma20 = ma.get("ma20");
+            BigDecimal[] ma30 = ma.get("ma30");
+            BigDecimal[] ma60 = ma.get("ma60");
+            BigDecimal[] ma120 = ma.get("ma120");
+            BigDecimal[] ma250 = ma.get("ma250");
+
+            int last = ks.size() - 1;
+            if (k.getClose().compareTo(ma5[last]) < 0
+                    || k.getClose().compareTo(ma10[last]) < 0
+                    || k.getClose().compareTo(ma20[last]) < 0
+                    || k.getClose().compareTo(ma30[last]) < 0
+                    || k.getClose().compareTo(ma60[last]) < 0
+                    || k.getClose().compareTo(ma120[last]) < 0
+                    || k.getClose().compareTo(ma250[last]) < 0) {
+                log.info("runOpen code {} 不满足均线之上", emCList.getF12Code());
+                continue;
+            }
 
 
             //计算 amt
             BigDecimal dayAmtTop10 = emClient.amtTop10p(ks);
             BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
             BigDecimal fAmt = BDUtil.b0_1.multiply(hourAmt);
+            if (fAmt.compareTo(BDUtil.B500W) < 0) {
+                log.info("runOpen code {} 不满足条件(约成交额 fAmt<500w)", emCList.getF12Code());
+                continue;
+            }
+
+
             //成交量放大倍数
             BigDecimal fx = k.getAmt().divide(fAmt, 4, RoundingMode.HALF_UP);
-            if (fx.compareTo(BDUtil.B1) > 0) {
+            if (fx.compareTo(BDUtil.B5) > 0) {
                 String content = k.getCode() + k.getName()
+                        + "<br>bk=" + k.getBk()
                         + "<br>p=" + k.getClose()
                         + "<br>pct=" + k.getPct() + "%"
                         + "<br>fx=" + fx
                         + "<br>amt=" + BDUtil.amtHuman(k.getAmt())
                         + "<br>td=" + LocalDateTime.now().toString().substring(0, 16);
-                wxUtil.send(content);
+                try {
+                    String encodedContent = URLEncoder.encode(content, StandardCharsets.UTF_8);
+                    wxUtil.send(encodedContent);
+
+                } catch (Exception ex) {
+                    log.error("{}", ex.getMessage(), ex);
+                }
+
             }
+            log.info("runOpen code {} 不满足条件 fx > 5 fx={}", emCList.getF12Code(),fx);
         }
     }
 }

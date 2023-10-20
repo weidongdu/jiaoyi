@@ -9,7 +9,7 @@ okhttp4:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/jiaoyi?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&useSSL=true
+    url: jdbc:mysql://localhost:3306/jiaoyi?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2b8&useSSL=true
     username: root
 #    password: mysqlroot
     password: 12345678

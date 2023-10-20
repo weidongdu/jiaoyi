@@ -102,7 +102,7 @@ public class OkHttpUtil {
         //发送请求
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                log.warn("post请求失败, code != 2xx, url:{}", url);
+                log.warn("请求失败, code != 2xx, url:{}", url);
             }
             return response;
         } catch (IOException e) {

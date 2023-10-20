@@ -9,7 +9,5 @@ import java.time.LocalDate;
 
 @Repository
 public interface FenshiRepo extends JpaRepository<EastGetStockFenShiTransEntity,Long>, CrudRepository<EastGetStockFenShiTransEntity, Long> {
-
-
     EastGetStockFenShiTransEntity findByCodeAndCreateDate(String code, LocalDate now);
 }
