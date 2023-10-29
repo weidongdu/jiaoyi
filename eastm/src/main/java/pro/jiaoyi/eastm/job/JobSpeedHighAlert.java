@@ -496,7 +496,7 @@ public class JobSpeedHighAlert {
             BigDecimal dayAmtTop10 = emClient.amtTop10p(ks);
             BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
             BigDecimal fAmt = BDUtil.b0_1.multiply(hourAmt);
-            if (fAmt.compareTo(BDUtil.B500W) < 0) {
+            if (fAmt.compareTo(BDUtil.B1000W) < 0) {
                 log.info("runOpen code {} 不满足条件(约成交额 fAmt<500w)", emCList.getF12Code());
                 continue;
             }

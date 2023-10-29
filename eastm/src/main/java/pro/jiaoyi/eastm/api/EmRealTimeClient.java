@@ -1,5 +1,6 @@
 package pro.jiaoyi.eastm.api;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,10 +100,10 @@ public class EmRealTimeClient {
                     && eastSpeedInfo.getPct_f3().compareTo(BDUtil.B3) <= 0 // 涨幅 <5
                     && eastSpeedInfo.getPrice_f2().compareTo(BDUtil.B50) < 0 //价格小于50
                     && !eastSpeedInfo.getName_f14().contains("ST")) {
-
                 list.add(eastSpeedInfo);
             }
         }
+        log.info("top list {}", String.join(",", list.stream().map(EastSpeedInfo::getName_f14).toList()));
         return list;
     }
 

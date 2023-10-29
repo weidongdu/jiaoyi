@@ -8,6 +8,8 @@ import okhttp3.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pro.jiaoyi.bn.config.WxUtil;
+import pro.jiaoyi.bn.dao.entity.BnOrderEntity;
+import pro.jiaoyi.bn.dao.repo.BnOrderRepo;
 import pro.jiaoyi.bn.model.trade.AccountPosition;
 import pro.jiaoyi.bn.model.trade.OpenOrders;
 import pro.jiaoyi.bn.sdk.FutureApi;
@@ -19,6 +21,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -605,5 +608,133 @@ public class BnAccountTradeService {
 
         System.out.println(base);
     }
+
+    @Autowired
+    private BnOrderRepo bnOrderRepo;
+
+    public void autoTrade(String symbol, int level, BigDecimal usdt, int side) {
+        //开仓条件
+        List<AccountPosition> accountPositions = positionList();
+        //1, position 为空 或者 最近一次开单时间大于4小时
+        if (accountPositions != null && accountPositions.size() > 0) {
+            long count = accountPositions.stream().filter(a -> a.getSymbol().equalsIgnoreCase(symbol)).count();
+            if (count > 0) {
+                log.info("当前有position={}", symbol);
+                return;
+            }
+        }
+
+        int hour = 4;
+        Long ts = new Date().getTime() - hour * 60 * 60 * 1000;
+        BnOrderEntity one = bnOrderRepo.findList(symbol, ts);
+        if (one != null){
+            log.info("{}最近{}hour有开单", symbol,hour);
+            return;
+        }
+
+        //市价开单
+
+
+    }
+
+
+    public void open(){
+
+    }
+
+    public void close(){
+
+    }
+/*
+下单 (TRADE)
+响应:
+
+{
+    "clientOrderId": "testOrder", // 用户自定义的订单号
+    "cumQty": "0",
+    "cumQuote": "0", // 成交金额
+    "executedQty": "0", // 成交量
+    "orderId": 22542179, // 系统订单号
+    "avgPrice": "0.00000",  // 平均成交价
+    "origQty": "10", // 原始委托数量
+    "price": "0", // 委托价格
+    "reduceOnly": false, // 仅减仓
+    "side": "SELL", // 买卖方向
+    "positionSide": "SHORT", // 持仓方向
+    "status": "NEW", // 订单状态
+    "stopPrice": "0", // 触发价，对`TRAILING_STOP_MARKET`无效
+    "closePosition": false,   // 是否条件全平仓
+    "symbol": "BTCUSDT", // 交易对
+    "timeInForce": "GTD", // 有效方法
+    "type": "TRAILING_STOP_MARKET", // 订单类型
+    "origType": "TRAILING_STOP_MARKET",  // 触发前订单类型
+    "activatePrice": "9020", // 跟踪止损激活价格, 仅`TRAILING_STOP_MARKET` 订单返回此字段
+    "priceRate": "0.3", // 跟踪止损回调比例, 仅`TRAILING_STOP_MARKET` 订单返回此字段
+    "updateTime": 1566818724722, // 更新时间
+    "workingType": "CONTRACT_PRICE", // 条件价格触发类型
+    "priceProtect": false,            // 是否开启条件单触发保护
+    "priceMatch": "NONE",              //盘口价格下单模式
+    "selfTradePreventionMode": "NONE", //订单自成交保护模式
+    "goodTillDate": 1693207680000      //订单TIF为GTD时的自动取消时间
+}
+
+参数:
+
+名称	类型	是否必需	描述
+symbol	STRING	YES	交易对
+side	ENUM	YES	买卖方向 SELL, BUY
+type	ENUM	YES	订单类型 LIMIT, MARKET, STOP, TAKE_PROFIT, STOP_MARKET, TAKE_PROFIT_MARKET, TRAILING_STOP_MARKET
+
+quantity	DECIMAL	NO	下单数量,使用closePosition不支持此参数。
+price	DECIMAL	NO	委托价格
+newClientOrderId	STRING	NO	用户自定义的订单号，不可以重复出现在挂单中。如空缺系统会自动赋值。必须满足正则规则 ^[\.A-Z\:/a-z0-9_-]{1,36}$
+stopPrice	DECIMAL	NO	触发价, 仅 STOP, STOP_MARKET, TAKE_PROFIT, TAKE_PROFIT_MARKET 需要此参数
+closePosition	STRING	NO	true, false；触发后全部平仓，仅支持STOP_MARKET和TAKE_PROFIT_MARKET；不与quantity合用；自带只平仓效果，不与reduceOnly 合用
+activationPrice	DECIMAL	NO	追踪止损激活价格，仅TRAILING_STOP_MARKET 需要此参数, 默认为下单当前市场价格(支持不同workingType)
+callbackRate	DECIMAL	NO	追踪止损回调比例，可取值范围[0.1, 5],其中 1代表1% ,仅TRAILING_STOP_MARKET 需要此参数
+timeInForce	ENUM	NO	有效方法
+workingType	ENUM	NO	stopPrice 触发类型: MARK_PRICE(标记价格), CONTRACT_PRICE(合约最新价). 默认 CONTRACT_PRICE
+priceProtect	STRING	NO	条件单触发保护："TRUE","FALSE", 默认"FALSE". 仅 STOP, STOP_MARKET, TAKE_PROFIT, TAKE_PROFIT_MARKET 需要此参数
+newOrderRespType	ENUM	NO	"ACK", "RESULT", 默认 "ACK"
+symbol	STRING	YES	交易对
+priceMatch	ENUM	NO	OPPONENT/ OPPONENT_5/ OPPONENT_10/ OPPONENT_20/QUEUE/ QUEUE_5/ QUEUE_10/ QUEUE_20；不能与price同时传
+selfTradePreventionMode	ENUM	NO	NONE / EXPIRE_TAKER/ EXPIRE_MAKER/ EXPIRE_BOTH； 默认NONE
+goodTillDate	LONG	NO	TIF为GTD时订单的自动取消时间， 当timeInforce为GTD时必传；传入的时间戳仅保留秒级精度，毫秒级部分会被自动忽略，时间戳需大于当前时间+600s且小于253402300799000
+recvWindow	LONG	NO
+timestamp	LONG	YES
+根据 order type的不同，某些参数强制要求，具体如下:
+
+Type	强制要求的参数
+LIMIT	timeInForce, quantity, price
+MARKET	quantity
+STOP_MARKET, TAKE_PROFIT_MARKET	stopPrice
+
+
+MARKET 订单将直接返回成交结果；
+配合使用特殊 timeInForce 的 LIMIT 订单将直接返回成交或过期拒绝结果。
+STOP_MARKET, TAKE_PROFIT_MARKET 配合 closePosition=true:
+
+条件单触发依照上述条件单触发逻辑
+条件触发后，平掉当时持有所有多头仓位(若为卖单)或当时持有所有空头仓位(若为买单)
+不支持 quantity 参数
+自带只平仓属性，不支持reduceOnly参数
+双开模式下,LONG方向上不支持BUY; SHORT 方向上不支持SELL
+selfTradePreventionMode 仅在 timeInForce为IOC或GTC或GTD时生效.
+
+POST /fapi/v1/order
+ */
+    public void trade(String symbol, String side,String usdt, int lv){
+        String url = BASE_URL_FAPI + "/fapi/v1/order/test";
+        String type = "MARKET";
+
+        //设置杠杆
+        int maxLv = 1;//symbol 支持最大 杠杆
+
+        int leverage = Math.min(lv,maxLv);
+
+
+
+    }
+
 
 }

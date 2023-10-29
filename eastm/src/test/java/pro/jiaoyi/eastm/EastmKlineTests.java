@@ -459,8 +459,9 @@ class EastmKlineTests {
 
     @Test
     public void update1() {
-        String td = LocalDate.now().minusDays(1).toString().replaceAll("-", "");
-        String tdPre = LocalDate.now().minusDays(1).minusDays(1).toString().replaceAll("-", "");
+        String td = LocalDate.now().toString().replaceAll("-", "");
+        int pre = 1;
+        String tdPre = LocalDate.now().minusDays(pre).toString().replaceAll("-", "");
 
         List<EmCList> list = emClient.getClistDefaultSize(true);
         for (EmCList emCList : list) {
@@ -496,9 +497,9 @@ class EastmKlineTests {
             }
 
             List<EmDailyK> ks = emClient.getDailyKs(dbEntity.getCode(), LocalDate.now(), 100, false);
-            ks.remove(ks.size()-1);
-            ks.remove(ks.size()-1);
-
+            for (int i = 0; i < pre; i++) {
+                ks.remove(ks.size()-1);
+            }
             //计算 amt
             try {
                 BigDecimal dayAmtTop10 = emClient.amtTop10p(ks);
