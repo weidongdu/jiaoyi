@@ -283,25 +283,20 @@ public class EmClient {
                 return list;
             }
         }
-//        List<EmDailyK> szzs = getDailyKs(VipIndexEnum.index_000001.getCode(), LocalDate.now(), 500, false);
-//        if (szzs.size() == 0) {
-//            return Collections.emptyList();
-//        }
 
         List<EmCList> clist = getClist(1, 10000);
         if (clist.size() > 0) {
             List<EmCList> list = clist.stream().filter(e -> !(
-                                e.getF12Code().startsWith("8")
-                            || e.getF14Name().contains("ST")
+                    e.getF14Name().contains("ST")
                             || e.getF14Name().contains("退"))
             ).toList();
 
+            ArrayList<EmCList> results = new ArrayList<>(list);
             //超过 每天 9:31 之后的数据 在放入缓存
             if (LocalTime.now().isAfter(LocalTime.of(9, 31))) {
-                DATE_INDEX_ALL_MAP.put(DateUtil.today(), new ArrayList<>(list));
-                return DATE_INDEX_ALL_MAP.get(DateUtil.today());
+                DATE_INDEX_ALL_MAP.put(DateUtil.today(), results);
             }
-            return new ArrayList<>(list);
+            return results;
         } else {
             return Collections.emptyList();
         }
@@ -935,6 +930,105 @@ public class EmClient {
         return new ArrayList<>(gubaList);
     }
 
+
+    /**
+     * 获取个股概念
+     *
+     * @return
+     */
+    public List<String> coreThemeDetail(String code) {
+        code = codeFull(code);
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put("type", "RPT_F10_CORETHEME_BOARDTYPE");
+        params.put("sty", "SECUCODE%2CSECURITY_CODE%2CSECURITY_NAME_ABBR%2CBOARD_CODE%2CBOARD_NAME%2CIS_PRECISE%2CBOARD_RANK%2CBOARD_TYPE");
+        params.put("filter", "(SECUCODE=\"" + code + "\")");
+        params.put("p", "1");
+        params.put("ps", "");
+        params.put("sr", "1");
+        params.put("st", "BOARD_RANK");
+        params.put("source", "HSF10");
+        params.put("client", "PC");
+        String url = "https://datacenter.eastmoney.com/securities/api/data/get";
+        return theme(url, params);
+    }
+
+    public List<String> coreTheme(String code) {
+        //https://datacenter.eastmoney.com/securities/api/data/v1/get?reportName=RPT_F10_CORETHEME_BOARDTYPE&columns=SECUCODE%2CSECURITY_CODE%2CSECURITY_NAME_ABBR%2CNEW_BOARD_CODE%2CBOARD_NAME%2CSELECTED_BOARD_REASON%2CIS_PRECISE%2CBOARD_RANK%2CBOARD_YIELD%2CDERIVE_BOARD_CODE&quoteColumns=f3~05~NEW_BOARD_CODE~BOARD_YIELD&filter=(SECUCODE%3D%22002584.SZ%22)(IS_PRECISE%3D%221%22)&pageNumber=1&pageSize=&sortTypes=1&sortColumns=BOARD_RANK&source=HSF10&client=PC
+
+        code = codeFull(code);
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put("reportName", "RPT_F10_CORETHEME_BOARDTYPE");
+        params.put("columns", "SECUCODE,SECURITY_CODE,SECURITY_NAME_ABBR,NEW_BOARD_CODE,BOARD_NAME,SELECTED_BOARD_REASON,IS_PRECISE,BOARD_RANK,BOARD_YIELD,DERIVE_BOARD_CODE");
+        params.put("quoteColumns", "f3~05~NEW_BOARD_CODE~BOARD_YIELD");
+//        params.put("filter", "(SECUCODE=\"002584.SZ\")(IS_PRECISE=\"1\")");
+        params.put("filter", "(SECUCODE=\"" + code + "\")(IS_PRECISE=\"1\")");
+        params.put("pageNumber", "1");
+        params.put("pageSize", "");
+        params.put("sortTypes", "1");
+        params.put("sortColumns", "BOARD_RANK");
+        params.put("source", "HSF10");
+        params.put("client", "PC");
+        String url = "https://datacenter.eastmoney.com/securities/api/data/v1/get";
+        return theme(url, params);
+    }
+
+    public String codeFull(String code){
+        if (code.startsWith("6")) {
+            code = code + ".SH";
+        }
+        if (code.startsWith("0") || code.startsWith("3")) {
+            code = code + ".SZ";
+        }
+        if (code.startsWith("8")) {
+            code = code + ".BJ";
+        }
+
+        return code;
+    }
+
+    private List<String> theme(String url, Map<String, String> params) {
+
+        HashMap<String, String> header = new HashMap<>();
+        header.put("Accept", "*/*");//: ' \
+        header.put("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");//: ' \
+        header.put("Cache-Control", "no-cache");//: ' \
+        header.put("Connection", "keep-alive");//: ' \
+        header.put("Origin", "https://emweb.securities.eastmoney.com");//: ' \
+        header.put("Pragma", "no-cache");//: ' \
+        header.put("Referer", "https://emweb.securities.eastmoney.com/");//: ' \
+        header.put("Sec-Fetch-Dest", "empty");//: ' \
+        header.put("Sec-Fetch-Mode", "cors");//: ' \
+        header.put("Sec-Fetch-Site", "same-site");//: ' \
+        header.put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36");//: ' \
+        header.put("sec-ch-ua", "Google Chrome\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\"");//: "' \
+        header.put("sec-ch-ua-mobile", "?0");//: ' \
+        header.put("sec-ch-ua-platform", "macOS");//: ""' \
+
+//        String url = "https://datacenter.eastmoney.com/securities/api/data/v1/get";
+
+        byte[] bytes = okHttpUtil.getForBytes(url, header, params);
+        if (bytes.length == 0) return Collections.emptyList();
+        String s = new String(bytes);
+        JSONObject jsonObject = JSONObject.parseObject(s);
+        if (jsonObject == null || jsonObject.getIntValue("code") != 0) {
+            return Collections.emptyList();
+        }
+        EmTheme emTheme = jsonObject.toJavaObject(EmTheme.class);
+        if (emTheme == null || emTheme.getResult() == null || emTheme.getResult().getData() == null) {
+            return Collections.emptyList();
+        }
+
+        List<String> arrayList = new ArrayList<>();
+
+        for (EmTheme.Theme theme : emTheme.getResult().getData()) {
+            log.info("{}", theme);
+            arrayList.add(theme.getBOARD_NAME());
+        }
+
+        return arrayList;
+    }
 
     public static final Map<String, String> headerMap = new HashMap<>();
 

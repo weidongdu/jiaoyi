@@ -1,0 +1,5 @@
+okhttp4:
+  enabled: true
+  connectTimeout: 2000
+  readTimeout: 3000
+  writeTimeout: 3000

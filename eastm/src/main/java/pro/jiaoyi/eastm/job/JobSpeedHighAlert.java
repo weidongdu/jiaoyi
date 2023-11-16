@@ -3,6 +3,7 @@ package pro.jiaoyi.eastm.job;
 import com.alibaba.fastjson.JSON;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -11,6 +12,7 @@ import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.util.BDUtil;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.EmojiUtil;
+import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.api.EmRealTimeClient;
 import pro.jiaoyi.eastm.config.WxUtil;
@@ -39,7 +41,7 @@ import java.util.stream.Collectors;
 
 import static pro.jiaoyi.eastm.api.EmClient.*;
 
-@Component
+//@Component
 @Slf4j
 public class JobSpeedHighAlert {
     //监控 放量有涨速
@@ -405,7 +407,7 @@ public class JobSpeedHighAlert {
     private FenshiSimpleRepo fenshiSimpleRepo;
 
     //cron 工作日 上午 9:26分
-    @Scheduled(cron = "0 26 9 * * ?")
+    @Scheduled(cron = "30 25 9 * * ?")
 //    @Scheduled(fixedRate = 1000)
     public void runOpen() {
 
@@ -524,4 +526,6 @@ public class JobSpeedHighAlert {
             log.info("runOpen code {} 不满足条件 fx > 5 fx={}", emCList.getF12Code(),fx);
         }
     }
+
+
 }

@@ -327,6 +327,7 @@ public class EastGetStockFenShiTrans {
 
                 String sts = String.valueOf(d.getT());
                 String ts = LocalDate.now().toString();
+//                String ts = "2023-10-27";//LocalDate.now().toString();
 
                 if (sts.length() == 5) {//93809
                     ts += " 0" + sts.charAt(0) + ":" + sts.substring(1, 3) + ":" + sts.substring(3);

@@ -13,6 +13,13 @@ public class DateUtil {
     public static final String PATTERN_yyyy_MM_dd = "yyyy-MM-dd";
     public static final String PATTERN_HH_mm_ss = "HH:mm:ss";
 
+    public static String td() {
+        return LocalDate.now().toString().replace("-", "");
+    }
+
+    public static String tdPre(int i) {
+        return LocalDate.now().minusDays(i).toString().replace("-", "");
+    }
 
     public static LocalDateTime strToLocalDateTime(String str, String pattern) {
         return LocalDateTime.parse(str, DateTimeFormatter.ofPattern(pattern));
@@ -58,7 +65,7 @@ public class DateUtil {
         LocalDateTime pre = LocalDateTime.of(LocalDate.now(), localTimePre);
 //        LocalDateTime end = LocalDateTime.of(LocalDate.now(), localTimeEnd);
         String dateStr = DateUtil.today();
-        if (LocalDateTime.now().isBefore(pre)){
+        if (LocalDateTime.now().isBefore(pre)) {
             dateStr = dateStr(LocalDate.now().minusDays(1));
         }
 

@@ -4,21 +4,28 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Response;
+import org.jsoup.Jsoup;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.scheduling.annotation.Scheduled;
 import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.util.BDUtil;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.FileUtil;
+import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.api.EmRealTimeClient;
 import pro.jiaoyi.eastm.config.IndexEnum;
+import pro.jiaoyi.eastm.config.VipIndexEnum;
+import pro.jiaoyi.eastm.config.WxUtil;
 import pro.jiaoyi.eastm.dao.entity.FenshiSimpleEntity;
 import pro.jiaoyi.eastm.dao.entity.KLineEntity;
 import pro.jiaoyi.eastm.dao.repo.FenshiSimpleRepo;
 import pro.jiaoyi.eastm.dao.repo.KLineRepo;
+import pro.jiaoyi.eastm.job.MarketJob;
 import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
 import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiTrans;
@@ -27,6 +34,8 @@ import pro.jiaoyi.eastm.service.FenshiService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -279,80 +288,7 @@ class EastmKlineTests {
 
     }
 
-    @Test
-    public void save1() {
-        save1("20221107");
-        save1("20221108");
-        save1("20221109");
-        save1("20221110");
-        save1("20221111");
-        save1("20221114");
-        save1("20221115");
-        save1("20221117");
-        save1("20221118");
-        save1("20221121");
-        save1("20221122");
-        save1("20221123");
-        save1("20221125");
-        save1("20221129");
-        save1("20221130");
 
-
-        save1("20221201");
-        save1("20221202");
-        save1("20221206");
-        save1("20221207");
-        save1("20221208");
-        save1("20221212");
-        save1("20221213");
-        save1("20221214");
-
-    }
-
-    public void save1(String td) {
-
-//        String td = "20220830";
-        String dir = "/Users/dwd/Downloads/search/mj/" + td;
-        List<String> list = FileUtil.readDirectoryFilesAbsPath(dir);
-
-
-        for (String path : list) {
-
-            try {
-                EastGetStockFenShiVo fEastGetStockFenShiVo = emRealTimeClient.getFenshiByCodeFromLocal("", path, true);
-                if (fEastGetStockFenShiVo == null) continue;
-                EastGetStockFenShiTrans trans = EastGetStockFenShiTrans.trans(fEastGetStockFenShiVo);
-                if (trans == null) continue;
-                if (trans.getOpenAmt() == null
-                        || trans.getOpenAmt().compareTo(BDUtil.B1000W) < 0) continue;
-
-
-                String code = trans.getCode();
-                List<EmDailyK> ks = emClient.getDailyKs(code, LocalDate.now(), 500, true);
-                if (ks.size() < 500) continue;
-                int index = 0;
-                for (int i = 0; i < ks.size(); i++) {
-                    String tradeDate = ks.get(i).getTradeDate();
-                    if (tradeDate.equalsIgnoreCase(td)) {
-                        index = i;
-                        break;
-                    }
-                }
-
-                if (index > 0) {
-                    ks = ks.subList(0, index + 1);
-                }
-
-                //计算 amt
-                fenshiService.saveOrUpdate(trans, ks);
-            } catch (Exception e) {
-                log.error("save error {}", e.getMessage(), e);
-            }
-
-        }
-
-
-    }
 
     @Resource
     private FenshiSimpleRepo fenshiSimpleRepo;
@@ -367,6 +303,7 @@ class EastmKlineTests {
 
         for (EmCList e : emList) {
             try {
+                System.out.println(counter.get());
                 if (counter.getAndIncrement() % 10 == 0) Thread.sleep(1000);
             } catch (InterruptedException ex) {
                 log.error("sleep 1s");
@@ -439,33 +376,24 @@ class EastmKlineTests {
         }
     }
 
-    @Test
-    public void update() {
-        String td = LocalDate.now().toString().replaceAll("-", "");
-
-        List<EmCList> list = emClient.getClistDefaultSize(true);
-        for (EmCList emCList : list) {
-            FenshiSimpleEntity dbEntity = fenshiSimpleRepo.findByCodeAndTradeDate(emCList.getF12Code(), td);
-            if (dbEntity == null) continue;
-
-            String data = dbEntity.getData();
-            JSONObject jsonObject = JSONObject.parseObject(data);
-            BigDecimal closePre = jsonObject.getBigDecimal("closePre");
-            dbEntity.setClosePre(closePre);
-            fenshiSimpleRepo.saveAndFlush(dbEntity);
-        }
-
-    }
 
     @Test
     public void update1() {
-        String td = LocalDate.now().toString().replaceAll("-", "");
-        int pre = 1;
-        String tdPre = LocalDate.now().minusDays(pre).toString().replaceAll("-", "");
+//        String td = "20231031";
+//        String tdPre = "20231030";
+        String td = DateUtil.tdPre(0);
+        String tdPre = DateUtil.tdPre(3);
 
         List<EmCList> list = emClient.getClistDefaultSize(true);
+        boolean flag = false;
         for (EmCList emCList : list) {
             log.info(emCList.getF12Code());
+//            if ("301023".equals(emCList.getF12Code())){
+//                flag = true;
+//            }
+//            if (!flag){
+//                continue;
+//            }
             FenshiSimpleEntity dbEntity = fenshiSimpleRepo.findByCodeAndTradeDate(emCList.getF12Code(), td);
             if (dbEntity == null) continue;
 
@@ -496,12 +424,12 @@ class EastmKlineTests {
                 dbEntity.setHoldPct(BigDecimal.valueOf(-100));//holdPct;//开盘幅度 (close - open )/ open
             }
 
-            List<EmDailyK> ks = emClient.getDailyKs(dbEntity.getCode(), LocalDate.now(), 100, false);
-            for (int i = 0; i < pre; i++) {
-                ks.remove(ks.size()-1);
-            }
             //计算 amt
             try {
+                List<EmDailyK> ks = emClient.getDailyKs(dbEntity.getCode(), LocalDate.now(), 100, false);
+                ks.remove(ks.size()-1);
+                ks.remove(ks.size()-1);
+
                 BigDecimal dayAmtTop10 = emClient.amtTop10p(ks);
                 BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
                 BigDecimal fAmt = BDUtil.b0_1.multiply(hourAmt);
@@ -515,7 +443,6 @@ class EastmKlineTests {
 
             fenshiSimpleRepo.saveAndFlush(dbEntity);
         }
-
     }
 
 
@@ -574,6 +501,105 @@ class EastmKlineTests {
 //            continue;
 //        }
     }
+
+
+    @Resource
+    private WxUtil wxUtil;
+
+    @Test
+    public void sCodeRunOpen(){
+        {
+            //判断昨天集合竞价
+
+            String code = "300291";
+            //判断fx
+            List<EmDailyK> ks = emClient.getDailyKs(code, LocalDate.now(), 300, true);
+            if (ks.size() < 300) {
+                log.info("runOpen code {} size < 300", code);
+                return;
+            }
+
+
+            //不清楚这个时候 是否出了最新的k
+            EmDailyK k = ks.get(ks.size() - 1);
+
+            String td = LocalDate.now().toString().replaceAll("-", "");
+
+            ks.remove(ks.size() - 1);
+
+            Map<String, BigDecimal[]> ma = MaUtil.ma(ks);
+            BigDecimal[] ma5 = ma.get("ma5");
+            BigDecimal[] ma10 = ma.get("ma10");
+            BigDecimal[] ma20 = ma.get("ma20");
+            BigDecimal[] ma30 = ma.get("ma30");
+            BigDecimal[] ma60 = ma.get("ma60");
+            BigDecimal[] ma120 = ma.get("ma120");
+            BigDecimal[] ma250 = ma.get("ma250");
+
+            int last = ks.size() - 1;
+            if (k.getClose().compareTo(ma5[last]) < 0
+                    || k.getClose().compareTo(ma10[last]) < 0
+                    || k.getClose().compareTo(ma20[last]) < 0
+                    || k.getClose().compareTo(ma30[last]) < 0
+                    || k.getClose().compareTo(ma60[last]) < 0
+                    || k.getClose().compareTo(ma120[last]) < 0
+                    || k.getClose().compareTo(ma250[last]) < 0) {
+                log.info("runOpen code {} 不满足均线之上", code);
+            }
+
+
+            //计算 amt
+            BigDecimal dayAmtTop10 = emClient.amtTop10p(ks);
+            BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
+            BigDecimal fAmt = BDUtil.b0_1.multiply(hourAmt);
+            if (fAmt.compareTo(BDUtil.B1000W) < 0) {
+                log.info("runOpen code {} 不满足条件(约成交额 fAmt<500w)", code);
+                return;
+            }
+
+
+            //成交量放大倍数
+
+//            BigDecimal fx = k.getAmt().divide(fAmt, 4, RoundingMode.HALF_UP);
+            BigDecimal fx = BigDecimal.valueOf(65000000).divide(fAmt, 4, RoundingMode.HALF_UP);
+            if (fx.compareTo(BDUtil.B5) > 0) {
+                String content = k.getCode() + k.getName()
+                        + "<br>bk=" + k.getBk()
+                        + "<br>p=" + k.getClose()
+                        + "<br>pct=" + k.getPct() + "%"
+                        + "<br>fx=" + fx
+                        + "<br>amt=" + BDUtil.amtHuman(k.getAmt())
+                        + "<br>td=" + LocalDateTime.now().toString().substring(0, 16);
+                try {
+                    String encodedContent = URLEncoder.encode(content, StandardCharsets.UTF_8);
+                    wxUtil.send(encodedContent);
+
+                } catch (Exception ex) {
+                    log.error("{}", ex.getMessage(), ex);
+                }
+
+            }
+            log.info("runOpen code {} 不满足条件 fx > 5 fx={}", code,fx);
+        }
+    }
+
+
+@Resource
+private MarketJob marketJob;
+    @Test
+    public void tmp1(){
+
+        marketJob.con();
+
+//        List<String> list = emClient.coreTheme("002584");
+//        System.out.println(list);
+//        List<String> listD = emClient.coreThemeDetail("002584");
+//        System.out.println(listD);
+
+
+
+    }
+
 
 
 }
