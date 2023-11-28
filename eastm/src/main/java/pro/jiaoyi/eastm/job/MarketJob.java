@@ -2,6 +2,8 @@ package pro.jiaoyi.eastm.job;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -11,12 +13,17 @@ import pro.jiaoyi.common.util.CollectionsUtil;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.FileUtil;
 import pro.jiaoyi.eastm.api.EmClient;
+import pro.jiaoyi.eastm.api.EmRealTimeClient;
 import pro.jiaoyi.eastm.config.VipIndexEnum;
 import pro.jiaoyi.eastm.config.WxUtil;
 import pro.jiaoyi.eastm.dao.entity.OpenEmCListEntity;
 import pro.jiaoyi.eastm.dao.repo.OpenEmCListRepo;
+import pro.jiaoyi.eastm.model.EastSpeedInfo;
 import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
+import pro.jiaoyi.eastm.model.fenshi.DetailTrans;
+import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiTrans;
+import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiVo;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -24,8 +31,10 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
@@ -43,6 +52,21 @@ public class MarketJob {
     public void open() {
         THEME_MAP.clear();
         open("");
+    }
+
+    /**
+     * 穿越均线
+     * 1, ma5 之上
+     * 2, 穿越碰个均线
+     */
+    public void crossMa() {
+        List<String> codes = emClient.crossMa();
+        if (codes == null || codes.size() == 0) {
+            return;
+        }
+        for (String code : codes) {
+            log.info("穿越均线: {}", code);
+        }
     }
 
     public void open(String source) {
@@ -300,11 +324,211 @@ public class MarketJob {
 
         log.info("\n{}", csv);
         String time = DateUtil.tsToStr(System.currentTimeMillis(), DateUtil.PATTERN_yyyyMMdd_HHmmss);
-        FileUtil.writeToFile("csv/概念_"+ time +".csv", csv.toString());
-        FileUtil.writeToFile("csv/概念" +".csv", csv.toString());
+        FileUtil.writeToFile("csv/概念_" + time + ".csv", csv.toString());
+        FileUtil.writeToFile("csv/概念" + ".csv", csv.toString());
     }
 
     public static final HashSet<String> BLOCK_THEME_SET = new HashSet<>();
 
+
+    @Resource
+    private EmRealTimeClient emRealTimeClient;
+    Cache<String, BigDecimal> AMT_M1_MAP = Caffeine.newBuilder()
+            .expireAfterWrite(600, TimeUnit.MINUTES)
+            .maximumSize(1000).build();
+
+    Cache<String, String> BLOCK_CODE_MAP = Caffeine.newBuilder()
+            .expireAfterWrite(600, TimeUnit.MINUTES)
+            .maximumSize(5000).build();
+    Cache<String, Integer> WX_SEND_MAP = Caffeine.newBuilder()
+            .expireAfterWrite(600, TimeUnit.MINUTES)
+            .maximumSize(5000).build();
+
+    Cache<LocalDate, Integer> TRADE_DAY_MAP = Caffeine.newBuilder()
+            .expireAfterWrite(600, TimeUnit.MINUTES)
+            .maximumSize(2).build();
+
+
+    @Scheduled(fixedRate = 5000L)
+    public void speedUp() {
+        //排除 周六 周日
+        if (LocalDate.now().getDayOfWeek().getValue() > 5) {
+            return;
+        }
+
+        //要求 9:30 - 11:30 , 13:00 - 15:00
+        LocalTime time = LocalTime.now();
+        boolean am = time.isAfter(LocalTime.of(9, 30)) && time.isBefore(LocalTime.of(11, 30));
+        boolean pm = time.isAfter(LocalTime.of(13, 0)) && time.isBefore(LocalTime.of(14, 58));
+        if (am || pm) {
+            log.info("speedUp time: {}", time);
+        } else {
+            return;
+        }
+
+        //判断是否为交易日
+        //1, 拿缓存判断
+        //2, 拿接口判断
+        // -1 休息日 1 交易日
+        Integer tradeDay = TRADE_DAY_MAP.getIfPresent(LocalDate.now());
+        if (tradeDay == null) {
+            log.info("未获取上证指数: {}", LocalDate.now());
+            //获取上证指数
+            List<EmDailyK> ks = emClient.getDailyKs(VipIndexEnum.index_000001.getCode(), LocalDate.now(), 100, true);
+            if (ks == null || ks.size() == 0) {
+                log.error("获取上证指数失败: {}", LocalDate.now());
+                TRADE_DAY_MAP.put(LocalDate.now(), -1);
+                return;
+            }
+
+            String tradeDate = ks.get(ks.size() - 1).getTradeDate();
+            if (!LocalDate.now().toString().replace("-", "").equals(tradeDate)) {
+                log.info("非交易日: {}", tradeDate);
+                TRADE_DAY_MAP.put(LocalDate.now(), -1);
+                return;
+            } else {
+                TRADE_DAY_MAP.put(LocalDate.now(), 1);
+            }
+
+        } else if (tradeDay == -1) {
+            log.info("not交易日: {}", LocalDate.now());
+            return;
+        }
+
+
+        List<EastSpeedInfo> speedTop = emRealTimeClient.getSpeedTop(50, false);
+        if (speedTop == null || speedTop.size() == 0) {
+            return;
+        }
+
+        for (EastSpeedInfo eastSpeedInfo : speedTop) {
+            String code = eastSpeedInfo.getCode_f12();
+            if ("".equals(BLOCK_CODE_MAP.getIfPresent(code))) {
+                log.debug("block code: {}", code + eastSpeedInfo.getName_f14());
+                continue;
+            }
+
+            //1, 判断当前30s 是否包含当日最高点
+            //2, 判断是否为成交量最大
+            //3, speed > 1
+            if (eastSpeedInfo.getSpeed_f22().compareTo(BDUtil.B1) <= 0) {
+                continue;
+            }
+            if (eastSpeedInfo.getPct_f3().compareTo(BigDecimal.ZERO) <= 0
+                    || eastSpeedInfo.getPct_f3().compareTo(BDUtil.B2) > 0) {
+                continue;
+            }
+            if (eastSpeedInfo.getName_f14().contains("ST")) {
+                continue;
+            }
+
+            //获取成交额m1
+            List<EmDailyK> dailyKs = emClient.getDailyKs(code, LocalDate.now(), 100, true);
+            if (dailyKs.size() < 100) {
+                log.info("k size {} < 100", dailyKs.size());
+                BLOCK_CODE_MAP.put(code, "");
+                continue;
+            }
+
+            int last = dailyKs.size() - 1;
+            EmDailyK lk = dailyKs.get(last);
+            BigDecimal fAmt = BigDecimal.ZERO;
+            if (AMT_M1_MAP.getIfPresent(code) != null) {
+                fAmt = AMT_M1_MAP.getIfPresent(code);
+            } else {
+                BigDecimal dayAmtTop10 = emClient.amtTop10p(dailyKs);
+                BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
+                fAmt = hourAmt.multiply(BDUtil.b0_1);
+                AMT_M1_MAP.put(code, fAmt);
+            }
+
+            if (fAmt != null && fAmt.compareTo(BDUtil.B5000W) < 0) {
+                log.info("fenshi m1 定量 小于500w: {} {} ", eastSpeedInfo.getName_f14(), BDUtil.amtHuman(BDUtil.b0_1.multiply(fAmt)));
+                BLOCK_CODE_MAP.put(code, "");
+                continue;
+            }
+
+
+            //判断 最近30s 是否包含当日最高点
+            EastGetStockFenShiVo fEastGetStockFenShiVo = emRealTimeClient.getFenshiByCode(code);
+            if (fEastGetStockFenShiVo == null) {
+                log.info("fenshi is null: {}", eastSpeedInfo.getName_f14());
+                BLOCK_CODE_MAP.put(code, "");
+                continue;
+            }
+
+            EastGetStockFenShiTrans trans = EastGetStockFenShiTrans.trans(fEastGetStockFenShiVo);
+            if (trans == null) {
+                log.info("trans is null: {}", eastSpeedInfo.getName_f14());
+                BLOCK_CODE_MAP.put(code, "");
+                continue;
+            }
+
+            List<DetailTrans> DetailTransList = trans.getData();
+            if (DetailTransList == null || DetailTransList.isEmpty()) {
+                log.info("DetailTransList is null: {}", eastSpeedInfo.getName_f14());
+                BLOCK_CODE_MAP.put(code, "");
+                continue;
+            }
+
+            //判断70s 内 是否大于 0.1 fAmt
+            BigDecimal fenshiAmtLast70 = emRealTimeClient.getFenshiAmt(DetailTransList, 70);
+            if (fenshiAmtLast70.compareTo(BDUtil.b0_1.multiply(fAmt)) < 0 ||
+                    fenshiAmtLast70.compareTo(BDUtil.B5000W) < 0) {
+                log.info("70s内成交额{} < 定量 {} or 5000W: {}", BDUtil.amtHuman(fenshiAmtLast70), BDUtil.amtHuman(BDUtil.b0_1.multiply(fAmt)), eastSpeedInfo.getName_f14());
+                continue;
+            }
+
+            BigDecimal fenshi30sHigh = emRealTimeClient.getFenshiAmt(DetailTransList, 30);
+            if (lk.getHigh().compareTo(fenshi30sHigh) > 0) {
+                log.info("30s内达到最高价 high={} {} {}", lk.getHigh(), fenshi30sHigh, eastSpeedInfo.getName_f14());
+                continue;
+            }
+
+            // 比较开盘60s 内的成交额
+            BigDecimal fenshiAmtOpenM1 = emRealTimeClient.getFenshiAmtOpenM1(DetailTransList);
+            if (fenshiAmtLast70.compareTo(fenshiAmtOpenM1) < 0) {
+                log.info("70s内成交额{} < 开盘60s内成交额{}: {}", BDUtil.amtHuman(fenshiAmtLast70), BDUtil.amtHuman(fenshiAmtOpenM1), eastSpeedInfo.getName_f14());
+                continue;
+            }
+
+            log.info("分时新高 量价满足: {}", eastSpeedInfo.getName_f14());
+
+            //发送微信 WX_SEND_MAP check < 3
+            Integer count = WX_SEND_MAP.getIfPresent(code);
+            if (count == null) {
+                count = 0;
+            }
+
+            if (count > 2) {
+                log.info("wx send count >= 3: {}", eastSpeedInfo.getName_f14());
+                BLOCK_CODE_MAP.put(code, "");
+                continue;
+            }
+
+            String symbol = "";
+            if (code.startsWith("6")) {
+                symbol = "sh" + code;
+            } else if (code.startsWith("0") || code.startsWith("3")) {
+                symbol = "sz" + code;
+            } else {
+                symbol = "bj/" + code;
+
+            }
+            String url = "https://quote.eastmoney.com/" + symbol + ".html";
+            String content = "[speed_up]" + eastSpeedInfo.getName_f14() + code +
+                    "<br>" + "涨速: " + eastSpeedInfo.getSpeed_f22() +
+                    "<br>" + "涨幅: " + eastSpeedInfo.getPct_f3() +
+                    "<br>" + "成交额: " + BDUtil.amtHuman(lk.getAmt()) +
+                    "<br>" + "fAmt: " + BDUtil.amtHuman(BDUtil.b0_1.multiply(fAmt).setScale(2, RoundingMode.HALF_UP)) + ",m1: " + BDUtil.amtHuman(fenshiAmtLast70) + ",open: " + BDUtil.amtHuman(fenshiAmtOpenM1) +
+                    "<br>" + "ts: " + LocalDateTime.now() +
+                    "<br>" + url;
+
+            String encode = URLEncoder.encode(content, StandardCharsets.UTF_8);
+            wxUtil.send(encode);
+            WX_SEND_MAP.put(code, count + 1);
+
+        }
+    }
 
 }

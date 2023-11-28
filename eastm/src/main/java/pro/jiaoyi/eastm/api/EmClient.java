@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.model.KPeriod;
 import pro.jiaoyi.common.util.BDUtil;
+import pro.jiaoyi.common.util.CollectionsUtil;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.FileUtil;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
@@ -974,7 +975,7 @@ public class EmClient {
         return theme(url, params);
     }
 
-    public String codeFull(String code){
+    public String codeFull(String code) {
         if (code.startsWith("6")) {
             code = code + ".SH";
         }
@@ -1028,6 +1029,174 @@ public class EmClient {
         }
 
         return arrayList;
+    }
+
+    /**
+     * 上穿ma5
+     */
+    public List<String> crossMa() {
+        String[] days = {"BREAKUP_MA_5DAYS"};
+
+        HashMap<String, List<String>> map = new HashMap<>();
+        for (String d : days) {
+            List<String> list = crossMa(d);
+            map.put(d, list);
+            log.info("{} {}", d, list.size());
+        }
+
+        List<EmCList> emCLists = getClistDefaultSize(true);
+        //emCLists -> map key=code,value=EmCList
+        HashMap<String, EmCList> codeMap = new HashMap<>();
+        HashMap<String, String> codeNameMap = new HashMap<>();
+        for (EmCList emCList : emCLists) {
+            codeMap.put(emCList.getF12Code(), emCList);
+            codeNameMap.put(emCList.getF12Code(), emCList.getF14Name());
+        }
+
+
+        List<String> list = map.get("BREAKUP_MA_5DAYS");
+        HashMap<String, Integer> codeCrossCountMap = new HashMap<>();
+        for (String code : list) {
+            EmCList emCList = codeMap.get(code);
+            if (emCList == null) {
+                log.info("code={} emCList == null", code + codeNameMap.get(code));
+                continue;
+            }
+            if (emCList.getF17Open().compareTo(emCList.getF2Close()) >= 0) {
+                log.info("code={} open >= close", code + codeNameMap.get(code));
+                continue;
+            }
+
+
+            List<EmDailyK> ks = getDailyKs(code, LocalDate.now(), 300, true);
+            if (ks.size() < 250) {
+                log.info("code={} ks.size() < 60", code + codeNameMap.get(code));
+                continue;
+            }
+            int last = ks.size() - 1;
+            EmDailyK k = ks.get(last);
+            Map<String, BigDecimal[]> ma = MaUtil.ma(ks);
+            BigDecimal[] ma5s = ma.get("ma5");
+            BigDecimal[] ma250s = ma.get("ma250");
+            if (ma5s[last].compareTo(ma250s[last]) < 0) {
+                log.info("code={} ma5 < ma250", code + codeNameMap.get(code));
+                continue;
+            }
+
+            int cross = 0;
+            for (String m : ma.keySet()) {
+                BigDecimal[] mas = ma.get(m);
+                if (k.getOpen().compareTo(mas[last]) < 0 && k.getClose().compareTo(mas[last]) > 0) {
+                    log.info("code={} {} 上穿", code + codeNameMap.get(code), m);
+                    cross++;
+                }
+            }
+
+            if (cross >= 3) {
+                codeCrossCountMap.put(code, cross);
+            }
+        }
+
+        ArrayList<String> result = new ArrayList<>();
+
+        Map<String, Integer> sortedByValue = CollectionsUtil.sortByValue(codeCrossCountMap, false);
+        for (String s : sortedByValue.keySet()) {
+            log.warn("{} {}", s + codeNameMap.get(s), sortedByValue.get(s));
+            result.add(s + codeNameMap.get(s));
+        }
+
+        return result;
+    }
+
+    public List<String> crossMa(String day) {
+
+
+        String url = "https://data.eastmoney.com/dataapi/xuangu/list?st=CHANGE_RATE&sr=-1&ps=500&p=1&sty=SECUCODE%2CSECURITY_CODE%2CSECURITY_NAME_ABBR%2CNEW_PRICE%2CCHANGE_RATE%2CVOLUME_RATIO%2CHIGH_PRICE%2CLOW_PRICE%2CPRE_CLOSE_PRICE%2CVOLUME%2CDEAL_AMOUNT%2CTURNOVERRATE%2CBREAKUP_MA&filter=(" +
+                day
+                + "%3D%221%22)&source=SELECT_SECURITIES&client=WEB";
+        HashMap<String, String> h = new HashMap<>();
+        h.put("Accept", "application/json, text/javascript, */*; q=0.01");
+        h.put("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
+        h.put("Cache-Control", "no-cache");
+        h.put("Connection", "keep-alive");
+        h.put("Pragma", "no-cache");
+        h.put("Referer", "https://data.eastmoney.com/xuangu/");
+        h.put("Sec-Fetch-Dest", "empty");
+        h.put("Sec-Fetch-Mode", "cors");
+        h.put("Sec-Fetch-Site", "same-origin");
+        h.put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36");
+        h.put("X-Requested-With", "XMLHttpRequest");
+        h.put("sec-ch-ua", "\"Google Chrome\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\"");
+        h.put("sec-ch-ua-mobile", "?0");
+        h.put("sec-ch-ua-platform", "\"macOS\"");
+        h.put("Content-Type", "application/json");
+
+        byte[] bytes = okHttpUtil.getForBytes(url, h);
+        if (bytes.length == 0) return Collections.emptyList();
+
+        /*
+        {
+    "version": null,
+    "result": {
+        "nextpage": false,
+        "currentpage": 1,
+        "data": [
+            {
+                "SECUCODE": "839493.BJ",
+                "SECURITY_CODE": "839493",
+                "SECURITY_NAME_ABBR": "并行科技",
+                "NEW_PRICE": "-",
+                "CHANGE_RATE": "-",
+                "VOLUME_RATIO": "-",
+                "HIGH_PRICE": "-",
+                "LOW_PRICE": "-",
+                "PRE_CLOSE_PRICE": 67.4,
+                "VOLUME": "-",
+                "DEAL_AMOUNT": "-",
+                "TURNOVERRATE": 0,
+                "BREAKUP_MA": null,
+                "MAX_TRADE_DATE": "2023-11-22"
+            }
+        ],
+        "config": [],
+        "count": 168
+    },
+    "success": true,
+    "message": "ok",
+    "code": 0,
+    "url": "http://datacenter-web.eastmoney.com/wstock/selection/api/data/get?type=RPTA_PCNEW_STOCKSELECT&sty=SECUCODE%2CSECURITY_CODE%2CSECURITY_NAME_ABBR%2CNEW_PRICE%2CCHANGE_RATE%2CVOLUME_RATIO%2CHIGH_PRICE%2CLOW_PRICE%2CPRE_CLOSE_PRICE%2CVOLUME%2CDEAL_AMOUNT%2CTURNOVERRATE%2CBREAKUP_MA&filter=%28BREAKUP_MA_5DAYS%3D%221%22%29&p=1&ps=500&st=CHANGE_RATE&sr=-1&source=SELECT_SECURITIES&client=WEB"
+}
+         */
+
+        String s = new String(bytes);
+        JSONObject jsonObject = JSONObject.parseObject(s);
+        if (jsonObject.getIntValue("code") != 0) {
+            return Collections.emptyList();
+        }
+
+        JSONObject result = jsonObject.getJSONObject("result");
+        if (result == null) {
+            return Collections.emptyList();
+        }
+
+        Integer count = result.getInteger("count");
+        if (count == null || count == 0) {
+            return Collections.emptyList();
+        }
+
+        JSONArray dataArr = result.getJSONArray("data");
+        if (dataArr == null || dataArr.size() == 0) {
+            return Collections.emptyList();
+        }
+
+        List<String> codes = new ArrayList<>(count);
+        for (int i = 0; i < dataArr.size(); i++) {
+            JSONObject jsonObj = dataArr.getJSONObject(i);
+            String code = jsonObj.getString("SECURITY_CODE");
+            codes.add(code);
+        }
+
+        return codes;
     }
 
     public static final Map<String, String> headerMap = new HashMap<>();

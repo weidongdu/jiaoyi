@@ -589,13 +589,17 @@ private MarketJob marketJob;
     @Test
     public void tmp1(){
 
-        marketJob.con();
+//        marketJob.con();
 
 //        List<String> list = emClient.coreTheme("002584");
 //        System.out.println(list);
 //        List<String> listD = emClient.coreThemeDetail("002584");
 //        System.out.println(listD);
 
+
+        List<String> list = emClient.crossMa();
+
+        System.out.println(list);
 
 
     }

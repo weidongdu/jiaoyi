@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 @Component
@@ -83,7 +84,7 @@ public class EmRealTimeClient {
     }
 
     //获取涨速榜
-    public List<EastSpeedInfo> getSpeedTop(int num) {
+    public List<EastSpeedInfo> getSpeedTop(int num, boolean filter) {
         byte[] bytes = okHttpUtil.getForBytes(String.format(BASE_URL, num), hMap);
         String jsonString = new String(bytes, StandardCharsets.UTF_8);
 
@@ -95,16 +96,25 @@ public class EmRealTimeClient {
             JSONObject j = diff.getJSONObject(String.valueOf(i));
             EastSpeedInfo eastSpeedInfo = new EastSpeedInfo(j.getBigDecimal("f2"), j.getBigDecimal("f3"), j.getString("f12"), j.getString("f14"), j.getBigDecimal("f22"));
 
-            if (eastSpeedInfo.getSpeed_f22().compareTo(BigDecimal.ONE) > 0 //涨速 > 1
-                    && eastSpeedInfo.getPct_f3().compareTo(BigDecimal.ZERO) > 0 // 涨幅>0
-                    && eastSpeedInfo.getPct_f3().compareTo(BDUtil.B3) <= 0 // 涨幅 <5
-                    && eastSpeedInfo.getPrice_f2().compareTo(BDUtil.B50) < 0 //价格小于50
-                    && !eastSpeedInfo.getName_f14().contains("ST")) {
+            if (filter) {
+                if (eastSpeedInfo.getSpeed_f22().compareTo(BigDecimal.ONE) > 0 //涨速 > 1
+                        && eastSpeedInfo.getPct_f3().compareTo(BigDecimal.ZERO) > 0 // 涨幅>0
+                        && eastSpeedInfo.getPct_f3().compareTo(BDUtil.B3) <= 0 // 涨幅 <5
+                        && eastSpeedInfo.getPrice_f2().compareTo(BDUtil.B50) < 0 //价格小于50
+                        && !eastSpeedInfo.getName_f14().contains("ST")) {
+                    list.add(eastSpeedInfo);
+                }
+            } else {
                 list.add(eastSpeedInfo);
             }
         }
         log.info("top list {}", String.join(",", list.stream().map(EastSpeedInfo::getName_f14).toList()));
         return list;
+
+    }
+
+    public List<EastSpeedInfo> getSpeedTop(int num) {
+        return getSpeedTop(num, true);
     }
 
 
@@ -292,6 +302,62 @@ public class EmRealTimeClient {
         }
 
         return sum;
+    }
+
+    /**
+     * 开盘m1
+     *
+     * @param list
+     * @return
+     */
+    public BigDecimal getFenshiAmtOpenM1(List<DetailTrans> list) {
+
+
+        //累计计算最近90s 内的list 成交量
+        LocalDateTime open0931 = LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 31, 0));
+        LocalDateTime open0925 = LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 25, 0));
+        // LocalDateTime 转timestamp
+        long ts0931 = DateUtil.toTimestamp(open0931);
+        long ts0925 = DateUtil.toTimestamp(open0925);
+
+
+        List<DetailTrans> lastS = list.stream().filter(d -> d.getTs() >= ts0925 && d.getTs() < ts0931).toList();
+        BigDecimal sum = BigDecimal.ZERO;
+        for (DetailTrans detailTrans : lastS) {
+            sum = sum.add(detailTrans.amt());
+        }
+
+        return sum;
+    }
+
+    /**
+     * 集合竞价
+     */
+    public BigDecimal getFenshiAmtOpenM0(List<DetailTrans> list, int second) {
+
+        //累计计算最近90s 内的list 成交量
+        long start = second * 1000L;
+        List<DetailTrans> lastS = list.stream().filter(d -> d.getTs() >= (System.currentTimeMillis() - start)).toList();
+        BigDecimal sum = BigDecimal.ZERO;
+        for (DetailTrans detailTrans : lastS) {
+            sum = sum.add(detailTrans.amt());
+        }
+
+        return sum;
+    }
+
+    public BigDecimal getFenshiWindowsHigh(List<DetailTrans> list, int second) {
+
+        //累计计算最近90s 内的list 成交量
+        long start = second * 1000L;
+        List<DetailTrans> lastS = list.stream().filter(d -> d.getTs() >= (System.currentTimeMillis() - start)).toList();
+        BigDecimal high = BigDecimal.ZERO;
+        for (DetailTrans detailTrans : lastS) {
+            if (detailTrans.getPrice().compareTo(high) > 0) {
+                high = detailTrans.getPrice();
+            }
+        }
+        return high;
     }
 
     public BigDecimal getFenshiAmt(String code, int second) {
