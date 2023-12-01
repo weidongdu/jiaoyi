@@ -597,10 +597,11 @@ private MarketJob marketJob;
 //        System.out.println(listD);
 
 
-        List<String> list = emClient.crossMa();
+//        List<String> list = emClient.crossMa();
+//
+//        System.out.println(list);
 
-        System.out.println(list);
-
+        marketJob.themePct();
 
     }
 

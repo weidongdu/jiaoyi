@@ -6,6 +6,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import pro.jiaoyi.common.util.BDUtil;
@@ -32,9 +33,11 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @Slf4j
@@ -50,7 +53,6 @@ public class MarketJob {
     //1. 获取开盘竞价
     @Scheduled(cron = "30 25 9 * * ?")
     public void open() {
-        THEME_MAP.clear();
         open("");
     }
 
@@ -232,7 +234,7 @@ public class MarketJob {
     }
 
     public List<String> getTheme(String code) {
-        List<String> list = THEME_MAP.get(code);
+        List<String> list = THEME_MAP.getIfPresent(code);
         if (list == null) {
             List<String> themeList = emClient.coreThemeDetail(code);
             if (themeList.size() > 0) {
@@ -240,10 +242,12 @@ public class MarketJob {
             }
         }
 
-        return THEME_MAP.get(code);
+        return THEME_MAP.getIfPresent(code);
     }
 
-    public static final Map<String, List<String>> THEME_MAP = new ConcurrentHashMap<>();
+    public static final Cache<String, List<String>> THEME_MAP = Caffeine.newBuilder()
+            .expireAfterWrite(600, TimeUnit.MINUTES)
+            .maximumSize(5000).build();
 
     public void map(List<EmCList> list) {
         //数据处理
@@ -330,6 +334,26 @@ public class MarketJob {
 
     public static final HashSet<String> BLOCK_THEME_SET = new HashSet<>();
 
+    {
+        List<String> t = List.of(
+                "融资融券", "机构重仓", "创业板综", "标准普尔", "预盈预增",
+                "深股通", "预亏预减", "富时罗素", "沪股通", "转债标的",
+                "QFII重仓", "央企改革", "MSCI中国", "破净股", "参股保险",
+                "参股券商", "参股银行", "AH股", "基金重仓", "参股期货",
+                "AB股", "参股新三板", "证金持股", "送转预期", "注册制次新股",
+
+                "中证500", "深成500", "上证380", "低价股", "江苏板块",
+
+
+                "广东板块", "北京板块", "浙江板块", "深圳特区", "江苏板块",
+                "上海板块", "四川板块", "辽宁板块", "湖南板块", "湖北板块", "山东板块",
+                "安徽板块", "新疆板块", "江西板块", "京津冀", "长江三角",
+                "河南板块", "成渝特区", "河北板块", "海南板块", "贵州板块",
+                "吉林板块", "宁夏板块", "福建板块", "重庆板块", "甘肃板块", "陕西板块"
+        );
+
+        BLOCK_THEME_SET.addAll(t);
+    }
 
     @Resource
     private EmRealTimeClient emRealTimeClient;
@@ -396,139 +420,409 @@ public class MarketJob {
         }
 
 
-        List<EastSpeedInfo> speedTop = emRealTimeClient.getSpeedTop(50, false);
+        List<EastSpeedInfo> speedTop = emRealTimeClient.getSpeedTop(100, false);
         if (speedTop == null || speedTop.size() == 0) {
             return;
         }
 
-        for (EastSpeedInfo eastSpeedInfo : speedTop) {
-            String code = eastSpeedInfo.getCode_f12();
-            if ("".equals(BLOCK_CODE_MAP.getIfPresent(code))) {
-                log.debug("block code: {}", code + eastSpeedInfo.getName_f14());
-                continue;
-            }
+        List<EastSpeedInfo> top1 = speedTop.stream().filter(e -> e.getSpeed_f22().compareTo(BDUtil.B1) > 0
+                && e.getPct_f3().compareTo(BigDecimal.ZERO) > 0).toList();
+        log.info("speedTop 1% size: {}", top1.size());
 
-            //1, 判断当前30s 是否包含当日最高点
-            //2, 判断是否为成交量最大
-            //3, speed > 1
-            if (eastSpeedInfo.getSpeed_f22().compareTo(BDUtil.B1) <= 0) {
-                continue;
-            }
-            if (eastSpeedInfo.getPct_f3().compareTo(BigDecimal.ZERO) <= 0
-                    || eastSpeedInfo.getPct_f3().compareTo(BDUtil.B2) > 0) {
-                continue;
-            }
-            if (eastSpeedInfo.getName_f14().contains("ST")) {
-                continue;
-            }
-
-            //获取成交额m1
-            List<EmDailyK> dailyKs = emClient.getDailyKs(code, LocalDate.now(), 100, true);
-            if (dailyKs.size() < 100) {
-                log.info("k size {} < 100", dailyKs.size());
-                BLOCK_CODE_MAP.put(code, "");
-                continue;
-            }
-
-            int last = dailyKs.size() - 1;
-            EmDailyK lk = dailyKs.get(last);
-            BigDecimal fAmt = BigDecimal.ZERO;
-            if (AMT_M1_MAP.getIfPresent(code) != null) {
-                fAmt = AMT_M1_MAP.getIfPresent(code);
-            } else {
-                BigDecimal dayAmtTop10 = emClient.amtTop10p(dailyKs);
-                BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
-                fAmt = hourAmt.multiply(BDUtil.b0_1);
-                AMT_M1_MAP.put(code, fAmt);
-            }
-
-            if (fAmt != null && fAmt.compareTo(BDUtil.B5000W) < 0) {
-                log.info("fenshi m1 定量 小于500w: {} {} ", eastSpeedInfo.getName_f14(), BDUtil.amtHuman(BDUtil.b0_1.multiply(fAmt)));
-                BLOCK_CODE_MAP.put(code, "");
-                continue;
-            }
-
-
-            //判断 最近30s 是否包含当日最高点
-            EastGetStockFenShiVo fEastGetStockFenShiVo = emRealTimeClient.getFenshiByCode(code);
-            if (fEastGetStockFenShiVo == null) {
-                log.info("fenshi is null: {}", eastSpeedInfo.getName_f14());
-                BLOCK_CODE_MAP.put(code, "");
-                continue;
-            }
-
-            EastGetStockFenShiTrans trans = EastGetStockFenShiTrans.trans(fEastGetStockFenShiVo);
-            if (trans == null) {
-                log.info("trans is null: {}", eastSpeedInfo.getName_f14());
-                BLOCK_CODE_MAP.put(code, "");
-                continue;
-            }
-
-            List<DetailTrans> DetailTransList = trans.getData();
-            if (DetailTransList == null || DetailTransList.isEmpty()) {
-                log.info("DetailTransList is null: {}", eastSpeedInfo.getName_f14());
-                BLOCK_CODE_MAP.put(code, "");
-                continue;
-            }
-
-            //判断70s 内 是否大于 0.1 fAmt
-            BigDecimal fenshiAmtLast70 = emRealTimeClient.getFenshiAmt(DetailTransList, 70);
-            if (fenshiAmtLast70.compareTo(BDUtil.b0_1.multiply(fAmt)) < 0 ||
-                    fenshiAmtLast70.compareTo(BDUtil.B5000W) < 0) {
-                log.info("70s内成交额{} < 定量 {} or 5000W: {}", BDUtil.amtHuman(fenshiAmtLast70), BDUtil.amtHuman(BDUtil.b0_1.multiply(fAmt)), eastSpeedInfo.getName_f14());
-                continue;
-            }
-
-            BigDecimal fenshi30sHigh = emRealTimeClient.getFenshiAmt(DetailTransList, 30);
-            if (lk.getHigh().compareTo(fenshi30sHigh) > 0) {
-                log.info("30s内达到最高价 high={} {} {}", lk.getHigh(), fenshi30sHigh, eastSpeedInfo.getName_f14());
-                continue;
-            }
-
-            // 比较开盘60s 内的成交额
-            BigDecimal fenshiAmtOpenM1 = emRealTimeClient.getFenshiAmtOpenM1(DetailTransList);
-            if (fenshiAmtLast70.compareTo(fenshiAmtOpenM1) < 0) {
-                log.info("70s内成交额{} < 开盘60s内成交额{}: {}", BDUtil.amtHuman(fenshiAmtLast70), BDUtil.amtHuman(fenshiAmtOpenM1), eastSpeedInfo.getName_f14());
-                continue;
-            }
-
-            log.info("分时新高 量价满足: {}", eastSpeedInfo.getName_f14());
-
-            //发送微信 WX_SEND_MAP check < 3
-            Integer count = WX_SEND_MAP.getIfPresent(code);
-            if (count == null) {
-                count = 0;
-            }
-
-            if (count > 2) {
-                log.info("wx send count >= 3: {}", eastSpeedInfo.getName_f14());
-                BLOCK_CODE_MAP.put(code, "");
-                continue;
-            }
-
-            String symbol = "";
-            if (code.startsWith("6")) {
-                symbol = "sh" + code;
-            } else if (code.startsWith("0") || code.startsWith("3")) {
-                symbol = "sz" + code;
-            } else {
-                symbol = "bj/" + code;
-
-            }
-            String url = "https://quote.eastmoney.com/" + symbol + ".html";
-            String content = "[speed_up]" + eastSpeedInfo.getName_f14() + code +
-                    "<br>" + "涨速: " + eastSpeedInfo.getSpeed_f22() +
-                    "<br>" + "涨幅: " + eastSpeedInfo.getPct_f3() +
-                    "<br>" + "成交额: " + BDUtil.amtHuman(lk.getAmt()) +
-                    "<br>" + "fAmt: " + BDUtil.amtHuman(BDUtil.b0_1.multiply(fAmt).setScale(2, RoundingMode.HALF_UP)) + ",m1: " + BDUtil.amtHuman(fenshiAmtLast70) + ",open: " + BDUtil.amtHuman(fenshiAmtOpenM1) +
-                    "<br>" + "ts: " + LocalDateTime.now() +
-                    "<br>" + url;
-
-            String encode = URLEncoder.encode(content, StandardCharsets.UTF_8);
-            wxUtil.send(encode);
-            WX_SEND_MAP.put(code, count + 1);
-
+        for (EastSpeedInfo eastSpeedInfo : top1) {
+            check(eastSpeedInfo);
         }
+
+
     }
 
+    private static Map<String, BigDecimal> themeSpeedScoreMapPre = new HashMap<>();
+
+
+
+    @Scheduled(cron = "0 30 15 * * ?")
+    public void themePct() {
+        if (LocalDate.now().getDayOfWeek().getValue() > 5) {
+            return;
+        }
+
+        List<EmCList> list = emClient.getClistDefaultSize(true);
+        List<EmCList> pList = list.stream().filter(e ->
+                e.getF3Pct().compareTo(BDUtil.B9) > 0
+                        && !(e.getF14Name().contains("N") || e.getF14Name().contains("C"))
+        ).toList();
+        Map<String, BigDecimal> themeSpeedScoreMap = new HashMap<>();
+        Map<String, List<String>> themeCodesNameMap = new HashMap<>();
+
+        for (EmCList s : pList) {
+            String code = s.getF12Code();
+            List<String> themes = getTheme(code);
+            if (themes == null || themes.size() == 0) {
+                continue;
+            }
+            for (String theme : themes) {
+                if (BLOCK_THEME_SET.contains(theme)) {
+                    continue;
+                }
+                BigDecimal score = themeSpeedScoreMap.get(theme);
+                if (score == null) {
+                    score = BigDecimal.ZERO;
+                }
+                score = score.add(s.getF3Pct());
+                themeSpeedScoreMap.put(theme, score);
+
+                List<String> codes = themeCodesNameMap.get(theme);
+                if (codes == null) {
+                    codes = new ArrayList<>();
+                }
+                codes.add(s.getF14Name() + "_" + s.getF12Code() + "_" + s.getF3Pct());
+                ;
+                themeCodesNameMap.put(theme, codes);
+            }
+
+        }
+
+
+        Map<String, BigDecimal> sortMap = CollectionsUtil.sortByValue(themeSpeedScoreMap, false);
+        StringBuilder top100 = new StringBuilder();
+        sortMap.forEach((t, c) -> {
+            log.info("theme={} score={} {}", t, c, String.join(",\t", themeCodesNameMap.get(t)));
+            //send wx
+            if (c.compareTo(BDUtil.B100) <= 0) {
+                return;
+            }
+            top100.append("theme=").append(t).append(" score=").append(c).append("<br>");
+        });
+        top100.append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        String encodeTop100 = URLEncoder.encode(top100.toString(), StandardCharsets.UTF_8);
+        wxUtil.send(encodeTop100);
+
+        sortMap.forEach((t, c) -> {
+            log.info("theme={} score={} {}", t, c, String.join(",\t", themeCodesNameMap.get(t)));
+            //send wx
+            if (c.compareTo(BDUtil.B100) <= 0) {
+                return;
+            }
+            StringBuilder content = new StringBuilder();// + "<br>" + String.join(",\t", themeCodesNameMap.get(t));
+            content.append("theme=").append(t).append(" score=").append(c);
+            for (String s : themeCodesNameMap.get(t)) {
+                content.append("<br>").append(s);
+            }
+            String encode = URLEncoder.encode(content.toString(), StandardCharsets.UTF_8);
+            wxUtil.send(encode);
+        });
+
+    }
+
+    @Async
+    public void theme(List<EastSpeedInfo> speedTop) {
+
+        Map<String, BigDecimal> themeSpeedScoreMap = new HashMap<>();
+        Map<String, List<String>> themeCodesNameMap = new HashMap<>();
+
+        for (EastSpeedInfo s : speedTop) {
+
+            String code = s.getCode_f12();
+
+            List<String> themes = getTheme(code);
+            if (themes == null || themes.size() == 0) {
+                continue;
+            }
+
+            for (String theme : themes) {
+                if (BLOCK_THEME_SET.contains(theme)) {
+                    continue;
+                }
+                BigDecimal score = themeSpeedScoreMap.get(theme);
+                if (score == null) {
+                    score = BigDecimal.ZERO;
+                }
+                score = score.add(s.getSpeed_f22());
+                themeSpeedScoreMap.put(theme, score);
+
+                List<String> codes = themeCodesNameMap.get(theme);
+                if (codes == null) {
+                    codes = new ArrayList<>();
+                }
+                codes.add(s.getName_f14() + "_" + s.getCode_f12());
+                themeCodesNameMap.put(theme, codes);
+            }
+        }
+
+
+        Map<String, BigDecimal> themeSpeedScoreMapDiff = new HashMap<>();
+        //计算差值 与 pre 相比 , 增幅最大的 排序
+        themeSpeedScoreMap.forEach((t, c) -> {
+            BigDecimal pre = themeSpeedScoreMapPre.get(t);
+            if (pre == null) {
+                pre = BigDecimal.ZERO;
+            }
+            themeSpeedScoreMapDiff.put(t, c.subtract(pre));
+        });
+
+        Map<String, BigDecimal> sortMap = CollectionsUtil.sortByValue(themeSpeedScoreMapDiff, false);
+        AtomicInteger count = new AtomicInteger(0);
+        int limit = Math.min(10, sortMap.size());
+        sortMap.forEach((t, c) -> {
+            if (count.getAndIncrement() > limit) {
+                return;
+            }
+            //string 占用8个字符
+            String st = String.format("%8s", t);
+
+
+            log.info("theme={} score={} {}", st, c, String.join(",\t", themeCodesNameMap.get(t)));
+        });
+
+        themeSpeedScoreMapPre = themeSpeedScoreMap;
+    }
+
+    public void check(EastSpeedInfo eastSpeedInfo) {
+        String code = eastSpeedInfo.getCode_f12();
+        if ("".equals(BLOCK_CODE_MAP.getIfPresent(code))) {
+            log.debug("block code: {}", code + eastSpeedInfo.getName_f14());
+            return;
+        }
+
+        //1, 判断当前30s 是否包含当日最高点
+        //2, 判断是否为成交量最大
+        //3, speed > 1
+        if (eastSpeedInfo.getSpeed_f22().compareTo(BDUtil.B1) <= 0) {
+            return;
+        }
+        if (eastSpeedInfo.getPct_f3().compareTo(BigDecimal.ZERO) <= 0
+                || eastSpeedInfo.getPct_f3().compareTo(BDUtil.B2) > 0) {
+            return;
+        }
+        if (eastSpeedInfo.getName_f14().contains("ST")) {
+            return;
+        }
+
+        //获取成交额m1
+        List<EmDailyK> dailyKs = emClient.getDailyKs(code, LocalDate.now(), 100, true);
+        if (dailyKs.size() < 100) {
+            log.info("k size {} < 100", dailyKs.size());
+            BLOCK_CODE_MAP.put(code, "");
+            return;
+        }
+
+        int last = dailyKs.size() - 1;
+        EmDailyK lk1 = dailyKs.get(last);
+        if (lk1.getPct().compareTo(BDUtil.BN1) < 0) {
+            log.info("涨幅小于1%: {}", eastSpeedInfo.getName_f14());
+            BLOCK_CODE_MAP.put(code, "");
+            return;
+        }
+
+        EmDailyK lk = dailyKs.get(last);
+        BigDecimal fAmt = BigDecimal.ZERO;
+        if (AMT_M1_MAP.getIfPresent(code) != null) {
+            fAmt = AMT_M1_MAP.getIfPresent(code);
+        } else {
+            BigDecimal dayAmtTop10 = emClient.amtTop10p(dailyKs);
+            BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
+            fAmt = hourAmt.multiply(BDUtil.b0_1);
+            AMT_M1_MAP.put(code, fAmt);
+        }
+
+        if (fAmt != null && fAmt.compareTo(BDUtil.B5000W) < 0) {
+            log.info("fenshi m1 定量 小于500w: {} {} ", eastSpeedInfo.getName_f14(), BDUtil.amtHuman(BDUtil.b0_1.multiply(fAmt)));
+            BLOCK_CODE_MAP.put(code, "");
+            return;
+        }
+
+
+        //判断 最近30s 是否包含当日最高点
+        EastGetStockFenShiVo fEastGetStockFenShiVo = emRealTimeClient.getFenshiByCode(code);
+        if (fEastGetStockFenShiVo == null) {
+            log.info("fenshi is null: {}", eastSpeedInfo.getName_f14());
+            BLOCK_CODE_MAP.put(code, "");
+            return;
+        }
+
+        EastGetStockFenShiTrans trans = EastGetStockFenShiTrans.trans(fEastGetStockFenShiVo);
+        if (trans == null) {
+            log.info("trans is null: {}", eastSpeedInfo.getName_f14());
+            BLOCK_CODE_MAP.put(code, "");
+            return;
+        }
+
+        List<DetailTrans> DetailTransList = trans.getData();
+        if (DetailTransList == null || DetailTransList.isEmpty()) {
+            log.info("DetailTransList is null: {}", eastSpeedInfo.getName_f14());
+            BLOCK_CODE_MAP.put(code, "");
+            return;
+        }
+
+        //判断70s 内 是否大于 0.1 fAmt
+        BigDecimal fenshiAmtLast70 = emRealTimeClient.getFenshiAmt(DetailTransList, 70);
+        if (fenshiAmtLast70.compareTo(BDUtil.b0_1.multiply(fAmt)) < 0 ||
+                fenshiAmtLast70.compareTo(BDUtil.B5000W) < 0) {
+            log.info("70s内成交额{} < 定量 {} or 5000W: {}", BDUtil.amtHuman(fenshiAmtLast70), BDUtil.amtHuman(BDUtil.b0_1.multiply(fAmt)), eastSpeedInfo.getName_f14());
+            return;
+        }
+
+        BigDecimal fenshi30sHigh = emRealTimeClient.getFenshiAmt(DetailTransList, 30);
+        if (lk.getHigh().compareTo(fenshi30sHigh) > 0) {
+            log.info("30s内达到最高价 high={} {} {}", lk.getHigh(), fenshi30sHigh, eastSpeedInfo.getName_f14());
+            return;
+        }
+
+        // 比较开盘60s 内的成交额
+        BigDecimal fenshiAmtOpenM1 = emRealTimeClient.getFenshiAmtOpenM1(DetailTransList);
+        if (fenshiAmtLast70.compareTo(fenshiAmtOpenM1) < 0) {
+            log.info("70s内成交额{} < 开盘60s内成交额{}: {}", BDUtil.amtHuman(fenshiAmtLast70), BDUtil.amtHuman(fenshiAmtOpenM1), eastSpeedInfo.getName_f14());
+            return;
+        }
+
+        log.warn("分时新高 量价满足: {}", eastSpeedInfo.getName_f14());
+
+        //发送微信 WX_SEND_MAP check < 3
+        Integer count = WX_SEND_MAP.getIfPresent(code);
+        if (count == null) {
+            count = 0;
+        }
+
+        if (count > 2) {
+            log.info("wx send count >= 3: {}", eastSpeedInfo.getName_f14());
+            BLOCK_CODE_MAP.put(code, "");
+            return;
+        }
+
+        String symbol = "";
+        if (code.startsWith("6")) {
+            symbol = "sh" + code;
+        } else if (code.startsWith("0") || code.startsWith("3")) {
+            symbol = "sz" + code;
+        } else {
+            symbol = "bj/" + code;
+
+        }
+        String url = "https://quote.eastmoney.com/" + symbol + ".html";
+        String content = "[speed_up]" + eastSpeedInfo.getName_f14() + code +
+                "<br>" + "涨速: " + eastSpeedInfo.getSpeed_f22() +
+                "<br>" + "涨幅: " + eastSpeedInfo.getPct_f3() +
+                "<br>" + "成交额: " + BDUtil.amtHuman(lk.getAmt()) +
+                "<br>" + "fAmt: " + BDUtil.amtHuman(BDUtil.b0_1.multiply(fAmt).setScale(2, RoundingMode.HALF_UP)) + ",m1: " + BDUtil.amtHuman(fenshiAmtLast70) + ",open: " + BDUtil.amtHuman(fenshiAmtOpenM1) +
+                "<br>" + "ts: " + LocalDateTime.now() +
+                "<br>" + url;
+
+        String encode = URLEncoder.encode(content, StandardCharsets.UTF_8);
+        wxUtil.send(encode);
+        WX_SEND_MAP.put(code, count + 1);
+
+    }
+
+
+    public void check(EastSpeedInfo eastSpeedInfo, List<DetailTrans> DetailTransList, List<EmDailyK> dailyKs) {
+        String code = eastSpeedInfo.getCode_f12();
+        if ("".equals(BLOCK_CODE_MAP.getIfPresent(code))) {
+            log.debug("block code: {}", code + eastSpeedInfo.getName_f14());
+            return;
+        }
+
+        //1, 判断当前30s 是否包含当日最高点
+        //2, 判断是否为成交量最大
+        //3, speed > 1
+        if (eastSpeedInfo.getSpeed_f22().compareTo(BDUtil.B1) <= 0) {
+            return;
+        }
+        if (eastSpeedInfo.getPct_f3().compareTo(BigDecimal.ZERO) <= 0
+                || eastSpeedInfo.getPct_f3().compareTo(BDUtil.B2) > 0) {
+            return;
+        }
+        if (eastSpeedInfo.getName_f14().contains("ST")) {
+            return;
+        }
+
+        //获取成交额m1
+        if (dailyKs.size() < 100) {
+            log.info("k size {} < 100", dailyKs.size());
+            BLOCK_CODE_MAP.put(code, "");
+            return;
+        }
+
+        int last = dailyKs.size() - 1;
+        EmDailyK lk = dailyKs.get(last);
+        BigDecimal fAmt = BigDecimal.ZERO;
+        if (AMT_M1_MAP.getIfPresent(code) != null) {
+            fAmt = AMT_M1_MAP.getIfPresent(code);
+        } else {
+            BigDecimal dayAmtTop10 = emClient.amtTop10p(dailyKs);
+            BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
+            fAmt = hourAmt.multiply(BDUtil.b0_1);
+            AMT_M1_MAP.put(code, fAmt);
+        }
+
+        if (fAmt != null && fAmt.compareTo(BDUtil.B5000W) < 0) {
+            log.info("fenshi m1 定量 小于500w: {} {} ", eastSpeedInfo.getName_f14(), BDUtil.amtHuman(BDUtil.b0_1.multiply(fAmt)));
+            BLOCK_CODE_MAP.put(code, "");
+            return;
+        }
+
+
+        if (DetailTransList == null || DetailTransList.isEmpty()) {
+            log.info("DetailTransList is null: {}", eastSpeedInfo.getName_f14());
+            BLOCK_CODE_MAP.put(code, "");
+            return;
+        }
+
+        //判断70s 内 是否大于 0.1 fAmt
+        BigDecimal fenshiAmtLast70 = emRealTimeClient.getFenshiAmt(DetailTransList, 70);
+        if (fenshiAmtLast70.compareTo(BDUtil.b0_1.multiply(fAmt)) < 0 ||
+                fenshiAmtLast70.compareTo(BDUtil.B5000W) < 0) {
+            log.info("70s内成交额{} < 定量 {} or 5000W: {}", BDUtil.amtHuman(fenshiAmtLast70), BDUtil.amtHuman(BDUtil.b0_1.multiply(fAmt)), eastSpeedInfo.getName_f14());
+            return;
+        }
+
+        BigDecimal fenshi30sHigh = emRealTimeClient.getFenshiAmt(DetailTransList, 30);
+        if (lk.getHigh().compareTo(fenshi30sHigh) > 0) {
+            log.info("30s内达到最高价 high={} {} {}", lk.getHigh(), fenshi30sHigh, eastSpeedInfo.getName_f14());
+            return;
+        }
+
+        // 比较开盘60s 内的成交额
+        BigDecimal fenshiAmtOpenM1 = emRealTimeClient.getFenshiAmtOpenM1(DetailTransList);
+        if (fenshiAmtLast70.compareTo(fenshiAmtOpenM1) < 0) {
+            log.info("70s内成交额{} < 开盘60s内成交额{}: {}", BDUtil.amtHuman(fenshiAmtLast70), BDUtil.amtHuman(fenshiAmtOpenM1), eastSpeedInfo.getName_f14());
+            return;
+        }
+
+        log.warn("分时新高 量价满足: {}", eastSpeedInfo.getName_f14());
+
+        //发送微信 WX_SEND_MAP check < 3
+        Integer count = WX_SEND_MAP.getIfPresent(code);
+        if (count == null) {
+            count = 0;
+        }
+
+        if (count > 2) {
+            log.info("wx send count >= 3: {}", eastSpeedInfo.getName_f14());
+            BLOCK_CODE_MAP.put(code, "");
+            return;
+        }
+
+        String symbol = "";
+        if (code.startsWith("6")) {
+            symbol = "sh" + code;
+        } else if (code.startsWith("0") || code.startsWith("3")) {
+            symbol = "sz" + code;
+        } else {
+            symbol = "bj/" + code;
+
+        }
+        String url = "https://quote.eastmoney.com/" + symbol + ".html";
+        String content = "[speed_up]" + eastSpeedInfo.getName_f14() + code +
+                "<br>" + "涨速: " + eastSpeedInfo.getSpeed_f22() +
+                "<br>" + "涨幅: " + eastSpeedInfo.getPct_f3() +
+                "<br>" + "成交额: " + BDUtil.amtHuman(lk.getAmt()) +
+                "<br>" + "fAmt: " + BDUtil.amtHuman(BDUtil.b0_1.multiply(fAmt).setScale(2, RoundingMode.HALF_UP)) + ",m1: " + BDUtil.amtHuman(fenshiAmtLast70) + ",open: " + BDUtil.amtHuman(fenshiAmtOpenM1) +
+                "<br>" + "ts: " + LocalDateTime.now() +
+                "<br>" + url;
+
+        String encode = URLEncoder.encode(content, StandardCharsets.UTF_8);
+        wxUtil.send(encode);
+        WX_SEND_MAP.put(code, count + 1);
+
+    }
 }

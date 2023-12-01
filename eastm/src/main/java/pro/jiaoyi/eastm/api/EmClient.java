@@ -120,7 +120,7 @@ public class EmClient {
                     "&klt=101&fqt=1&end=20500101&lmt=10000";
         }
 
-        if (COUNT.incrementAndGet() % 10 == 0) {
+        if (COUNT.incrementAndGet() % 100 == 0) {
             try {
                 log.info("sleep 1s");
                 Thread.sleep(1000);
@@ -1024,7 +1024,7 @@ public class EmClient {
         List<String> arrayList = new ArrayList<>();
 
         for (EmTheme.Theme theme : emTheme.getResult().getData()) {
-            log.info("{}", theme);
+            log.debug("{}", theme);
             arrayList.add(theme.getBOARD_NAME());
         }
 
