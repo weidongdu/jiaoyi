@@ -18,7 +18,9 @@ import pro.jiaoyi.eastm.api.EmRealTimeClient;
 import pro.jiaoyi.eastm.config.VipIndexEnum;
 import pro.jiaoyi.eastm.config.WxUtil;
 import pro.jiaoyi.eastm.dao.entity.OpenEmCListEntity;
+import pro.jiaoyi.eastm.dao.entity.ThemeScoreEntity;
 import pro.jiaoyi.eastm.dao.repo.OpenEmCListRepo;
+import pro.jiaoyi.eastm.dao.repo.ThemeScoreRepo;
 import pro.jiaoyi.eastm.model.EastSpeedInfo;
 import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
@@ -336,11 +338,11 @@ public class MarketJob {
 
     {
         List<String> t = List.of(
-                "融资融券", "机构重仓", "创业板综", "标准普尔", "预盈预增",
+                "融资融券", "国企改革", "机构重仓", "创业板综", "标准普尔", "预盈预增",
                 "深股通", "预亏预减", "富时罗素", "沪股通", "转债标的",
                 "QFII重仓", "央企改革", "MSCI中国", "破净股", "参股保险",
                 "参股券商", "参股银行", "AH股", "基金重仓", "参股期货",
-                "AB股", "参股新三板", "证金持股", "送转预期", "注册制次新股",
+                "AB股", "参股新三板", "证金持股", "送转预期", "注册制次新股", "昨日涨停",
 
                 "中证500", "深成500", "上证380", "低价股", "江苏板块",
 
@@ -374,6 +376,7 @@ public class MarketJob {
 
 
     @Scheduled(fixedRate = 5000L)
+    @Async
     public void speedUp() {
         //排除 周六 周日
         if (LocalDate.now().getDayOfWeek().getValue() > 5) {
@@ -439,10 +442,22 @@ public class MarketJob {
     private static Map<String, BigDecimal> themeSpeedScoreMapPre = new HashMap<>();
 
 
+    @Resource
+    private ThemeScoreRepo themeScoreRepo;
 
-    @Scheduled(cron = "0 30 15 * * ?")
+    @Scheduled(cron = "30 0/1 * * * ?")
+    @Async
     public void themePct() {
         if (LocalDate.now().getDayOfWeek().getValue() > 5) {
+            return;
+        }
+        if (LocalTime.now().isBefore(LocalTime.of(9, 25))
+                || LocalTime.now().isAfter(LocalTime.of(15, 1))) {
+            return;
+        }
+
+        if (LocalTime.now().isAfter(LocalTime.of(11, 31))
+                && LocalTime.now().isBefore(LocalTime.of(12, 59))) {
             return;
         }
 
@@ -491,12 +506,38 @@ public class MarketJob {
             if (c.compareTo(BDUtil.B100) <= 0) {
                 return;
             }
-            top100.append("theme=").append(t).append(" score=").append(c).append("<br>");
+
+            BigDecimal pre = themeSpeedScoreMapPre.get(t) == null ? BigDecimal.ZERO : themeSpeedScoreMapPre.get(t);
+            BigDecimal chg = c.subtract(pre);
+            top100.append(t).append("_").append(c).append("_[").append(chg).append("]").append("<br>");
         });
+
         top100.append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         String encodeTop100 = URLEncoder.encode(top100.toString(), StandardCharsets.UTF_8);
         wxUtil.send(encodeTop100);
 
+        ArrayList<ThemeScoreEntity> themeScoreEntities = new ArrayList<>(sortMap.size());
+        LocalDateTime now = LocalDateTime.now();
+        sortMap.forEach((t, c) -> {
+            BigDecimal pre = themeSpeedScoreMapPre.get(t) == null ? BigDecimal.ZERO : themeSpeedScoreMapPre.get(t);
+            BigDecimal chg = c.subtract(pre);
+
+            ThemeScoreEntity themeScore = new ThemeScoreEntity();
+            themeScore.setId(null);
+            themeScore.setF1Theme(t);
+            themeScore.setF2Score(c);
+            themeScore.setF3Chg(chg);
+            themeScore.setCreateTime(now);
+            themeScoreEntities.add(themeScore);
+        });
+        themeScoreRepo.saveAllAndFlush(themeScoreEntities);
+        //保存pre
+        themeSpeedScoreMapPre = themeSpeedScoreMap;
+
+
+        if (LocalTime.now().isBefore(LocalTime.of(14, 59))) {
+            return;
+        }
         sortMap.forEach((t, c) -> {
             log.info("theme={} score={} {}", t, c, String.join(",\t", themeCodesNameMap.get(t)));
             //send wx
@@ -508,6 +549,7 @@ public class MarketJob {
             for (String s : themeCodesNameMap.get(t)) {
                 content.append("<br>").append(s);
             }
+            content.append("<br>").append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             String encode = URLEncoder.encode(content.toString(), StandardCharsets.UTF_8);
             wxUtil.send(encode);
         });
@@ -698,6 +740,20 @@ public class MarketJob {
             symbol = "bj/" + code;
 
         }
+
+        if (code.startsWith("60") || code.startsWith("00") || code.startsWith("30")) {
+            if (eastSpeedInfo.getPrice_f2().compareTo(BDUtil.B50) > 0) {
+                log.info("price > 50: {}, stop", eastSpeedInfo.getName_f14());
+                return;
+            }
+        } else {
+            if (eastSpeedInfo.getPrice_f2().multiply(BDUtil.B2).compareTo(BDUtil.B50) > 0) {
+                log.info("price x2 > 50: {}, stop", eastSpeedInfo.getName_f14());
+                return;
+            }
+        }
+
+
         String url = "https://quote.eastmoney.com/" + symbol + ".html";
         String content = "[speed_up]" + eastSpeedInfo.getName_f14() + code +
                 "<br>" + "涨速: " + eastSpeedInfo.getSpeed_f22() +
@@ -816,7 +872,8 @@ public class MarketJob {
                 "<br>" + "涨速: " + eastSpeedInfo.getSpeed_f22() +
                 "<br>" + "涨幅: " + eastSpeedInfo.getPct_f3() +
                 "<br>" + "成交额: " + BDUtil.amtHuman(lk.getAmt()) +
-                "<br>" + "fAmt: " + BDUtil.amtHuman(BDUtil.b0_1.multiply(fAmt).setScale(2, RoundingMode.HALF_UP)) + ",m1: " + BDUtil.amtHuman(fenshiAmtLast70) + ",open: " + BDUtil.amtHuman(fenshiAmtOpenM1) +
+                "<br>" + "fAmt: " + BDUtil.amtHuman(BDUtil.b0_1.multiply(fAmt).setScale(2, RoundingMode.HALF_UP))
+                + ",m1: <bold>" + BDUtil.amtHuman(fenshiAmtLast70) + "</bold>,open: " + BDUtil.amtHuman(fenshiAmtOpenM1) +
                 "<br>" + "ts: " + LocalDateTime.now() +
                 "<br>" + url;
 

@@ -11,6 +11,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.GetMapping;
 import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.util.BDUtil;
 import pro.jiaoyi.common.util.DateUtil;
@@ -23,8 +24,10 @@ import pro.jiaoyi.eastm.config.VipIndexEnum;
 import pro.jiaoyi.eastm.config.WxUtil;
 import pro.jiaoyi.eastm.dao.entity.FenshiSimpleEntity;
 import pro.jiaoyi.eastm.dao.entity.KLineEntity;
+import pro.jiaoyi.eastm.dao.entity.ThemeScoreEntity;
 import pro.jiaoyi.eastm.dao.repo.FenshiSimpleRepo;
 import pro.jiaoyi.eastm.dao.repo.KLineRepo;
+import pro.jiaoyi.eastm.dao.repo.ThemeScoreRepo;
 import pro.jiaoyi.eastm.job.MarketJob;
 import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
@@ -289,7 +292,6 @@ class EastmKlineTests {
     }
 
 
-
     @Resource
     private FenshiSimpleRepo fenshiSimpleRepo;
 
@@ -405,7 +407,7 @@ class EastmKlineTests {
                     || dbEntityPre.getOpenAmt().compareTo(BigDecimal.ZERO) == 0) {
                 dbEntity.setOpenAmtPre(BigDecimal.ZERO);
                 dbEntity.setOpenAmtPreFx(BigDecimal.ZERO);
-            }else {
+            } else {
 
                 dbEntity.setOpenAmtPre(dbEntityPre.getOpenAmt());
                 dbEntity.setOpenAmtPreFx(dbEntity.getOpenAmt()
@@ -427,8 +429,8 @@ class EastmKlineTests {
             //计算 amt
             try {
                 List<EmDailyK> ks = emClient.getDailyKs(dbEntity.getCode(), LocalDate.now(), 100, false);
-                ks.remove(ks.size()-1);
-                ks.remove(ks.size()-1);
+                ks.remove(ks.size() - 1);
+                ks.remove(ks.size() - 1);
 
                 BigDecimal dayAmtTop10 = emClient.amtTop10p(ks);
                 BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
@@ -455,7 +457,7 @@ class EastmKlineTests {
 
         ArrayList<EmCList> filterList = new ArrayList<>();
         for (EmCList emCList : list) {
-            if (!set.contains(emCList.getF12Code())){
+            if (!set.contains(emCList.getF12Code())) {
                 continue;
             }
 
@@ -486,10 +488,10 @@ class EastmKlineTests {
 
 
     @Test
-    public void famt(){
+    public void famt() {
         String code = "600520";
         List<EmDailyK> ks = emClient.getDailyKs(code, LocalDate.now(), 500, true);
-        ks.remove(ks.size()-1);
+        ks.remove(ks.size() - 1);
 
         //计算 amt
         BigDecimal dayAmtTop10 = emClient.amtTop10p(ks);
@@ -507,7 +509,7 @@ class EastmKlineTests {
     private WxUtil wxUtil;
 
     @Test
-    public void sCodeRunOpen(){
+    public void sCodeRunOpen() {
         {
             //判断昨天集合竞价
 
@@ -579,15 +581,16 @@ class EastmKlineTests {
                 }
 
             }
-            log.info("runOpen code {} 不满足条件 fx > 5 fx={}", code,fx);
+            log.info("runOpen code {} 不满足条件 fx > 5 fx={}", code, fx);
         }
     }
 
 
-@Resource
-private MarketJob marketJob;
+    @Resource
+    private MarketJob marketJob;
+
     @Test
-    public void tmp1(){
+    public void tmp1() {
 
 //        marketJob.con();
 
@@ -606,5 +609,57 @@ private MarketJob marketJob;
     }
 
 
+    @Resource
+    private ThemeScoreRepo themeScoreRepo;
+
+    @Test
+    public void themeScore() {
+
+
+        LocalDateTime now = LocalDateTime.now();
+        List<ThemeScoreEntity> list = themeScoreRepo.findAllByCreateTimeBetween(now.minusDays(2), now);
+
+        /*
+        [
+[
+"Income",
+"Life Expectancy",
+"Population",
+"Country",
+"Year"
+],
+[
+815,
+34.05,
+351014,
+"Australia",
+1800
+]]
+         */
+
+        if (list.size() == 0) return;
+
+        ArrayList<Object[]> array = new ArrayList<>(list.size() + 1);
+        Object[] head = new Object[5];
+        head[0] = "Income"; //score
+        head[1] = "Life Expectancy";
+        head[2] = "Population";
+        head[3] = "Country";//theme
+        head[4] = "Year";//creatTime
+        array.add(head);
+
+        for (ThemeScoreEntity themeScore : list) {
+            Object[] items = new Object[5];
+            items[0] = themeScore.getF2Score(); //"Income",
+            items[1] = themeScore.getF3Chg(); //"Life Expectancy",
+            items[2] = themeScore.getId(); //"Population",
+            items[3] = themeScore.getF1Theme(); //"Country",
+            items[4] = themeScore.getCreateTime();//"Year"
+            array.add(items);
+        }
+
+
+        System.out.println(JSON.toJSONString(array));
+    }
 
 }
