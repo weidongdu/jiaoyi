@@ -109,4 +109,8 @@ public class DateUtil {
         System.out.println(tradeDate());
     }
 
+    public static String now() {
+        LocalDateTime now = LocalDateTime.now();
+        return now.format(DateTimeFormatter.ofPattern(PATTERN_yyyyMMdd_HHmmss));
+    }
 }

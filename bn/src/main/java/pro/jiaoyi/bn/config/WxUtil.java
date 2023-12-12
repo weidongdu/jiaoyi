@@ -13,7 +13,7 @@ public class WxUtil {
     private OkHttpUtil httpUtil;
 
     public void send(String content) {
-        String wxUrl = "http://8.142.9.14:20808/msg/wx?content=";
+        String wxUrl = "http://8.142.9.14:28887/fei/send?content=";
         String url = wxUrl + content;
 
         try {

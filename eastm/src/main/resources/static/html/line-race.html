@@ -19,13 +19,24 @@
         renderer: 'canvas',
         useDirtyRect: false
     });
+
+    var score = 100;
+    //从url 中获取 参数score 的值
+    // 获取当前页面的 URL
+    var url = new URL(window.location.href);
+
+    // 从 URL 参数中获取 score 的值
+    var searchParams = new URLSearchParams(url.search);
+    score = searchParams.get('score');
+
+
     var app = {};
     // var ROOT_PATH = 'http://localhost:28889';
     var ROOT_PATH = 'http://8.142.9.14:28889';
     var option;
 
     $.get(
-        ROOT_PATH + '/data/themeScore',
+        ROOT_PATH + '/data/themeScore' + '?score=' + score,
         function (_rawData) {
             run(_rawData.themes, _rawData.data);
         }

@@ -10,8 +10,10 @@ import pro.jiaoyi.common.util.BDUtil;
 import pro.jiaoyi.eastm.dao.entity.ThemeScoreEntity;
 import pro.jiaoyi.eastm.dao.repo.ThemeScoreRepo;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 
@@ -65,8 +67,19 @@ public class DataController {
 
         LocalDateTime now = LocalDateTime.now();
         List<ThemeScoreEntity> list = themeScoreRepo.findAllByCreateTimeBetween(now.minusDays(2), now);
+
+        BigDecimal score = BigDecimal.ZERO;
+
+        List<ThemeScoreEntity> ids = list.stream()
+                .filter(i -> i.getF1Theme().equals("昨日涨停_含一字"))
+                .sorted(Comparator.comparingLong(ThemeScoreEntity::getId)).toList();
+        if (!ids.isEmpty()) {
+            score = ids.get(ids.size() - 1).getF2Score();
+        }
+
+        final BigDecimal finalScore = score;
         List<String> themelist = list.stream()
-                .filter(i -> i.getF2Score().compareTo(BDUtil.B100) > 0)
+                .filter(i -> i.getF2Score().compareTo(finalScore) > 0)
                 .map(ThemeScoreEntity::getF1Theme).distinct().toList();
 
         HashSet<String> themes = new HashSet<>(themelist);

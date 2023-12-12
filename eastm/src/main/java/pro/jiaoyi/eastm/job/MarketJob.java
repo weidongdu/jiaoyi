@@ -132,7 +132,7 @@ public class MarketJob {
                 BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
                 BigDecimal fAmt = hourAmt.multiply(BDUtil.b0_1);
                 if (fAmt.compareTo(BDUtil.B1000W) < 0) {
-                    log.info("成交额小于1000万: {}", em.getF14Name());
+                    log.info("fAmt={} 成交额小于1000万: {}", fAmt, em.getF14Name());
                     continue;
                 }
 
@@ -153,7 +153,7 @@ public class MarketJob {
                 for (String name : names) {
                     content.append("<br>").append(name);
                 }
-                String encode = URLEncoder.encode(content.toString(), StandardCharsets.UTF_8);
+                String encode = URLEncoder.encode(content.toString().replaceAll("<br>", "\n"), StandardCharsets.UTF_8);
                 wxUtil.send(encode);
             }
 
@@ -500,10 +500,12 @@ public class MarketJob {
 
         Map<String, BigDecimal> sortMap = CollectionsUtil.sortByValue(themeSpeedScoreMap, false);
         StringBuilder top100 = new StringBuilder();
+
+        BigDecimal scoreLimit = sortMap.getOrDefault("昨日涨停_含一字", BDUtil.B100);
         sortMap.forEach((t, c) -> {
             log.info("theme={} score={} {}", t, c, String.join(",\t", themeCodesNameMap.get(t)));
             //send wx
-            if (c.compareTo(BDUtil.B100) <= 0) {
+            if (c.compareTo(scoreLimit) <= 0) {
                 return;
             }
 
@@ -512,8 +514,8 @@ public class MarketJob {
             top100.append(t).append("_").append(c).append("_[").append(chg).append("]").append("<br>");
         });
 
-        top100.append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        String encodeTop100 = URLEncoder.encode(top100.toString(), StandardCharsets.UTF_8);
+        String encodeTop100 = URLEncoder.encode(top100.toString().replaceAll("<br>", "\n"), StandardCharsets.UTF_8);
+//        String encodeTop100 = (top100.toString()).replaceAll("<br>", "\n");
         wxUtil.send(encodeTop100);
 
         ArrayList<ThemeScoreEntity> themeScoreEntities = new ArrayList<>(sortMap.size());
@@ -549,8 +551,8 @@ public class MarketJob {
             for (String s : themeCodesNameMap.get(t)) {
                 content.append("<br>").append(s);
             }
-            content.append("<br>").append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            String encode = URLEncoder.encode(content.toString(), StandardCharsets.UTF_8);
+            String encode = URLEncoder.encode(content.toString().replaceAll("<br>", "\n"), StandardCharsets.UTF_8);
+//            String encode = (content.toString()).replaceAll("<br>", "\n");
             wxUtil.send(encode);
         });
 
@@ -760,10 +762,9 @@ public class MarketJob {
                 "<br>" + "涨幅: " + eastSpeedInfo.getPct_f3() +
                 "<br>" + "成交额: " + BDUtil.amtHuman(lk.getAmt()) +
                 "<br>" + "fAmt: " + BDUtil.amtHuman(BDUtil.b0_1.multiply(fAmt).setScale(2, RoundingMode.HALF_UP)) + ",m1: " + BDUtil.amtHuman(fenshiAmtLast70) + ",open: " + BDUtil.amtHuman(fenshiAmtOpenM1) +
-                "<br>" + "ts: " + LocalDateTime.now() +
                 "<br>" + url;
 
-        String encode = URLEncoder.encode(content, StandardCharsets.UTF_8);
+        String encode = URLEncoder.encode(content.replaceAll("<br>", "\n"), StandardCharsets.UTF_8);
         wxUtil.send(encode);
         WX_SEND_MAP.put(code, count + 1);
 
@@ -874,10 +875,9 @@ public class MarketJob {
                 "<br>" + "成交额: " + BDUtil.amtHuman(lk.getAmt()) +
                 "<br>" + "fAmt: " + BDUtil.amtHuman(BDUtil.b0_1.multiply(fAmt).setScale(2, RoundingMode.HALF_UP))
                 + ",m1: <bold>" + BDUtil.amtHuman(fenshiAmtLast70) + "</bold>,open: " + BDUtil.amtHuman(fenshiAmtOpenM1) +
-                "<br>" + "ts: " + LocalDateTime.now() +
                 "<br>" + url;
 
-        String encode = URLEncoder.encode(content, StandardCharsets.UTF_8);
+        String encode = URLEncoder.encode(content.replaceAll("<br>", "\n"), StandardCharsets.UTF_8);
         wxUtil.send(encode);
         WX_SEND_MAP.put(code, count + 1);
 
