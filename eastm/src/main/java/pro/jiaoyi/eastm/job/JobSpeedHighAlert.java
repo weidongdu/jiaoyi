@@ -311,7 +311,7 @@ public class JobSpeedHighAlert {
                                     + "<br>" + "价格=" + k.getClose() + ",涨幅=" + k.getPct()
                                     + "<br>" + "标准量=" + amtStr + ",M1=" + fx + "_" + fenshiAmtStr
                                     + "<br>" + LocalDateTime.now().toString().substring(0, 16));
-                            log.info("价格突破成功 {}", content.toString().replaceAll("<br>", "\n"));
+                            log.info("价格突破成功 {}", content.toString());
 
                             List<String> guba = emClient.guba(code);
                             if (guba.size() > 0) {

@@ -265,7 +265,7 @@ public class JobAlert {
                                         + "<br>" + "价格=" + k.getClose() + ",涨幅=" + k.getPct()
                                         + "<br>" + "标准量=" + amtStr + ",M1=" + fx + "_" + fenshiAmtStr
                                         + "<br>" + LocalDateTime.now().toString().substring(0, 16);
-                                log.info("价格突破成功 {}", content.replaceAll("<br>", "\n"));
+                                log.info("价格突破成功 {}", content);
                                 boolean push = checkSendWxCount(code);
                                 if (push) {
                                     wxUtil.send(content);
@@ -294,7 +294,7 @@ public class JobAlert {
                             + "<br>" + "价格=" + k.getClose() + ",涨幅=" + k.getPct()
                             + "<br>" + "标准量=" + amtStr + ",M1=" + fx + "_" + fenshiAmtStr
                             + "<br>" + LocalDateTime.now().toString().substring(0, 16);
-                    log.info("价格突破成功 {}", content.replaceAll("<br>", "\n"));
+                    log.info("价格突破成功 {}", content);
                     boolean push = checkSendWxCount(code);
                     if (push) {
                         wxUtil.send(content);

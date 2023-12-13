@@ -153,7 +153,7 @@ public class MarketJob {
                 for (String name : names) {
                     content.append("<br>").append(name);
                 }
-                String encode = URLEncoder.encode(content.toString().replaceAll("<br>", "\n"), StandardCharsets.UTF_8);
+                String encode = URLEncoder.encode(content.toString(), StandardCharsets.UTF_8);
                 wxUtil.send(encode);
             }
 
@@ -514,8 +514,21 @@ public class MarketJob {
             top100.append(t).append("_").append(c).append("_[").append(chg).append("]").append("<br>");
         });
 
-        String encodeTop100 = URLEncoder.encode(top100.toString().replaceAll("<br>", "\n"), StandardCharsets.UTF_8);
-//        String encodeTop100 = (top100.toString()).replaceAll("<br>", "\n");
+        if (top100.length() == 0) {
+            //top 3
+            int limit = Math.min(3, sortMap.size());
+            AtomicInteger count = new AtomicInteger(0);
+            sortMap.forEach((t, c) -> {
+                if (count.getAndIncrement() > limit) {
+                    return;
+                }
+                BigDecimal pre = themeSpeedScoreMapPre.get(t) == null ? BigDecimal.ZERO : themeSpeedScoreMapPre.get(t);
+                BigDecimal chg = c.subtract(pre);
+                top100.append(t).append("_").append(c).append("_[").append(chg).append("]").append("<br>");
+            });
+        }
+
+        String encodeTop100 = URLEncoder.encode(top100.toString(), StandardCharsets.UTF_8);
         wxUtil.send(encodeTop100);
 
         ArrayList<ThemeScoreEntity> themeScoreEntities = new ArrayList<>(sortMap.size());
@@ -551,8 +564,7 @@ public class MarketJob {
             for (String s : themeCodesNameMap.get(t)) {
                 content.append("<br>").append(s);
             }
-            String encode = URLEncoder.encode(content.toString().replaceAll("<br>", "\n"), StandardCharsets.UTF_8);
-//            String encode = (content.toString()).replaceAll("<br>", "\n");
+            String encode = URLEncoder.encode(content.toString(), StandardCharsets.UTF_8);
             wxUtil.send(encode);
         });
 
@@ -764,7 +776,7 @@ public class MarketJob {
                 "<br>" + "fAmt: " + BDUtil.amtHuman(BDUtil.b0_1.multiply(fAmt).setScale(2, RoundingMode.HALF_UP)) + ",m1: " + BDUtil.amtHuman(fenshiAmtLast70) + ",open: " + BDUtil.amtHuman(fenshiAmtOpenM1) +
                 "<br>" + url;
 
-        String encode = URLEncoder.encode(content.replaceAll("<br>", "\n"), StandardCharsets.UTF_8);
+        String encode = URLEncoder.encode(content, StandardCharsets.UTF_8);
         wxUtil.send(encode);
         WX_SEND_MAP.put(code, count + 1);
 
@@ -877,7 +889,7 @@ public class MarketJob {
                 + ",m1: <bold>" + BDUtil.amtHuman(fenshiAmtLast70) + "</bold>,open: " + BDUtil.amtHuman(fenshiAmtOpenM1) +
                 "<br>" + url;
 
-        String encode = URLEncoder.encode(content.replaceAll("<br>", "\n"), StandardCharsets.UTF_8);
+        String encode = URLEncoder.encode(content, StandardCharsets.UTF_8);
         wxUtil.send(encode);
         WX_SEND_MAP.put(code, count + 1);
 
