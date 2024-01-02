@@ -344,7 +344,7 @@ public class EastGetStockFenShiTrans {
                 detailTrans.setVol(d.getV());
                 detailTrans.setBs(d.getBs());
 
-                if (sts.equals("92500")){ //竞价解读
+                if (sts.startsWith("9250")){ //竞价解读
                     openPrice = detailTrans.getPrice();
                     openVol = BigDecimal.valueOf(d.getV());
                     openAmt = openPrice.multiply(openVol).multiply(BigDecimal.valueOf(100));

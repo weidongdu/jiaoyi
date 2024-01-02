@@ -22,12 +22,8 @@ import pro.jiaoyi.eastm.api.EmRealTimeClient;
 import pro.jiaoyi.eastm.config.IndexEnum;
 import pro.jiaoyi.eastm.config.VipIndexEnum;
 import pro.jiaoyi.eastm.config.WxUtil;
-import pro.jiaoyi.eastm.dao.entity.FenshiSimpleEntity;
-import pro.jiaoyi.eastm.dao.entity.KLineEntity;
-import pro.jiaoyi.eastm.dao.entity.ThemeScoreEntity;
-import pro.jiaoyi.eastm.dao.repo.FenshiSimpleRepo;
-import pro.jiaoyi.eastm.dao.repo.KLineRepo;
-import pro.jiaoyi.eastm.dao.repo.ThemeScoreRepo;
+import pro.jiaoyi.eastm.dao.entity.*;
+import pro.jiaoyi.eastm.dao.repo.*;
 import pro.jiaoyi.eastm.job.MarketJob;
 import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
@@ -35,8 +31,10 @@ import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiTrans;
 import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiVo;
 import pro.jiaoyi.eastm.service.FenshiService;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.SocketOption;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -59,607 +57,581 @@ class EastmKlineTests {
     private KLineRepo kLineRepo;
 
 
+    @Autowired
+    private EmDailyKRepo emDailyKRepo;
+
+    @Autowired
+    private OpenEmCListRepo openEmCListRepo;
+    @Autowired
+    private StopRepo stopRepo;
+
     @Test
-    public void getAll() {
-        //获取 成份股
-        HashSet<String> indexSet = new HashSet<>();
-        indexSet.addAll(emClient.getIndex(IndexEnum.HS300.getUrl()).stream().map(EmCList::getF12Code).toList());
-        indexSet.addAll(emClient.getIndex(IndexEnum.CYCF.getUrl()).stream().map(EmCList::getF12Code).toList());
-        indexSet.addAll(emClient.getIndex(IndexEnum.ZZ500.getUrl()).stream().map(EmCList::getF12Code).toList());
-        indexSet.addAll(emClient.getIndex1000().stream().map(EmCList::getF12Code).toList());
-
-        int daysBefore = 0;//0 当天 1 昨天 2 前天
-        getAllIndex(indexSet, daysBefore);
-
-    }
-
-
-    public void getAllIndex(HashSet<String> containSet, int daysBefore) {
-
-        List<EmCList> srclist = emClient.getClistDefaultSize(false);
-        List<EmCList> list = srclist.stream().filter(emCList -> containSet.contains(emCList.getF12Code())).toList();
-
-        LocalDate end = LocalDate.now().minusDays(daysBefore);
-        long endTs = DateUtil.toTimestamp(end);
-
+    public void t() {
+        List<EmCList> list = emClient.getClistDefaultSize(false);
+        boolean flag = false;
         for (EmCList emCList : list) {
-            List<EmDailyK> dailyKs = emClient.getDailyKs(emCList.getF12Code(), end, 500, false);
-            int size = dailyKs.size();
-            if (size == 0) {
-                continue;
-            }
-
-            int last = size - 1;
-            if (dailyKs.get(last).getTsOpen() != endTs) {
-                log.warn("停牌 {}", dailyKs.get(last));
-                continue;
-            }
-
-            market(dailyKs);
-        }
-
-    }
-
-    private void market(List<EmDailyK> dailyKs) {
-
-        BigDecimal[] amtArr = dailyKs.stream().map(EmDailyK::getAmt).toList().toArray(new BigDecimal[0]);
-        BigDecimal[] amtArr_ma5 = MaUtil.ma(5, amtArr, 3);
-        BigDecimal[] amtArr_ma10 = MaUtil.ma(10, amtArr, 3);
-        BigDecimal[] amtArr_ma20 = MaUtil.ma(20, amtArr, 3);
-        BigDecimal[] amtArr_ma30 = MaUtil.ma(30, amtArr, 3);
-        BigDecimal[] amtArr_ma60 = MaUtil.ma(60, amtArr, 3);
-        BigDecimal[] amtArr_ma120 = MaUtil.ma(120, amtArr, 3);
-        BigDecimal[] amtArr_ma250 = MaUtil.ma(250, amtArr, 3);
-
-        BigDecimal[] closeArr = dailyKs.stream().map(EmDailyK::getClose).toList().toArray(new BigDecimal[0]);
-        BigDecimal[] ma5 = MaUtil.ma(5, closeArr, 3);
-        BigDecimal[] ma10 = MaUtil.ma(10, closeArr, 3);
-        BigDecimal[] ma20 = MaUtil.ma(20, closeArr, 3);
-        BigDecimal[] ma30 = MaUtil.ma(30, closeArr, 3);
-        BigDecimal[] ma60 = MaUtil.ma(60, closeArr, 3);
-        BigDecimal[] ma120 = MaUtil.ma(120, closeArr, 3);
-        BigDecimal[] ma250 = MaUtil.ma(250, closeArr, 3);
-
-
-        ArrayList<KLineEntity> list = new ArrayList<>(dailyKs.size());
-        for (int i = 0; i < dailyKs.size(); i++) {
-            EmDailyK dk = dailyKs.get(i);
-            String s = JSON.toJSONString(dk);
-            KLineEntity entity = JSON.toJavaObject(JSON.parseObject(s), KLineEntity.class);
-            list.add(entity);
-
-
-            entity.setTradeDate(DateUtil.strToLocalDate(dk.getTradeDate(), DateUtil.PATTERN_yyyyMMdd));
-            entity.setTradeDateStr(dk.getTradeDate());
-
-            entity.setMa5(ma5[i]);
-            entity.setMa10(ma10[i]);
-            entity.setMa20(ma20[i]);
-            entity.setMa30(ma30[i]);
-            entity.setMa60(ma60[i]);
-            entity.setMa120(ma120[i]);
-            entity.setMa250(ma250[i]);
-
-            entity.setVma5(amtArr_ma5[i]);
-            entity.setVma10(amtArr_ma10[i]);
-            entity.setVma20(amtArr_ma20[i]);
-            entity.setVma30(amtArr_ma30[i]);
-            entity.setVma60(amtArr_ma60[i]);
-            entity.setVma120(amtArr_ma120[i]);
-            entity.setVma250(amtArr_ma250[i]);
-
-            if (i < 250) {
-                entity.setVl5(BDUtil.BN1);
-                entity.setVl10(BDUtil.BN1);
-                entity.setVl20(BDUtil.BN1);
-                entity.setVl30(BDUtil.BN1);
-                entity.setVl60(BDUtil.BN1);
-                entity.setVl120(BDUtil.BN1);
-                entity.setVl250(BDUtil.BN1);
-            } else {
-                BigDecimal amt = entity.getAmt();
-                List<BigDecimal> l5 = dailyKs.subList(i + 1 - 5, i + 1).stream().map(EmDailyK::getAmt).sorted().toList();//.toArray(new BigDecimal[0]);
-                List<BigDecimal> l10 = dailyKs.subList(i + 1 - 10, i + 1).stream().map(EmDailyK::getAmt).sorted().toList();//.toArray(new BigDecimal[0]);
-                List<BigDecimal> l20 = dailyKs.subList(i + 1 - 20, i + 1).stream().map(EmDailyK::getAmt).sorted().toList();//.toArray(new BigDecimal[0]);
-                List<BigDecimal> l30 = dailyKs.subList(i + 1 - 30, i + 1).stream().map(EmDailyK::getAmt).sorted().toList();//.toArray(new BigDecimal[0]);
-                List<BigDecimal> l60 = dailyKs.subList(i + 1 - 60, i + 1).stream().map(EmDailyK::getAmt).sorted().toList();//.toArray(new BigDecimal[0]);
-                List<BigDecimal> l120 = dailyKs.subList(i + 1 - 120, i + 1).stream().map(EmDailyK::getAmt).sorted().toList();//.toArray(new BigDecimal[0]);
-                List<BigDecimal> l250 = dailyKs.subList(i + 1 - 250, i + 1).stream().map(EmDailyK::getAmt).sorted().toList();//.toArray(new BigDecimal[0]);
-
-                entity.setVl5(new BigDecimal(l5.indexOf(amt)).divide(new BigDecimal(l5.size() - 1), 4, RoundingMode.HALF_UP));
-                entity.setVl10(new BigDecimal(l10.indexOf(amt)).divide(new BigDecimal(l10.size() - 1), 4, RoundingMode.HALF_UP));
-                entity.setVl20(new BigDecimal(l20.indexOf(amt)).divide(new BigDecimal(l20.size() - 1), 4, RoundingMode.HALF_UP));
-                entity.setVl30(new BigDecimal(l30.indexOf(amt)).divide(new BigDecimal(l30.size() - 1), 4, RoundingMode.HALF_UP));
-                entity.setVl60(new BigDecimal(l60.indexOf(amt)).divide(new BigDecimal(l60.size() - 1), 4, RoundingMode.HALF_UP));
-                entity.setVl120(new BigDecimal(l120.indexOf(amt)).divide(new BigDecimal(l120.size() - 1), 4, RoundingMode.HALF_UP));
-                entity.setVl250(new BigDecimal(l250.indexOf(amt)).divide(new BigDecimal(l250.size() - 1), 4, RoundingMode.HALF_UP));
-
-            }
-
-            log.debug("entity {}", entity);
-
-        }
-        kLineRepo.saveAll(list);
-    }
-
-
-    @Test
-    public void xuangu() {
-        List<String> codes = emClient.xuangu();
-        Map<String, String> codeNameMap = emClient.getCodeNameMap(false);
-        for (String code : codes) {
-            log.info("{} {}", code, codeNameMap.get(code));
-        }
-    }
-
-
-    @Test
-    public void guba() {
-        List<String> guba = emClient.guba("601088");
-        System.out.println(guba);
-
-    }
-
-
-    @Resource
-    private EmRealTimeClient emRealTimeClient;
-
-    @Test
-    public void fenShi() {
-//        String code = "688016";
-
-        //这里做一个测试
-        //1, 开盘放量
-//        List<EmCList> index = emClient.getIndex(IndexEnum.EM_MA_UP, true);
-        List<EmCList> index = emClient.getClistDefaultSize(true);
-        for (EmCList emCList : index) {
-            if (emCList.getF3Pct().compareTo(BDUtil.B7) < 0) continue;
-
             String code = emCList.getF12Code();
-            EastGetStockFenShiVo fEastGetStockFenShiVo = emRealTimeClient.getFenshiByCode(code);
-            if (fEastGetStockFenShiVo == null) continue;
-            EastGetStockFenShiTrans trans = EastGetStockFenShiTrans.trans(fEastGetStockFenShiVo);
-            if (trans == null) continue;
-            log.info("开盘 open {} vol={} amt={}", trans.getOpenPrice(), trans.getOpenVol(), trans.getOpenAmt());
-            if (trans.getOpenAmt() == null) continue;
+            String name = emCList.getF14Name();
 
-            List<EmDailyK> ks = emClient.getDailyKs(code, LocalDate.now(), 200, true);
-            if (ks.size() < 100) continue;
-            ks.remove(ks.size() - 1);
-            //计算 amt
-            BigDecimal dayAmtTop10 = emClient.amtTop10p(ks);
-            BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
-            BigDecimal fAmt = BDUtil.b0_1.multiply(hourAmt);
-            //成交量放大倍数
-            BigDecimal fx = trans.getOpenAmt().divide(hourAmt, 4, RoundingMode.HALF_UP);
+            //先查db
+            List<EmDailyKEntity> dbs = emDailyKRepo.findByCode(code);
+
+            List<EmDailyK> ks = new ArrayList<>();
+
+            if (dbs == null || dbs.size() == 0) {
+//                ks = emClient.getDailyKs(code, LocalDate.now(), 2000, false);
+//                if (ks == null ) {
+//                    continue;
+//                }
+//
+//                for (EmDailyK k : ks) {
+//                    EmDailyKEntity entity = new EmDailyKEntity();
+//                    BeanUtils.copyProperties(k, entity);
+//                    entity.setId(null);
+//                    emDailyKRepo.save(entity);
+//                }
 
 
-            //code=301085 name=亚康股份 openPct=1.0404 amt top10p=709323427 hourAmt=177330857 fAmt=17733085.7 openAmt=14602884.000 fx=0.0823 pct=7.54
-            //code=301095 name=广立微 openPct=1.0187 amt top10p=667663826 hourAmt=166915957 fAmt=16691595.7 openAmt=3205190.000 fx=0.0192 pct=10.51
-            //条件 fx > 0.01
-//            if (fx.compareTo(BDUtil.b0_01) < 0) continue;
-            BigDecimal diff = emCList.getF2Close().subtract(emCList.getF17Open()).divide(emCList.getF17Open(), 4, RoundingMode.HALF_UP);
-            log.info("code={} name={} openPct={} amt top10p={} hourAmt={} fAmt={} openAmt={} fx={} pct={}", code, emCList.getF14Name()
-                    , trans.getOpenPrice().divide(trans.getClosePre(), 4, RoundingMode.HALF_UP), dayAmtTop10, hourAmt, fAmt, trans.getOpenAmt(), fx, emCList.getF3Pct());
-            log.error("match fx={} close-open={} {}", fx, diff.multiply(BDUtil.B100), emCList);
+            } else {
 
-            fenshiService.saveOrUpdate(trans, null);
-        }
-
-    }
-
-    @Resource
-    private FenshiService fenshiService;
-
-    @Test
-    public void save() {
-
-        String dir = "/Users/dwd/Downloads/search/mj/20220610";
-        FileUtil.readDirectoryFilesAbsPath(dir);
-        List<EmCList> list = emClient.getClistDefaultSize(true);
-        for (EmCList emCList : list) {
-            if (emCList.getF3Pct().compareTo(BDUtil.B7) < 0) {
-
-                if (emCList.getF17Open().compareTo(BigDecimal.ZERO) > 0
-                        && emCList.getF18Close().subtract(emCList.getF17Open())
-                        .divide(emCList.getF17Open(), 4, RoundingMode.HALF_UP).compareTo(BDUtil.b0_05) > 0) {
-                    //例外情况 低开高走 5% 以上
-                } else {
-                    continue;
+                for (EmDailyKEntity db : dbs) {
+                    EmDailyK k = new EmDailyK();
+                    BeanUtils.copyProperties(db, k);
+                    ks.add(k);
                 }
             }
 
+
+            for (int i = 2; i < ks.size() - 5; i++) {
+                EmDailyK preK = ks.get(i - 1);
+                EmDailyK k = ks.get(i);
+
+                //preK 涨停
+
+                //k T 字或 一 字
+
+                if (k.getPct().compareTo(BigDecimal.ONE) > 0
+                        && k.getClose().compareTo(k.getOpen()) == 0
+                        && k.getClose().compareTo(k.getHigh()) == 0
+                        && k.getLow().compareTo(new BigDecimal("0.95").multiply(k.getClose())) > 0) {
+                    //判断pre 是否为涨停
+//                    EmDailyK k1 = ks.get(i + 1);
+//                    BigDecimal openDiff = k1.getOpen().subtract(k1.getPreClose());
+//                    BigDecimal k1openPct = openDiff.divide(k1.getPreClose(), 4, RoundingMode.HALF_UP);
+//                    if (k1openPct.compareTo(new BigDecimal("0.015")) <= 0
+//                            && k1openPct.compareTo(new BigDecimal("-0.01")) > 0) {
+//                    } else {
+//                        continue;
+//                    }
+
+//                    if (highBreak(preK) && k.getAmt().compareTo(new BigDecimal("0.5").multiply(preK.getAmt())) < 0) {
+                    if (highBreak(preK)) {
+
+                        //判断当前是第几个板
+                        int count = 1;
+
+                        for (int j = 1; j < 20; j++) {
+                            int index = i - j;
+                            if (index < 0) {
+                                break;
+                            }
+                            if (highBreak(ks.get(index))) {
+                                count++;
+                            } else {
+                                break;
+                            }
+                        }
+
+                        if (k.getClose().compareTo(k.getLow()) == 0) {
+                            log.info("满足条件 一字板 {}板 且缩量1/2 name={} td={} amt={} close={} {}", count, name + code, k.getTradeDate(), BDUtil.amtHuman(k.getAmt()), k.getClose(), JSON.toJSONString(k));
+                        } else {
+                            log.info("满足条件 T字板 {}板 且缩量1/2 name={} td={} amt={} close={} {}", count, name + code, k.getTradeDate(), BDUtil.amtHuman(k.getAmt()), k.getClose(), JSON.toJSONString(k));
+                        }
+
+                        //判断 post 5 天open close 幅度
+                        StopEntity stopEntity = new StopEntity();
+                        stopEntity.setCode(code);
+                        stopEntity.setName(name);
+                        stopEntity.setTradeDate(k.getTradeDate());
+                        stopEntity.setOpen(k.getOpen());
+                        stopEntity.setClose(k.getClose());
+                        stopEntity.setHigh(k.getHigh());
+                        stopEntity.setLow(k.getLow());
+                        stopEntity.setPct(k.getPct());
+                        stopEntity.setAmt(k.getAmt());
+                        stopEntity.setStopCount(new BigDecimal(count));
+
+                        stopEntity.setPreAmt(preK.getAmt());
+                        stopEntity.setPreAmtRate(k.getAmt().divide(preK.getAmt(), 4, RoundingMode.HALF_UP));
+
+
+                        for (int j = 1; j <= 5; j++) {
+                            EmDailyK postK = ks.get(i + j);
+                            BigDecimal openPct = (postK.getOpen().subtract(k.getClose())).divide(k.getClose(), 4, RoundingMode.HALF_UP);
+                            BigDecimal closePct = (postK.getClose().subtract(k.getClose())).divide(k.getClose(), 4, RoundingMode.HALF_UP);
+                            BigDecimal entityPct = postK.getClose().subtract(postK.getOpen()).divide(postK.getPreClose(), 4, RoundingMode.HALF_UP);
+
+                            if (j == 2) {
+                                log.error("post {}K td={} amt={} open={} openPct={} close={} closePct={} 实体={} {}", j, postK.getTradeDate(), BDUtil.amtHuman(postK.getAmt()), postK.getOpen(), BDUtil.p100(openPct), postK.getClose(), BDUtil.p100(closePct), BDUtil.p100(entityPct), JSON.toJSONString(postK));
+                            } else {
+                                log.info("post {}K td={} amt={} open={} openPct={} close={} closePct={} 实体={} {}", j, postK.getTradeDate(), BDUtil.amtHuman(postK.getAmt()), postK.getOpen(), BDUtil.p100(openPct), postK.getClose(), BDUtil.p100(closePct), BDUtil.p100(entityPct), JSON.toJSONString(postK));
+                            }
+
+                            if (j == 1) {
+                                stopEntity.setPostK1Open(postK.getOpen());
+                                stopEntity.setPostK1Close(postK.getClose());
+                                stopEntity.setPostK1Open(postK.getOpen());
+                                stopEntity.setPostK1OpenPct(openPct);
+                                stopEntity.setPostK1ClosePct(closePct);
+                                stopEntity.setPostK1Amt(postK.getAmt());
+                                stopEntity.setPostK1TradeDate(postK.getTradeDate());
+                            }
+
+
+                            if (j == 2) {
+                                stopEntity.setPostK2Open(postK.getOpen());
+                                stopEntity.setPostK2Close(postK.getClose());
+                                stopEntity.setPostK2OpenPct(openPct);
+                                stopEntity.setPostK2ClosePct(closePct);
+                                stopEntity.setPostK2Amt(postK.getAmt());
+                                stopEntity.setPostK2TradeDate(postK.getTradeDate());
+                            }
+
+
+                            if (j == 3) {
+                                stopEntity.setPostK3Open(postK.getOpen());
+                                stopEntity.setPostK3Close(postK.getClose());
+                                stopEntity.setPostK3OpenPct(openPct);
+                                stopEntity.setPostK3ClosePct(closePct);
+                                stopEntity.setPostK3Amt(postK.getAmt());
+                                stopEntity.setPostK3TradeDate(postK.getTradeDate());
+                            }
+
+
+                            if (j == 4) {
+                                stopEntity.setPostK4Open(postK.getOpen());
+                                stopEntity.setPostK4Close(postK.getClose());
+                                stopEntity.setPostK4OpenPct(openPct);
+                                stopEntity.setPostK4ClosePct(closePct);
+                                stopEntity.setPostK4Amt(postK.getAmt());
+                                stopEntity.setPostK4TradeDate(postK.getTradeDate());
+                            }
+
+
+                            if (j == 5) {
+                                stopEntity.setPostK5Open(postK.getOpen());
+                                stopEntity.setPostK5Close(postK.getClose());
+                                stopEntity.setPostK5OpenPct(openPct);
+                                stopEntity.setPostK5ClosePct(closePct);
+                                stopEntity.setPostK5Amt(postK.getAmt());
+                                stopEntity.setPostK5TradeDate(postK.getTradeDate());
+                            }
+
+                        }
+
+
+                        stopRepo.save(stopEntity);
+                    }
+
+                }
+
+
+            }
+
+        }
+    }
+
+
+    public boolean highBreak(EmDailyK k) {
+        BigDecimal f = new BigDecimal("1.095");
+
+        if (k.getPct().compareTo(BigDecimal.ONE) > 0
+                && k.getHigh().compareTo(k.getClose()) == 0
+                && k.getOpen().compareTo(k.getClose()) == 0
+                && k.getHigh().compareTo(f.multiply(k.getPreClose())) >= 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    @Test
+    public void tOpen() {
+        List<EmCList> list = emClient.getClistDefaultSize(false);
+        StringBuffer b = new StringBuffer();
+        b.append("name,code,stop,td,开盘额,hsl,开盘amt/ma60,开盘amt/昨日,昨日amt/ma60,openPct,closePct,open2Pct\n");
+        for (EmCList emCList : list) {
             String code = emCList.getF12Code();
+            String name = emCList.getF14Name();
+
+//            //先查db
+            List<EmDailyKEntity> dbs = emDailyKRepo.findByCode(code);
+
+            List<EmDailyK> ks = new ArrayList<>();
+
+            for (EmDailyKEntity db : dbs) {
+                EmDailyK k = new EmDailyK();
+                BeanUtils.copyProperties(db, k);
+                ks.add(k);
+            }
+
+            BigDecimal[] amtArr = ks.stream().map(EmDailyK::getAmt).toList().toArray(new BigDecimal[0]);
+            List<String> tds = ks.stream().map(EmDailyK::getTradeDate).toList();
+
+            BigDecimal[] ma60s = MaUtil.ma(60, amtArr, 2);
+
+            HashMap<String, BigDecimal> map = new HashMap<>();
+            HashMap<String, EmDailyK> mapK = new HashMap<>();
+            for (int i = 1; i < ma60s.length; i++) {
+                String tradeDate = ks.get(i).getTradeDate();
+                map.put(tradeDate, ma60s[i - 1]);
+                mapK.put(tradeDate, ks.get(i));
+            }
+
+            List<OpenEmCListEntity> openList = openEmCListRepo.findByF12Code(code);
+            for (int i = 1; i < openList.size() - 1; i++) {
+                OpenEmCListEntity o = openList.get(i);
+                String tradeDate = o.getTradeDate();
+
+                int tdi = tds.indexOf(tradeDate);
+                if (tdi < 1 || tdi + 1 > tds.size() - 1) {
+                    continue;
+                }
 
 
-            try {
-                EastGetStockFenShiVo fEastGetStockFenShiVo = emRealTimeClient.getFenshiByCode(code);
-                if (fEastGetStockFenShiVo == null) continue;
-                EastGetStockFenShiTrans trans = EastGetStockFenShiTrans.trans(fEastGetStockFenShiVo);
-                if (trans == null) continue;
-                if (trans.getOpenAmt() == null
-                        || trans.getOpenAmt().compareTo(BDUtil.B1Y) < 0) continue;
+                String tradeDate_1 = tds.get(tdi - 1);
+                EmDailyK k1 = mapK.get(tradeDate_1);
 
 
-                fenshiService.saveOrUpdate(trans, null);
-            } catch (Exception e) {
-                log.error("save error {}", e.getMessage(), e);
+                if (k1 == null) continue;
+                if (k1.getHigh().compareTo(k1.getClose()) == 0
+                        && k1.getOpen().compareTo(k1.getClose()) == 0
+                        && k1.getPct().compareTo(new BigDecimal("9.5")) > 0) {
+
+                } else {
+                    continue;
+                }
+
+                int stopT = 1;
+                for (int j = 2; j < 10; j++) {
+                    //判断当前是几板
+                    int index = i - j;
+                    if (index < 0) {
+                        break;
+                    }
+
+
+                    OpenEmCListEntity o_j = openList.get(index);
+                    EmDailyK kj = mapK.get(o_j.getTradeDate());
+
+                    if (kj != null) {
+                        if (kj.getHigh().compareTo(kj.getClose()) == 0
+                                && kj.getPct().compareTo(new BigDecimal("9.5")) > 0) {
+                            stopT++;
+                        }
+                    }
+
+                }
+
+
+                BigDecimal ma60 = map.get(tradeDate);
+                if (ma60 == null || ma60.compareTo(BigDecimal.ZERO) == 0) {
+                    continue;
+                }
+                BigDecimal f6Amt = o.getF6Amt();
+                if (f6Amt.compareTo(BDUtil.B1000W) < 0) {
+                    continue;
+                }
+
+                EmDailyK k = mapK.get(tradeDate);
+                BigDecimal openPct = k.getOpen().subtract(k.getPreClose()).divide(k.getPreClose(), 4, RoundingMode.HALF_UP);
+                o.setF3Pct(openPct.multiply(BDUtil.B100));
+                if (o.getF3Pct().compareTo(new BigDecimal("9.5")) > 0 || o.getF3Pct().compareTo(BigDecimal.ZERO) < 0) {
+                    continue;
+                }
+
+
+                BigDecimal openAmt60Pct = f6Amt.divide(ma60, 4, RoundingMode.HALF_UP);
+                BigDecimal openK1AmtPct = f6Amt.divide(k1.getAmt(), 4, RoundingMode.HALF_UP);
+
+
+                EmDailyK k2 = mapK.get(tds.get(tdi + 1));
+                if (k2 == null) {
+                    continue;
+                }
+                BigDecimal o2Pct = (k2.getOpen().subtract(o.getF2Close())).divide(o.getF2Close(), 4, RoundingMode.HALF_UP);
+                log.info("\nname={} td={} openAmt={} openAmtPct={} openPct={} closePct={} open2Pct={} ", name + code, tradeDate, BDUtil.amtHuman(o.getF6Amt()), BDUtil.p100(openAmt60Pct), o.getF3Pct(), k.getPct(), BDUtil.p100(o2Pct));
+
+                BigDecimal openKr = openK1AmtPct.compareTo(BigDecimal.ZERO) == 0 ? BDUtil.B100 : openAmt60Pct.divide(openK1AmtPct, 4, RoundingMode.HALF_UP);
+                b.append(name)
+                        .append(",").append(code)
+                        .append(",").append(stopT)
+                        .append(",").append(tradeDate)
+                        .append(",").append((o.getF6Amt()))
+                        .append(",").append(o.getF8Turnover())
+                        .append(",").append(BDUtil.p100(openAmt60Pct))
+                        .append(",").append(BDUtil.p100(openK1AmtPct))
+                        .append(",").append(openKr)
+                        .append(",").append((o.getF3Pct()))
+                        .append(",").append((k.getPct()))
+                        .append(",").append(BDUtil.p100(o2Pct)).append("\n");
             }
 
         }
-
-
+        FileUtil.writeToFile("openPct.csv", b.toString());
     }
 
-
-    @Resource
-    private FenshiSimpleRepo fenshiSimpleRepo;
 
     @Test
-    public void fenshiSimple() {
-        String td = LocalDate.now().toString().replaceAll("-", "");
-        HashSet<EmCList> set = new HashSet<>();
-        List<EmCList> emList = emClient.getClistDefaultSize(true);
-
-        AtomicInteger counter = new AtomicInteger(0);
-
-        for (EmCList e : emList) {
-            try {
-                System.out.println(counter.get());
-                if (counter.getAndIncrement() % 10 == 0) Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                log.error("sleep 1s");
-            }
-            String code = e.getF12Code();
-            int i = fenshiSimpleRepo.countByCodeAndTradeDate(code, td);
-            if (i > 0) continue;
-
-            EastGetStockFenShiVo fEastGetStockFenShiVo = emRealTimeClient.getFenshiByCode(code);
-            if (fEastGetStockFenShiVo == null) {
-                set.add(e);
-                continue;
-            }
-
-            EastGetStockFenShiTrans trans = EastGetStockFenShiTrans.trans(fEastGetStockFenShiVo);
-            if (trans == null) {
-                set.add(e);
-                continue;
-            }
-
-            saveToFenshiSimple(td, e, trans);
-        }
-
-
-        for (EmCList e : set) {
-            try {
-                if (counter.getAndIncrement() % 10 == 0) Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                log.error("sleep 1s");
-            }
-            String code = e.getF12Code();
-            int i = fenshiSimpleRepo.countByCodeAndTradeDate(code, td);
-            if (i > 0) continue;
-
-            EastGetStockFenShiVo fEastGetStockFenShiVo = emRealTimeClient.getFenshiByCode(code);
-            if (fEastGetStockFenShiVo == null) {
-                continue;
-            }
-
-            EastGetStockFenShiTrans trans = EastGetStockFenShiTrans.trans(fEastGetStockFenShiVo);
-            if (trans == null) {
-                continue;
-            }
-
-            saveToFenshiSimple(td, e, trans);
-        }
-
-
-    }
-
-    private void saveToFenshiSimple(String td, EmCList e, EastGetStockFenShiTrans trans) {
-
-        try {
-            FenshiSimpleEntity fenshiSimpleEntity = new FenshiSimpleEntity();
-            BeanUtils.copyProperties(e, fenshiSimpleEntity);
-            fenshiSimpleEntity.setData(JSON.toJSONString(trans));
-
-            fenshiSimpleEntity.setId(null);//Long id;
-            fenshiSimpleEntity.setCode(trans.getCode());//String code;
-            fenshiSimpleEntity.setName(trans.getName());//String name;
-            fenshiSimpleEntity.setClosePre(trans.getClosePre());//BigDecimal open;//当前价
-            fenshiSimpleEntity.setOpen(trans.getOpenPrice());//BigDecimal open;//当前价
-            fenshiSimpleEntity.setOpenVol(trans.getOpenVol());//BigDecimal openVol;//开盘量
-            fenshiSimpleEntity.setOpenAmt(trans.getOpenAmt());//BigDecimal openAmt;//开盘额
-            fenshiSimpleEntity.setCreateTime(LocalDateTime.now());//LocalDateTime createTime;//创建时间
-            fenshiSimpleEntity.setTradeDate(td);
-            fenshiSimpleRepo.saveAndFlush(fenshiSimpleEntity);
-        } catch (Exception ex) {
-            log.error("{}", ex.getMessage());
-        }
-    }
-
-
-    @Test
-    public void update1() {
-//        String td = "20231031";
-//        String tdPre = "20231030";
-        String td = DateUtil.tdPre(0);
-        String tdPre = DateUtil.tdPre(3);
-
-        List<EmCList> list = emClient.getClistDefaultSize(true);
-        boolean flag = false;
+    public void to() {
+        List<EmCList> list = emClient.getClistDefaultSize(false);
+        StringBuffer b = new StringBuffer();
+        b.append("name").append(",").append("code").append(",").append("td").append(",")
+                .append("amt").append(",")
+                .append("ma5Pct_1").append(",")
+                .append("ma60Pct_1").append(",")
+                .append("ma5Pct").append(",")
+                .append("ma60Pct").append(",")
+                .append("open").append(",")
+                .append("high").append(",")
+                .append("low").append(",")
+                .append("close").append(",")
+                .append("pct").append(",").append("次开").append("\n");
         for (EmCList emCList : list) {
-            log.info(emCList.getF12Code());
-//            if ("301023".equals(emCList.getF12Code())){
-//                flag = true;
-//            }
-//            if (!flag){
-//                continue;
-//            }
-            FenshiSimpleEntity dbEntity = fenshiSimpleRepo.findByCodeAndTradeDate(emCList.getF12Code(), td);
-            if (dbEntity == null) continue;
+            String code = emCList.getF12Code();
+            String name = emCList.getF14Name();
 
-            FenshiSimpleEntity dbEntityPre = fenshiSimpleRepo.findByCodeAndTradeDate(emCList.getF12Code(), tdPre);
-            if (dbEntityPre == null) continue;
+//            //先查db
+            List<EmDailyKEntity> dbs = emDailyKRepo.findByCode(code);
 
-            if (dbEntity.getOpenAmt() == null
-                    || dbEntityPre.getOpenAmt() == null
-                    || dbEntityPre.getOpenAmt().compareTo(BigDecimal.ZERO) == 0) {
-                dbEntity.setOpenAmtPre(BigDecimal.ZERO);
-                dbEntity.setOpenAmtPreFx(BigDecimal.ZERO);
-            } else {
-
-                dbEntity.setOpenAmtPre(dbEntityPre.getOpenAmt());
-                dbEntity.setOpenAmtPreFx(dbEntity.getOpenAmt()
-                        .divide(dbEntityPre.getOpenAmt(), 4, RoundingMode.HALF_UP));
-            }
-
-
-            try {
-                BigDecimal openPct = dbEntity.getF17Open().subtract(dbEntity.getClosePre()).divide(dbEntity.getClosePre(), 4, RoundingMode.HALF_UP);
-                BigDecimal holdPct = dbEntity.getF2Close().subtract(dbEntity.getF17Open()).divide(dbEntity.getF17Open(), 4, RoundingMode.HALF_UP);
-                dbEntity.setOpenPct(openPct);//openPct;//开盘幅度 (open - closePre )/ closePre
-                dbEntity.setHoldPct(holdPct);//holdPct;//开盘幅度 (close - open )/ open
-            } catch (Exception e) {
-
-                dbEntity.setOpenPct(BigDecimal.valueOf(-100));//openPct;//开盘幅度 (open - closePre )/ closePre
-                dbEntity.setHoldPct(BigDecimal.valueOf(-100));//holdPct;//开盘幅度 (close - open )/ open
-            }
-
-            //计算 amt
-            try {
-                List<EmDailyK> ks = emClient.getDailyKs(dbEntity.getCode(), LocalDate.now(), 100, false);
-                ks.remove(ks.size() - 1);
-                ks.remove(ks.size() - 1);
-
-                BigDecimal dayAmtTop10 = emClient.amtTop10p(ks);
-                BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
-                BigDecimal fAmt = BDUtil.b0_1.multiply(hourAmt);
-                //成交量放大倍数
-                dbEntity.setFAmt(fAmt);
-                dbEntity.setFAmtFx(dbEntity.getOpenAmt().divide(fAmt, 4, RoundingMode.HALF_UP));
-            } catch (Exception e) {
-                dbEntity.setFAmt(BigDecimal.ZERO);
-                dbEntity.setFAmtFx(BigDecimal.ZERO);
-            }
-
-            fenshiSimpleRepo.saveAndFlush(dbEntity);
-        }
-    }
-
-
-    @Test
-    public void filter() {
-        List<EmCList> list = emClient.getClistDefaultSize(true);
-        List<String> dbLists = fenshiSimpleRepo.findCodesByOpenAmt(BDUtil.B5000W);
-
-        HashSet<String> set = new HashSet<>(dbLists);
-
-        ArrayList<EmCList> filterList = new ArrayList<>();
-        for (EmCList emCList : list) {
-            if (!set.contains(emCList.getF12Code())) {
+            if (dbs.size() < 70){
                 continue;
             }
 
-            List<FenshiSimpleEntity> dbList = fenshiSimpleRepo.findByCode(emCList.getF12Code());
-            if (dbList == null || dbList.size() < 2) continue;
+            List<EmDailyK> ks = new ArrayList<>();
 
-            List<FenshiSimpleEntity> sortList = dbList.stream().sorted(Comparator.comparingLong(FenshiSimpleEntity::getId)).toList();
-            int size = sortList.size();
+            for (EmDailyKEntity db : dbs) {
+                EmDailyK k = new EmDailyK();
+                BeanUtils.copyProperties(db, k);
+                ks.add(k);
+            }
 
-            for (int i = size - 1; i > 0; i--) {
-                FenshiSimpleEntity item = sortList.get(i);
-                FenshiSimpleEntity item1 = sortList.get(i - 1);
-                if (item.getOpenAmt() != null && item1.getOpenAmt() != null) {
-                    if (item.getOpenAmt().compareTo(BDUtil.B5000W) > 0
-                            && item.getOpenAmt().compareTo(item1.getOpenAmt()) > 0) {
-                        filterList.add(emCList);
+            BigDecimal[] amtArr = ks.stream().map(EmDailyK::getAmt).toList().toArray(new BigDecimal[0]);
+
+            BigDecimal[] ma5s = MaUtil.ma(5, amtArr, 2);
+            BigDecimal[] ma60s = MaUtil.ma(60, amtArr, 2);
+
+
+
+            for (int i = 60; i < ks.size() - 1; i++) {
+                EmDailyK k = ks.get(i);
+                EmDailyK k_1 = ks.get(i - 1);
+                EmDailyK k1 = ks.get(i + 1);
+
+                if (k.getPreClose().compareTo(BigDecimal.ZERO)==0){
+                    continue;
+                }
+
+                if (k_1.getHigh().compareTo(k_1.getClose()) == 0
+                        && k_1.getOpen().compareTo(k_1.getClose()) == 0
+                        && k_1.getPct().compareTo(new BigDecimal("9.5")) > 0) {
+
+                    if (k.getHigh().compareTo(k.getClose()) == 0
+                            && k.getOpen().compareTo(k.getClose()) == 0
+                            && k.getLow().compareTo(k.getClose()) == 0
+                            && k.getPct().compareTo(new BigDecimal("9.5")) > 0) {
+
+                    } else {
+                        BigDecimal k1OpenPct = k1.getOpen().subtract(k.getClose()).divide(k.getClose(), 4, RoundingMode.HALF_UP);
+
+                        BigDecimal ma5 = ma5s[i];
+                        BigDecimal ma60 = ma60s[i];
+                        BigDecimal ma5Pct = k.getAmt().divide(ma5, 4, RoundingMode.HALF_UP);
+                        BigDecimal ma60Pct = k.getAmt().divide(ma60, 4, RoundingMode.HALF_UP);
+
+                        BigDecimal ma5_1 = ma5s[i-1];
+                        BigDecimal ma60_1 = ma60s[i-1];
+                        BigDecimal ma5Pct_1 = k_1.getAmt().divide(ma5_1, 4, RoundingMode.HALF_UP);
+                        BigDecimal ma60Pct_1 = k_1.getAmt().divide(ma60_1, 4, RoundingMode.HALF_UP);
+
+                        b.append(name).append(",").append(code).append(",").append(k.getTradeDate()).append(",")
+                                .append(BDUtil.amtHuman(k.getAmt())).append(",")
+
+                                .append(BDUtil.p100(ma5Pct_1)).append(",")
+                                .append(BDUtil.p100(ma60Pct_1)).append(",")
+
+                                .append(BDUtil.p100(ma5Pct)).append(",")
+                                .append(BDUtil.p100(ma60Pct)).append(",")
+                                .append(BDUtil.p100((k.getOpen().subtract(k.getPreClose())).divide(k.getPreClose(),4,RoundingMode.HALF_UP))).append(",")
+                                .append(BDUtil.p100((k.getHigh().subtract(k.getPreClose())).divide(k.getPreClose(),4,RoundingMode.HALF_UP))).append(",")
+                                .append(BDUtil.p100((k.getLow().subtract(k.getPreClose())).divide(k.getPreClose(),4,RoundingMode.HALF_UP))).append(",")
+                                .append(BDUtil.p100((k.getClose().subtract(k.getPreClose())).divide(k.getPreClose(),4,RoundingMode.HALF_UP))).append(",")
+                                .append((k.getPct())).append(",").append(BDUtil.p100(k1OpenPct)).append("\n");
                     }
                 }
             }
         }
 
-        System.out.println("filter list");
-        for (EmCList emCList : filterList) {
-            System.out.println(JSON.toJSONString(emCList));
+        FileUtil.writeToFile("t_" + new Date().getTime() + ".csv", b.toString());
+    }
+
+    @Test
+    public void openmarket() {
+        String path = "/Users/dwd/Downloads/east/";
+        List<String> list = FileUtil.readDirectoryDirsAbsPath(path);
+
+        HashMap<String, List<String>> codeTdList = new HashMap<>();
+        for (int i = 0; i < list.size(); i++) {
+            String dir = list.get(i);
+            String td = dir.substring(dir.length() - 8);
+            LocalDate ltd = DateUtil.strToLocalDate(td, "yyyyMMdd");
+            if (ltd.getDayOfWeek().getValue() > 5) {
+                continue;
+            }
+            List<String> files = FileUtil.readDirectoryFilesAbsPath(dir);
+            for (String file : files) {
+                if (file.startsWith(".")) {
+                    continue;
+                }
+                //取 filename 最后 10个字符
+                String code = file.substring(file.length() - 10, file.length() - 4);
+                List<String> tdList = codeTdList.computeIfAbsent(code, k -> new ArrayList<>());
+                tdList.add(td);
+            }
         }
 
-    }
+        for (String code : codeTdList.keySet()) {
 
+            List<String> tdList = codeTdList.get(code);
+            Collections.sort(tdList);
+//            List<EmDailyK> ks = emClient.getDailyKs(code, LocalDate.now(), 2000, false);
 
-    @Test
-    public void famt() {
-        String code = "600520";
-        List<EmDailyK> ks = emClient.getDailyKs(code, LocalDate.now(), 500, true);
-        ks.remove(ks.size() - 1);
+//            //先查db
+            List<EmDailyKEntity> dbs = emDailyKRepo.findByCode(code);
 
-        //计算 amt
-        BigDecimal dayAmtTop10 = emClient.amtTop10p(ks);
-        BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
-        BigDecimal fAmt = BDUtil.b0_1.multiply(hourAmt);
+            List<EmDailyK> ks = new ArrayList<>();
 
-        System.out.println(fAmt);
-//        if (fAmt.compareTo(BDUtil.B5000W) > 0 || fAmt.compareTo(BDUtil.B1000W) < 0) {
-//            continue;
-//        }
-    }
-
-
-    @Resource
-    private WxUtil wxUtil;
-
-    @Test
-    public void sCodeRunOpen() {
-        {
-            //判断昨天集合竞价
-
-            String code = "300291";
-            //判断fx
-            List<EmDailyK> ks = emClient.getDailyKs(code, LocalDate.now(), 300, true);
-            if (ks.size() < 300) {
-                log.info("runOpen code {} size < 300", code);
-                return;
+            for (EmDailyKEntity db : dbs) {
+                EmDailyK k = new EmDailyK();
+                BeanUtils.copyProperties(db, k);
+                ks.add(k);
             }
 
 
-            //不清楚这个时候 是否出了最新的k
-            EmDailyK k = ks.get(ks.size() - 1);
-
-            String td = LocalDate.now().toString().replaceAll("-", "");
-
-            ks.remove(ks.size() - 1);
-
-            Map<String, BigDecimal[]> ma = MaUtil.ma(ks);
-            BigDecimal[] ma5 = ma.get("ma5");
-            BigDecimal[] ma10 = ma.get("ma10");
-            BigDecimal[] ma20 = ma.get("ma20");
-            BigDecimal[] ma30 = ma.get("ma30");
-            BigDecimal[] ma60 = ma.get("ma60");
-            BigDecimal[] ma120 = ma.get("ma120");
-            BigDecimal[] ma250 = ma.get("ma250");
-
-            int last = ks.size() - 1;
-            if (k.getClose().compareTo(ma5[last]) < 0
-                    || k.getClose().compareTo(ma10[last]) < 0
-                    || k.getClose().compareTo(ma20[last]) < 0
-                    || k.getClose().compareTo(ma30[last]) < 0
-                    || k.getClose().compareTo(ma60[last]) < 0
-                    || k.getClose().compareTo(ma120[last]) < 0
-                    || k.getClose().compareTo(ma250[last]) < 0) {
-                log.info("runOpen code {} 不满足均线之上", code);
+            HashMap<String, EmDailyK> mapK = new HashMap<>();
+            for (EmDailyK k : ks) {
+                mapK.put(k.getTradeDate(), k);
             }
 
-
-            //计算 amt
-            BigDecimal dayAmtTop10 = emClient.amtTop10p(ks);
-            BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
-            BigDecimal fAmt = BDUtil.b0_1.multiply(hourAmt);
-            if (fAmt.compareTo(BDUtil.B1000W) < 0) {
-                log.info("runOpen code {} 不满足条件(约成交额 fAmt<500w)", code);
-                return;
-            }
-
-
-            //成交量放大倍数
-
-//            BigDecimal fx = k.getAmt().divide(fAmt, 4, RoundingMode.HALF_UP);
-            BigDecimal fx = BigDecimal.valueOf(65000000).divide(fAmt, 4, RoundingMode.HALF_UP);
-            if (fx.compareTo(BDUtil.B5) > 0) {
-                String content = k.getCode() + k.getName()
-                        + "<br>bk=" + k.getBk()
-                        + "<br>p=" + k.getClose()
-                        + "<br>pct=" + k.getPct() + "%"
-                        + "<br>fx=" + fx
-                        + "<br>amt=" + BDUtil.amtHuman(k.getAmt())
-                        + "<br>td=" + LocalDateTime.now().toString().substring(0, 16);
-                try {
-                    String encodedContent = URLEncoder.encode(content, StandardCharsets.UTF_8);
-                    wxUtil.send(encodedContent);
-
-                } catch (Exception ex) {
-                    log.error("{}", ex.getMessage(), ex);
+            for (String t : tdList) {
+                String f = path + t + "/" + code + ".txt";
+                EastGetStockFenShiVo vo = getFenshiByCodeFromLocal(code, f, true);
+                if (vo == null) {
+                    continue;
+                }
+                EastGetStockFenShiTrans trans = EastGetStockFenShiTrans.trans(vo);
+                if (trans == null) {
+                    continue;
                 }
 
+                if (trans.getOpenPrice() == null || trans.getOpenAmt() == null) {
+                    continue;
+                }
+
+                EmDailyK k = mapK.get(t);
+                if (k == null) {
+                    continue;
+                }
+                if (trans.getOpenPrice().compareTo(k.getOpen()) != 0) {
+                    continue;
+                }
+
+                OpenEmCListEntity entity = new OpenEmCListEntity();
+                OpenEmCListEntity db = openEmCListRepo.findByF12CodeAndTradeDate(code, t);
+                if (db != null) {
+                    continue;
+                }
+
+                entity.setId(null);
+                entity.setCreateTime(LocalDateTime.now());//  `create_time` datetime(6) DEFAULT NULL,
+                entity.setF100bk(k.getBk());//  `f100bk` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+                entity.setF10VolRatio(BigDecimal.ZERO);//  `f10vol_ratio` decimal(38,2) DEFAULT NULL,
+                entity.setF12Code(code);//  `f12code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+                entity.setF14Name(k.getName());//  `f14name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+                entity.setF15High(trans.getOpenPrice());//  `f15high` decimal(38,2) DEFAULT NULL,
+                entity.setF16Low(trans.getOpenPrice());//  `f16low` decimal(38,2) DEFAULT NULL,
+                entity.setF17Open(trans.getOpenPrice());//  `f17open` decimal(38,2) DEFAULT NULL,
+                entity.setF18Close(trans.getOpenPrice());//  `f18close` decimal(38,2) DEFAULT NULL,
+                entity.setF1Amt(BigDecimal.ZERO);//  `f1amt` decimal(38,2) DEFAULT NULL,
+                entity.setF22Speed(BigDecimal.ZERO);//  `f22speed` decimal(38,2) DEFAULT NULL,
+                entity.setF23Pb(BigDecimal.ZERO);//  `f23pb` decimal(38,2) DEFAULT NULL,
+                entity.setF2Close(trans.getOpenPrice());//  `f2close` decimal(38,2) DEFAULT NULL,
+                BigDecimal od = k.getOpen().subtract(k.getPreClose());
+                BigDecimal openPct = (od).divide(k.getPreClose(), 4, RoundingMode.HALF_UP);
+                entity.setF3Pct(openPct);//  `f3pct` decimal(38,2) DEFAULT NULL,
+                entity.setF4Chg(od);//  `f4chg` decimal(38,2) DEFAULT NULL,
+                entity.setF5Vol(trans.getOpenVol());//  `f5vol` decimal(38,2) DEFAULT NULL,
+                entity.setF6Amt(trans.getOpenAmt());//  `f6amt` decimal(38,2) DEFAULT NULL,
+                entity.setF7Amp(BigDecimal.ZERO);//  `f7amp` decimal(38,2) DEFAULT NULL,
+                entity.setF8Turnover(BigDecimal.ZERO);//  `f8turnover` decimal(38,2) DEFAULT NULL,
+                entity.setF9Pe(BigDecimal.ZERO);//  `f9pe` decimal(38,2) DEFAULT NULL,
+                entity.setOpenX(BigDecimal.ZERO);//  `openx` decimal(38,2) DEFAULT NULL,
+                entity.setTradeDate(t);//  `trade_date` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+                entity.setUpdateTime(LocalDateTime.now());//  `update_time` datetime(6) DEFAULT NULL,
+                openEmCListRepo.save(entity);
             }
-            log.info("runOpen code {} 不满足条件 fx > 5 fx={}", code, fx);
+
         }
+
+
+    }
+
+    public EastGetStockFenShiVo getFenshiByCodeFromLocal(String code, String path, boolean absPath) {
+
+        try {
+            String abs = "";
+            if (absPath) {
+                abs = path;
+            } else {
+                abs = path + "/" + code + ".txt";
+            }
+            String body = FileUtil.readFromFile(abs);
+            JSONObject data = JSONObject.parseObject(body).getJSONObject("data");
+            log.info("body length={}", body.length());
+
+            if (data != null) {
+                EastGetStockFenShiVo vo = data.toJavaObject(EastGetStockFenShiVo.class);
+                return vo;
+            }
+
+        } catch (Exception e) {
+            log.warn("get fenshi exception {} {}", e.getMessage(), e);
+        }
+
+        return null;
     }
 
 
-    @Resource
-    private MarketJob marketJob;
-
     @Test
-    public void tmp1() {
-
-//        marketJob.con();
-
-//        List<String> list = emClient.coreTheme("002584");
-//        System.out.println(list);
-//        List<String> listD = emClient.coreThemeDetail("002584");
-//        System.out.println(listD);
-
-
-//        List<String> list = emClient.crossMa();
+    public void testD() {
+//        OpenEmCListEntity db = openEmCListRepo.findByF12CodeAndTradeDate("000004", "20231116");
 //
-//        System.out.println(list);
+//        System.out.println(db);
 
-        marketJob.themePct();
+        ArrayList<String> list = new ArrayList<>();
+        list.add("20220111");
+        list.add("20230112");
+        list.add("20231112");
+        list.add("20231113");
+
+        int i = list.indexOf("20230112");
+        System.out.println(i);
+
+        i = list.indexOf("202301121");
+        System.out.println(i);
 
     }
 
-
-    @Resource
-    private ThemeScoreRepo themeScoreRepo;
-
-    @Test
-    public void themeScore() {
-
-
-        LocalDateTime now = LocalDateTime.now();
-        List<ThemeScoreEntity> list = themeScoreRepo.findAllByCreateTimeBetween(now.minusDays(2), now);
-
-        /*
-        [
-[
-"Income",
-"Life Expectancy",
-"Population",
-"Country",
-"Year"
-],
-[
-815,
-34.05,
-351014,
-"Australia",
-1800
-]]
-         */
-
-        if (list.size() == 0) return;
-
-        ArrayList<Object[]> array = new ArrayList<>(list.size() + 1);
-        Object[] head = new Object[5];
-        head[0] = "Income"; //score
-        head[1] = "Life Expectancy";
-        head[2] = "Population";
-        head[3] = "Country";//theme
-        head[4] = "Year";//creatTime
-        array.add(head);
-
-        for (ThemeScoreEntity themeScore : list) {
-            Object[] items = new Object[5];
-            items[0] = themeScore.getF2Score(); //"Income",
-            items[1] = themeScore.getF3Chg(); //"Life Expectancy",
-            items[2] = themeScore.getId(); //"Population",
-            items[3] = themeScore.getF1Theme(); //"Country",
-            items[4] = themeScore.getCreateTime();//"Year"
-            array.add(items);
-        }
-
-
-        System.out.println(JSON.toJSONString(array));
-    }
 
 }

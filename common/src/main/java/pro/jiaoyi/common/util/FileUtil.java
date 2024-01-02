@@ -111,4 +111,25 @@ public class FileUtil {
         }
         return Collections.emptyList();
     }
+
+
+    public static List<String> readDirectoryDirsAbsPath(String directoryPath) {
+        //获取dir下面所有文件名
+//        String directoryPath = "/Users/dwd/Downloads/search/zhihu_qid/brave"; // 替换为你要读取的目录的路径
+
+        File directory = new File(directoryPath);
+        File[] files = directory.listFiles();
+
+        if (files != null) {
+            ArrayList<String> fileList = new ArrayList<>();
+            for (File file : files) {
+                if (!file.isFile()) {
+                    fileList.add(file.getAbsolutePath());
+                }
+            }
+
+            return fileList;
+        }
+        return Collections.emptyList();
+    }
 }

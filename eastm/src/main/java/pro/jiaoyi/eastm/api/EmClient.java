@@ -55,7 +55,6 @@ public class EmClient {
     public static final BigDecimal B100 = new BigDecimal("100");
     public static final BigDecimal B1000 = new BigDecimal("1000");
 
-    //获取日线行情数据
     public List<EmDailyK> getDailyKs(String code, LocalDate end, int lmt, boolean force) {
         if (code == null) {
             return Collections.emptyList();
@@ -915,8 +914,8 @@ public class EmClient {
         Elements list = doc.select(".listitem");
         if (list.size() == 0) return Collections.emptyList();
 
-        HashSet<String> gubaList = new HashSet<>(5);
-        for (int i = 0; i < 5; i++) {
+        HashSet<String> gubaList = new HashSet<>(10);
+        for (int i = 0; i < 10; i++) {
             Element ele = list.get(i);
             String content = "<br>" + (i + 1) + "_read=%s_title=%s";
             Element read = ele.selectFirst(".read");
@@ -1035,7 +1034,13 @@ public class EmClient {
      * 上穿ma5
      */
     public List<String> crossMa() {
-        String[] days = {"BREAKUP_MA_5DAYS"};
+        String[] days = {"BREAKUP_MA_5DAYS", "BREAKUP_MA_10DAYS", "BREAKUP_MA_20DAYS", "BREAKUP_MA_30DAYS", "BREAKUP_MA_60DAYS"};
+        return crossMa(days);
+    }
+
+
+    public List<String> crossMa(String[] days) {
+//        String[] days = {"BREAKUP_MA_5DAYS","BREAKUP_MA_10DAYS","BREAKUP_MA_20DAYS","BREAKUP_MA_30DAYS","BREAKUP_MA_60DAYS"};
 
         HashMap<String, List<String>> map = new HashMap<>();
         for (String d : days) {
@@ -1220,5 +1225,56 @@ public class EmClient {
     public static final Map<String, List<EmCList>> DATE_INDEX_TP02_MAP = new ConcurrentHashMap<>();
     public static final Map<String, List<EmCList>> DATE_INDEX_BIXUAN_MAP = new ConcurrentHashMap<>();
 
+
+    public static final Set<LocalDate> MARKET_STOP_DAY = new HashSet<>();
+
+    static {
+        MARKET_STOP_DAY.add(LocalDate.of(2024, 2, 9));
+        MARKET_STOP_DAY.add(LocalDate.of(2024, 2, 12));
+        MARKET_STOP_DAY.add(LocalDate.of(2024, 2, 13));
+        MARKET_STOP_DAY.add(LocalDate.of(2024, 2, 14));
+        MARKET_STOP_DAY.add(LocalDate.of(2024, 2, 15));
+        MARKET_STOP_DAY.add(LocalDate.of(2024, 2, 16));
+
+        MARKET_STOP_DAY.add(LocalDate.of(2024, 4, 4));
+        MARKET_STOP_DAY.add(LocalDate.of(2024, 4, 5));
+
+        MARKET_STOP_DAY.add(LocalDate.of(2024, 5, 1));
+        MARKET_STOP_DAY.add(LocalDate.of(2024, 5, 2));
+        MARKET_STOP_DAY.add(LocalDate.of(2024, 5, 3));
+
+        MARKET_STOP_DAY.add(LocalDate.of(2024, 6, 10));
+
+        MARKET_STOP_DAY.add(LocalDate.of(2024, 9, 16));
+        MARKET_STOP_DAY.add(LocalDate.of(2024, 9, 17));
+
+        MARKET_STOP_DAY.add(LocalDate.of(2024, 10, 1));
+        MARKET_STOP_DAY.add(LocalDate.of(2024, 10, 2));
+        MARKET_STOP_DAY.add(LocalDate.of(2024, 10, 3));
+        MARKET_STOP_DAY.add(LocalDate.of(2024, 10, 4));
+        MARKET_STOP_DAY.add(LocalDate.of(2024, 10, 7));
+    }
+
+    public static boolean tradeTime() {
+
+        if (LocalDate.now().getDayOfWeek().getValue() > 5) {
+            return false;
+        }
+
+        if (MARKET_STOP_DAY.contains(LocalDate.now())) {
+            return false;
+        }
+
+        if (LocalTime.now().isBefore(LocalTime.of(9, 30))
+                || LocalTime.now().isAfter(LocalTime.of(15, 1))) {
+            return false;
+        }
+        if (LocalTime.now().isAfter(LocalTime.of(11, 31))
+                && LocalTime.now().isBefore(LocalTime.of(12, 59))) {
+            return false;
+        }
+
+        return true;
+    }
 
 }

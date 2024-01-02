@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.util.BDUtil;
 import pro.jiaoyi.common.util.CollectionsUtil;
 import pro.jiaoyi.common.util.DateUtil;
@@ -35,7 +36,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -64,13 +64,8 @@ public class MarketJob {
      * 2, 穿越碰个均线
      */
     public void crossMa() {
-        List<String> codes = emClient.crossMa();
-        if (codes == null || codes.size() == 0) {
-            return;
-        }
-        for (String code : codes) {
-            log.info("穿越均线: {}", code);
-        }
+        String[] days = {"BREAKUP_MA_5DAYS"};
+        emClient.crossMa(days);
     }
 
     public void open(String source) {
@@ -375,8 +370,8 @@ public class MarketJob {
             .maximumSize(2).build();
 
 
-    @Scheduled(fixedRate = 5000L)
-    @Async
+    //    @Scheduled(fixedRate = 5000L)
+//    @Async
     public void speedUp() {
         //排除 周六 周日
         if (LocalDate.now().getDayOfWeek().getValue() > 5) {
@@ -448,18 +443,10 @@ public class MarketJob {
     @Scheduled(cron = "30 0/1 * * * ?")
     @Async
     public void themePct() {
-        if (LocalDate.now().getDayOfWeek().getValue() > 5) {
-            return;
-        }
-        if (LocalTime.now().isBefore(LocalTime.of(9, 25))
-                || LocalTime.now().isAfter(LocalTime.of(15, 1))) {
+        if (!EmClient.tradeTime()) {
             return;
         }
 
-        if (LocalTime.now().isAfter(LocalTime.of(11, 31))
-                && LocalTime.now().isBefore(LocalTime.of(12, 59))) {
-            return;
-        }
 
         List<EmCList> list = emClient.getClistDefaultSize(true);
         List<EmCList> pList = list.stream().filter(e ->
@@ -528,7 +515,90 @@ public class MarketJob {
             });
         }
 
+        top100.append("<br>");
+        // 涨停板行情
+        ArrayList<EmCList> hsl = new ArrayList<>();
+        for (EmCList em : pList) {
+            if (em.getF15High().compareTo(em.getF2Close()) == 0) {
+                BigDecimal f = new BigDecimal("1.1");
+                BigDecimal highStop = BigDecimal.ZERO;
+                if (em.getF12Code().startsWith("60") || em.getF12Code().startsWith("0")) {
+
+                } else if (em.getF12Code().startsWith("3") || em.getF12Code().startsWith("68") || em.getF12Code().startsWith("69")) {
+                    f = new BigDecimal("1.2");
+                } else {
+                    f = new BigDecimal("1.3");
+                }
+
+                highStop = em.getF18Close().multiply(f).setScale(2, RoundingMode.HALF_UP);
+                if (em.getF2Close().compareTo(highStop) >= 0) {
+                    hsl.add(em);
+                }
+            }
+        }
+
+        top100.append(hsl.size()).append("<br>");
+        hsl.sort(Comparator.comparing(EmCList::getF8Turnover).reversed());
+        //HSL 按照每5 分组
+        //0-5
+        //5-10
+        //10-15 ...
+
+        // 创建一个Map，键是getF8Turnover的值除以5的结果，值是EmCList对象的列表
+        Map<Integer, List<EmCList>> groupedHsl = new HashMap<>();
+
+        for (EmCList emCList : hsl) {
+            int groupKey = emCList.getF8Turnover().intValue() / 5;
+            // 如果Map中已经有这个groupKey的键，就把当前的emCList添加到对应的列表中
+            // 否则，创建一个新的列表，把当前的emCList添加进去，然后把这个新的列表放到Map中
+            if (groupedHsl.containsKey(groupKey)) {
+                groupedHsl.get(groupKey).add(emCList);
+            } else {
+                List<EmCList> newList = new ArrayList<>();
+                newList.add(emCList);
+                groupedHsl.put(groupKey, newList);
+            }
+        }
+
+
+        for (List<EmCList> ll : groupedHsl.values()) {
+            AtomicInteger counter = new AtomicInteger(0);
+            for (EmCList em : ll) {
+                counter.incrementAndGet();
+                BigDecimal mv = em.getF6Amt().multiply(BDUtil.B100).divide(em.getF8Turnover(), 0, RoundingMode.HALF_UP);
+                top100.append(em.getF14Name()).append("_").append(BDUtil.amtHuman(mv)).append("_").append(BDUtil.amtHuman(em.getF6Amt())).append("_").append(em.getF8Turnover());
+                if (counter.intValue() % 4 == 0 && ll.size() > 4) {
+                    top100.append("<br>");
+                } else {
+                    top100.append("  ");
+                }
+            }
+
+            top100.append("<br>");
+            top100.append("<br>");
+        }
+
+        //随机取3条 hsl 中的数据
+        if (hsl.size() > 0) {
+            Random rand = new Random();
+            int randomNum = rand.nextInt(hsl.size()); // This will generate a random number between 0 (inclusive) and 101 (exclusive), so effectively 0-100.
+            EmCList em = hsl.get(randomNum);
+            List<String> themes = getTheme(em.getF12Code());
+            BigDecimal mv = em.getF6Amt().multiply(BDUtil.B100).divide(em.getF8Turnover(), 0, RoundingMode.HALF_UP);
+            top100.append(em.getF14Name()).append("_").append(BDUtil.amtHuman(mv)).append("_").append(BDUtil.amtHuman(em.getF6Amt())).append("_").append(em.getF8Turnover()).append(" ");
+            List<String> guba = emClient.guba(em.getF12Code());
+            for (String theme : themes) {
+                top100.append(theme).append(" ");
+            }
+            for (String s : guba) {
+                top100.append(s);
+            }
+            top100.append("<br>");
+        }
+
+
         String encodeTop100 = URLEncoder.encode(top100.toString(), StandardCharsets.UTF_8);
+
         wxUtil.send(encodeTop100);
 
         ArrayList<ThemeScoreEntity> themeScoreEntities = new ArrayList<>(sortMap.size());
@@ -894,4 +964,136 @@ public class MarketJob {
         WX_SEND_MAP.put(code, count + 1);
 
     }
+
+    /**
+     * 获取全部均线
+     * 每个周1 - 周5 30:08:00 执行
+     */
+    public static final Set<String> CODE_MA_BLOCK_SET = new HashSet<>();
+
+    @Scheduled(cron = "0 15 08 ? * MON-FRI")
+    public void initMaMap() {
+        CODE_MA_BLOCK_SET.clear();
+        CODE_KS_CACHE_COUNT.set(0);
+    }
+
+    //9:30 - 11:30 , 13:00 - 15:00
+    @Scheduled(cron = "0/15 0/1 * * * ?")
+    public void runCrossMa() {
+
+        if (!EmClient.tradeTime()) {
+            return;
+        }
+
+        List<EmCList> list = emClient.getClistDefaultSize(true);
+        List<EmCList> lowList = list.stream().filter(
+                em -> em.getF17Open().compareTo(em.getF2Close()) < 0
+                        && em.getF17Open().compareTo(em.getF16Low()) == 0
+                        && em.getF17Open().compareTo(BDUtil.B5) > 0
+                        && em.getF3Pct().compareTo(BigDecimal.ZERO) > 0
+        ).toList();
+
+
+        for (EmCList emCList : lowList) {
+            log.info("initMaMap: {}", emCList.getF12Code());
+            String code = emCList.getF12Code();
+            if (CODE_MA_BLOCK_SET.contains(code)) continue;
+
+            List<EmDailyK> dailyKs = getKsCache(code);
+            if (dailyKs == null || dailyKs.size() < 65) {
+                continue;
+            }
+
+            int last = dailyKs.size() - 1;
+
+            EmDailyK k = dailyKs.get(last);
+            k.setOpen(emCList.getF17Open());
+            k.setClose(emCList.getF2Close());
+            k.setLow(emCList.getF16Low());
+            k.setHigh(emCList.getF15High());
+
+            Map<String, BigDecimal[]> maMap = MaUtil.ma(dailyKs);
+
+            BigDecimal[] ma5 = maMap.get("ma5");
+            BigDecimal[] ma10 = maMap.get("ma10");
+            BigDecimal[] ma20 = maMap.get("ma20");
+            BigDecimal[] ma30 = maMap.get("ma30");
+            BigDecimal[] ma60 = maMap.get("ma60");
+
+            if (ma5 == null || ma10 == null || ma20 == null || ma30 == null || ma60 == null) {
+                CODE_MA_BLOCK_SET.add(code);
+                continue;
+            }
+
+            BigDecimal close = emCList.getF2Close();
+            BigDecimal open = emCList.getF17Open();
+
+            if (open.compareTo(ma5[last]) > 0
+                    || open.compareTo(ma10[last]) > 0
+                    || open.compareTo(ma20[last]) > 0
+                    || open.compareTo(ma30[last]) > 0
+                    || open.compareTo(ma60[last]) > 0
+            ) {
+                continue;
+            }
+
+            if (close.compareTo(ma5[last]) < 0
+                    || close.compareTo(ma10[last]) < 0
+                    || close.compareTo(ma20[last]) < 0
+                    || close.compareTo(ma30[last]) < 0
+                    || close.compareTo(ma60[last]) < 0
+            ) {
+                continue;
+            }
+
+
+            String content = "[crossMa]" + emCList.getF14Name() + emCList.getF12Code() + "_" + emCList.getF3Pct();
+
+            String symbol = "";
+            if (code.startsWith("6")) {
+                symbol = "sh" + code;
+            } else if (code.startsWith("0") || code.startsWith("3")) {
+                symbol = "sz" + code;
+            } else {
+                symbol = "bj/" + code;
+            }
+            String url = "https://quote.eastmoney.com/" + symbol + ".html";
+            content += "<br>" + url;
+
+            String encode = URLEncoder.encode(content, StandardCharsets.UTF_8);
+            wxUtil.send(encode);
+            CODE_MA_BLOCK_SET.add(code);
+            log.info("cross ma: {}", emCList.getF14Name() + emCList.getF12Code());
+        }
+    }
+
+    /*
+    获取K线, 排除今日
+     */
+    public List<EmDailyK> getKsCache(String code) {
+        // 1, 从缓存拿ks
+        List<EmDailyK> list = CODE_KS_CACHE_MAP.get(code);
+        if (list == null) {
+            //2, 新数据 从接口拿
+            list = emClient.getDailyKs(code, LocalDate.now(), 100, true);
+            if (list == null || list.size() < 65) {
+                //放入Block
+                CODE_MA_BLOCK_SET.add(code);
+                return Collections.emptyList();
+            }
+            CODE_KS_CACHE_MAP.put(code, list);
+        }
+
+        if (list.size() < 65) {
+            //放入Block
+            CODE_MA_BLOCK_SET.add(code);
+            return Collections.emptyList();
+        }
+
+        return list;
+    }
+
+    public static final Map<String, List<EmDailyK>> CODE_KS_CACHE_MAP = new HashMap<>();
+    public static final AtomicInteger CODE_KS_CACHE_COUNT = new AtomicInteger(0);
+
 }
