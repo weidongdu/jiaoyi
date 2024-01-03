@@ -274,6 +274,17 @@ public class MaUtil {
         maMap.put("ma120", ma120);
         maMap.put("ma250", ma250);
 
+        BigDecimal[] lastMa = new BigDecimal[7];
+        lastMa[0] = ma5[ma5.length - 1];
+        lastMa[1] = ma10[ma10.length - 1];
+        lastMa[2] = ma20[ma20.length - 1];
+        lastMa[3] = ma30[ma30.length - 1];
+        lastMa[4] = ma60[ma60.length - 1];
+        lastMa[5] = ma120[ma120.length - 1];
+        lastMa[6] = ma250[ma250.length - 1];
+
+        maMap.put("last", lastMa);
+
         return maMap;
     }
 

@@ -58,7 +58,13 @@ public class BDUtil {
 
 
     public static String p100(BigDecimal b) {
+        if (b == null) return "null";
         return b.multiply(B100).setScale(2, RoundingMode.HALF_UP).toPlainString();
+    }
+
+    public static String p100(BigDecimal b,int scale) {
+        if (b == null) return "null";
+        return b.multiply(B100).setScale(scale, RoundingMode.HALF_UP).toPlainString();
     }
 
     public static String amtHuman(BigDecimal b) {

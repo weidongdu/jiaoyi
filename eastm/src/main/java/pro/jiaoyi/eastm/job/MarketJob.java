@@ -578,7 +578,7 @@ public class MarketJob {
             top100.append("<br>");
         }
 
-        //随机取3条 hsl 中的数据
+        //随机取 hsl 中的数据
         if (hsl.size() > 0) {
             Random rand = new Random();
             int randomNum = rand.nextInt(hsl.size()); // This will generate a random number between 0 (inclusive) and 101 (exclusive), so effectively 0-100.
@@ -586,14 +586,11 @@ public class MarketJob {
             List<String> themes = getTheme(em.getF12Code());
             BigDecimal mv = em.getF6Amt().multiply(BDUtil.B100).divide(em.getF8Turnover(), 0, RoundingMode.HALF_UP);
             top100.append(em.getF14Name()).append("_").append(BDUtil.amtHuman(mv)).append("_").append(BDUtil.amtHuman(em.getF6Amt())).append("_").append(em.getF8Turnover()).append(" ");
-            List<String> guba = emClient.guba(em.getF12Code());
             for (String theme : themes) {
                 top100.append(theme).append(" ");
             }
-            for (String s : guba) {
-                top100.append(s);
-            }
-            top100.append("<br>");
+            String url = EmClient.getEastUrl(em.getF12Code());
+            top100.append("<br>").append(url);
         }
 
 
@@ -815,15 +812,6 @@ public class MarketJob {
             return;
         }
 
-        String symbol = "";
-        if (code.startsWith("6")) {
-            symbol = "sh" + code;
-        } else if (code.startsWith("0") || code.startsWith("3")) {
-            symbol = "sz" + code;
-        } else {
-            symbol = "bj/" + code;
-
-        }
 
         if (code.startsWith("60") || code.startsWith("00") || code.startsWith("30")) {
             if (eastSpeedInfo.getPrice_f2().compareTo(BDUtil.B50) > 0) {
@@ -838,7 +826,7 @@ public class MarketJob {
         }
 
 
-        String url = "https://quote.eastmoney.com/" + symbol + ".html";
+        String url = EmClient.getEastUrl(code);
         String content = "[speed_up]" + eastSpeedInfo.getName_f14() + code +
                 "<br>" + "涨速: " + eastSpeedInfo.getSpeed_f22() +
                 "<br>" + "涨幅: " + eastSpeedInfo.getPct_f3() +
@@ -941,16 +929,8 @@ public class MarketJob {
             return;
         }
 
-        String symbol = "";
-        if (code.startsWith("6")) {
-            symbol = "sh" + code;
-        } else if (code.startsWith("0") || code.startsWith("3")) {
-            symbol = "sz" + code;
-        } else {
-            symbol = "bj/" + code;
 
-        }
-        String url = "https://quote.eastmoney.com/" + symbol + ".html";
+        String url = EmClient.getEastUrl(code);
         String content = "[speed_up]" + eastSpeedInfo.getName_f14() + code +
                 "<br>" + "涨速: " + eastSpeedInfo.getSpeed_f22() +
                 "<br>" + "涨幅: " + eastSpeedInfo.getPct_f3() +
@@ -1048,16 +1028,7 @@ public class MarketJob {
 
 
             String content = "[crossMa]" + emCList.getF14Name() + emCList.getF12Code() + "_" + emCList.getF3Pct();
-
-            String symbol = "";
-            if (code.startsWith("6")) {
-                symbol = "sh" + code;
-            } else if (code.startsWith("0") || code.startsWith("3")) {
-                symbol = "sz" + code;
-            } else {
-                symbol = "bj/" + code;
-            }
-            String url = "https://quote.eastmoney.com/" + symbol + ".html";
+            String url = EmClient.getEastUrl(emCList.getF12Code());
             content += "<br>" + url;
 
             String encode = URLEncoder.encode(content, StandardCharsets.UTF_8);
