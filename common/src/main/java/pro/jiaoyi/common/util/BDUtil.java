@@ -55,6 +55,7 @@ public class BDUtil {
     public static final BigDecimal b0_02 = new BigDecimal("0.02");
     public static final BigDecimal b0_01 = new BigDecimal("0.01");
     public static final BigDecimal BN1 = new BigDecimal("-1");
+    public static final BigDecimal BN3 = new BigDecimal("-3");
 
 
     public static String p100(BigDecimal b) {

@@ -9,6 +9,7 @@ import pro.jiaoyi.common.util.FileUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.config.IndexEnum;
 import pro.jiaoyi.eastm.config.VipIndexEnum;
+import pro.jiaoyi.eastm.flow.common.CommonInfo;
 import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
 import pro.jiaoyi.eastm.util.EmMaUtil;
@@ -79,6 +80,11 @@ public class TvService {
 
     private static AtomicLong COUNTER = new AtomicLong(0);
 
+    public Map<String, List<String>> getAllIndexFlow() {
+
+        return CommonInfo.TYPE_CODES_MAP;
+
+    }
     public Map<String, List<String>> getAllIndex(boolean sync) {
         if (COUNTER.getAndIncrement() == 0 && sync) {
             //init

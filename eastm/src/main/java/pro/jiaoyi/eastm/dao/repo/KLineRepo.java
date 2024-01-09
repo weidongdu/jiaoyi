@@ -24,4 +24,13 @@ public interface KLineRepo extends JpaRepository<KLineEntity,Long>, CrudReposito
     List<KLineEntity> findByCodeLimit5(String code,Long tsOpen);
 
 
+    int deleteByCode(String code);
+    int deleteByCodeIn(List<String> code);
+
+
+    @Query(nativeQuery = true, value = " SELECT * FROM t_kline t " +
+            "WHERE t.code = ?1 " +
+            "ORDER BY t.id DESC " +
+            "LIMIT 1 ")
+    KLineEntity findByCodeLast(String code);
 }

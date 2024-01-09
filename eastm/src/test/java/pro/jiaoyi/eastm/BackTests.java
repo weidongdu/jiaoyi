@@ -172,12 +172,14 @@ class BackTests {
      */
     @Test
     public void rangePct() {
-        List<EmCList> list = emClient.getClistDefaultSize(false);
-        for (EmCList em : list) {
-            String code = em.getF12Code();
-            rangePct(code);
-        }
+//        List<EmCList> list = emClient.getClistDefaultSize(false);
+//        for (EmCList em : list) {
+//            String code = em.getF12Code();
+//            rangePct(code);
+//        }
+//        rangePct("601985");
 //        rangePct("688981");
+        rangePct("002432");
     }
 
     public void rangePct(String code) {
@@ -186,8 +188,8 @@ class BackTests {
 //        String code = "600985";
 
         //先查db
-        List<EmDailyK> ks = getFromDb(code);
-//        List<EmDailyK> ks = emClient.getDailyKs(code, LocalDate.now(), 2000, true);
+//        List<EmDailyK> ks = getFromDb(code);
+        List<EmDailyK> ks = emClient.getDailyKs(code, LocalDate.now().minusDays(1), 500, true);
 
         if (ks.size() < 260) return;
 
@@ -202,7 +204,8 @@ class BackTests {
         BigDecimal ccUpPct = BigDecimal.ZERO;
         String name = "";
 
-        for (int i = 0; i < ks.size(); i++) {
+//        for (int i = 0; i < ks.size(); i++) {
+        for (int i = 0; i < 1; i++) {
 
             int end = ks.size() - 1 - i;
             EmDailyK endK = ks.get(end);
@@ -211,7 +214,7 @@ class BackTests {
 
             BigDecimal h = endK.getHigh();
             BigDecimal l = endK.getLow();
-            for (int j = 1; j < Math.min(120, end); j++) {
+            for (int j = 1; j < Math.min(250, end); j++) {
                 int start = end - j;
                 EmDailyK startK = ks.get(start);
                 if (startK.getHigh().compareTo(h) > 0) {
@@ -243,7 +246,7 @@ class BackTests {
 
             if (range > 15
                     && oscc.compareTo(new BigDecimal("0.2")) < 0
-                    && ccUpPct.compareTo(new BigDecimal("0.02")) <= 0) {
+                    && ccUpPct.compareTo(new BigDecimal("0.025")) <= 0) {
                 Map<String, BigDecimal[]> ma = MaUtil.ma(ks.subList(0, end + 1));
                 BigDecimal[] last = ma.get("last");
 

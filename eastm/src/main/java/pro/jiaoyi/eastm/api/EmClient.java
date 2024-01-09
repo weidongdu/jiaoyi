@@ -21,11 +21,10 @@ import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.FileUtil;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
 import pro.jiaoyi.eastm.config.IndexEnum;
-import pro.jiaoyi.eastm.config.VipIndexEnum;
 import pro.jiaoyi.eastm.model.*;
 import pro.jiaoyi.eastm.util.EmMaUtil;
 
-import java.io.UnsupportedEncodingException;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URLEncoder;
@@ -286,10 +285,15 @@ public class EmClient {
 
         List<EmCList> clist = getClist(1, 10000);
         if (clist.size() > 0) {
-            List<EmCList> list = clist.stream().filter(e -> !(
-                    e.getF14Name().contains("ST")
-                            || e.getF14Name().contains("退"))
-            ).toList();
+            // 按照 bk 排序，相同的 bk 按 pct 排序
+            Comparator<EmCList> comparator = Comparator
+                    .comparing(EmCList::getF100bk)
+                    .thenComparingDouble(emCList -> emCList.getF3Pct().doubleValue())
+                    .reversed();
+
+            List<EmCList> list = clist.stream()
+                    .sorted(comparator)
+                    .filter(e -> !(e.getF14Name().contains("退"))).toList();
 
             ArrayList<EmCList> results = new ArrayList<>(list);
             //超过 每天 9:31 之后的数据 在放入缓存
@@ -833,7 +837,6 @@ public class EmClient {
     }
 
     public List<String> xuangu() {
-        String IS_SZ50 = "(IS_SZ50=\"是\")";
         String IS_HS300 = "(IS_HS300=\"是\")";
         String IS_ZZ500 = "(IS_ZZ500=\"是\")";
         String IS_ZZ1000 = "(IS_ZZ1000=\"是\")";
@@ -1285,7 +1288,7 @@ public class EmClient {
             return false;
         }
 
-        if (LocalTime.now().isBefore(LocalTime.of(9, 30))
+        if (LocalTime.now().isBefore(LocalTime.of(9, 29))
                 || LocalTime.now().isAfter(LocalTime.of(15, 1))) {
             return false;
         }
@@ -1319,7 +1322,35 @@ public class EmClient {
 //        List<EmDailyK> ks = getFromDb(code);
 //        List<EmDailyK> ks = emClient.getDailyKs(code, LocalDate.now(), 2000, true);
 
-        if (ks.size() < 260) return false;
+        if (ks.size() < 260) {
+            log.info("code={},ks.size() < 260", code);
+            return false;
+        }
+
+
+        BigDecimal amt = ks.get(ks.size() - 1).getAmt();
+        if (amt.compareTo(B1_5Y) < 0) {
+            log.info("code={},amt < 15000万", code);
+            return false;
+        }
+
+        Map<String, BigDecimal[]> ma = MaUtil.ma(ks);
+        BigDecimal[] last = ma.get("last");
+        BigDecimal cc = ks.get(ks.size() - 1).getClose();
+        for (int i = 0; i < 5; i++) {
+            if (cc.compareTo(last[i]) < 0) {
+                log.info("code={},cc < ma", code);
+                return false;
+            }
+        }
+//
+//        for (BigDecimal m : last) {
+//            if (cc.compareTo(m) < 0) {
+//                log.info("code={},cc < ma", code);
+//                return false;
+//            }
+//        }
+
 
         Map<String, BigDecimal> rangeMap = new HashMap<>();
         //倒序
@@ -1327,7 +1358,6 @@ public class EmClient {
         int range = 0;
         BigDecimal hh = BigDecimal.ZERO;
         BigDecimal ll = BigDecimal.ZERO;
-        BigDecimal cc = BigDecimal.ZERO;
         BigDecimal oscc = BigDecimal.ZERO;
         BigDecimal ccUpPct = BigDecimal.ZERO;
         String name = "";
@@ -1341,7 +1371,7 @@ public class EmClient {
 
             BigDecimal h = endK.getHigh();
             BigDecimal l = endK.getLow();
-            for (int j = 1; j < Math.min(120, end); j++) {
+            for (int j = 1; j < 250; j++) {
                 int start = end - j;
                 EmDailyK startK = ks.get(start);
                 if (startK.getHigh().compareTo(h) > 0) {
@@ -1369,27 +1399,14 @@ public class EmClient {
                     oscc = osc;
                 }
 
+
             }
 
-            if (range > 15
-                    && oscc.compareTo(new BigDecimal("0.2")) < 0
-                    && ccUpPct.compareTo(new BigDecimal("0.02")) <= 0) {
-//                Map<String, BigDecimal[]> ma = MaUtil.ma(ks.subList(0, end + 1));
-                Map<String, BigDecimal[]> ma = MaUtil.ma(ks);
-                BigDecimal[] last = ma.get("last");
-
-                boolean maUp = true;
-                for (BigDecimal m : last) {
-                    if (cc.compareTo(m) < 0) {
-                        maUp = false;
-                        break;
-                    }
-                }
-                if (maUp) {
-                    log.warn("code,{},end,{},start,{},h,{},l,{},区间振幅,{},周期,{},平均每日,{},距离高点,{}",
-                            code + name, endK.getTradeDate(), startTd, hh, ll, BDUtil.p100(oscc, 4), range, BDUtil.p100(rangeMap.get(endK.getTradeDate()), 4), BDUtil.p100(ccUpPct));
-                    return true;
-                }
+            if (range > 15 && oscc.compareTo(new BigDecimal("0.2")) < 0
+                    && ccUpPct.compareTo(new BigDecimal("0.025")) <= 0) {
+                log.warn("code,{},end,{},start,{},h,{},l,{},区间振幅,{},周期,{},平均每日,{},距离高点,{}",
+                        code + name, endK.getTradeDate(), startTd, hh, ll, BDUtil.p100(oscc, 4), range, BDUtil.p100(rangeMap.get(endK.getTradeDate()), 4), BDUtil.p100(ccUpPct));
+                return true;
             }
         }
 

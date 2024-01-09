@@ -56,6 +56,15 @@ public class KLineEntity {
      * 成交额
      */
     private BigDecimal amt;
+    /**
+     * 换手率
+     */
+    private BigDecimal hsl;
+    /**
+     * 流通市值
+     */
+    private BigDecimal mv;
+
 
     /**
      * 周期

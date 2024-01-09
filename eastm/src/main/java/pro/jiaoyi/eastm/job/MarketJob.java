@@ -303,7 +303,7 @@ public class MarketJob {
 
         csv.append("概念").append(",").append("数量").append(",");
         for (EmCList emCList : sortList) {
-            csv.append(emCList.getF12Code() + emCList.getF14Name()).append(",");
+            csv.append(emCList.getF12Code()).append(emCList.getF14Name()).append(",");
         }
         csv.append("\n");
 
@@ -440,7 +440,7 @@ public class MarketJob {
     @Resource
     private ThemeScoreRepo themeScoreRepo;
 
-    @Scheduled(cron = "30 0/1 * * * ?")
+    @Scheduled(cron = "30 0/5 * * * ?")
     @Async
     public void themePct() {
         if (!EmClient.tradeTime()) {
