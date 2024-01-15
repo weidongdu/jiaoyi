@@ -59,14 +59,12 @@ public class KlineFlow implements BaseFlow {
         List<EmCList> emList = CommonInfo.EM_LIST;
 
         List<EmCList> list = emList.stream().filter(
-                em -> em.getF6Amt().compareTo(BDUtil.B5000W) > 0
+                em -> em.getF6Amt().compareTo(BDUtil.B1_5Y) > 0
                         && em.getF3Pct().compareTo(BDUtil.BN3) > 0
                         && em.getF3Pct().compareTo(BDUtil.B5) < 0
         ).toList();
 
-        log.info("emList size={}, amt > 5000w size={}", emList.size(), list.size());
-
-        ArrayList<KLineEntity> kListToSave = new ArrayList<>();
+        log.info("emList size={}, amt > 15000w size={}", emList.size(), list.size());
 
         for (EmCList em : list) {
             String code = em.getF12Code();
@@ -88,7 +86,7 @@ public class KlineFlow implements BaseFlow {
                 }
             }
 
-//            //如何比较两个enum 是否相等
+            //如何比较两个enum 是否相等
             if (!isTradeTime().equals(TradeTimeEnum.POST) || !isTradeDay()) {
                 log.info("只有盘后才操作保存");
                 continue;
@@ -170,6 +168,17 @@ public class KlineFlow implements BaseFlow {
             entity.setVma60(amtArr_ma60[i]);
             entity.setVma120(amtArr_ma120[i]);
             entity.setVma250(amtArr_ma250[i]);
+
+            if (i > 250) {
+                //包含今天
+                entity.setPct5(dk.getClose().subtract(ks.get(i + 1 - 5).getClose()).divide(ks.get(i + 1 - 5).getClose(), 4, RoundingMode.HALF_UP));
+                entity.setPct10(dk.getClose().subtract(ks.get(i + 1 - 10).getClose()).divide(ks.get(i + 1 - 10).getClose(), 4, RoundingMode.HALF_UP));
+                entity.setPct20(dk.getClose().subtract(ks.get(i + 1 - 20).getClose()).divide(ks.get(i + 1 - 20).getClose(), 4, RoundingMode.HALF_UP));
+                entity.setPct30(dk.getClose().subtract(ks.get(i + 1 - 30).getClose()).divide(ks.get(i + 1 - 30).getClose(), 4, RoundingMode.HALF_UP));
+                entity.setPct60(dk.getClose().subtract(ks.get(i + 1 - 60).getClose()).divide(ks.get(i + 1 - 60).getClose(), 4, RoundingMode.HALF_UP));
+                entity.setPct120(dk.getClose().subtract(ks.get(i + 1 - 120).getClose()).divide(ks.get(i + 1 - 120).getClose(), 4, RoundingMode.HALF_UP));
+                entity.setPct250(dk.getClose().subtract(ks.get(i + 1 - 250).getClose()).divide(ks.get(i + 1 - 250).getClose(), 4, RoundingMode.HALF_UP));
+            }
 
             BigDecimal hsl = entity.getHsl();
             //sublist [) 左闭右开

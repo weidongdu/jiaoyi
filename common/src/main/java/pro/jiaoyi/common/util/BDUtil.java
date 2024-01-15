@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class BDUtil {
+    public static final BigDecimal B1000Y = new BigDecimal("100000000000");
     public static final BigDecimal B1_5Y = new BigDecimal("150000000");
     public static final BigDecimal B1Y = new BigDecimal("100000000");
     public static final BigDecimal B5000W = new BigDecimal("50000000");

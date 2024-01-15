@@ -21,8 +21,10 @@ import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.FileUtil;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
 import pro.jiaoyi.eastm.config.IndexEnum;
+import pro.jiaoyi.eastm.flow.common.TradeTimeEnum;
 import pro.jiaoyi.eastm.model.*;
 import pro.jiaoyi.eastm.util.EmMaUtil;
+import pro.jiaoyi.eastm.util.TradeTimeUtil;
 
 
 import java.math.BigDecimal;
@@ -293,7 +295,12 @@ public class EmClient {
 
             List<EmCList> list = clist.stream()
                     .sorted(comparator)
-                    .filter(e -> !(e.getF14Name().contains("退"))).toList();
+                    .filter(e ->
+                            !(e.getF14Name().contains("退"))//排除退市
+                                    && e.getF2Close().compareTo(B5) > 0 //股价 > 5
+                                    && e.getF3Pct().compareTo(BN3) > 0 //股价 > 5
+                    )
+                    .toList();
 
             ArrayList<EmCList> results = new ArrayList<>(list);
             //超过 每天 9:31 之后的数据 在放入缓存
@@ -807,14 +814,24 @@ public class EmClient {
      * @return
      */
     public BigDecimal amtTop10p(List<EmDailyK> dailyKs) {
+
         ArrayList<BigDecimal> amts = new ArrayList<>();
         int size = dailyKs.size();
-        for (int i = 1; i <= 60; i++) {
-            EmDailyK k = dailyKs.get(size - 1 - i);
-            amts.add(k.getAmt());
-        }
-        Collections.sort(amts);
 
+        if (TradeTimeUtil.isTrading()) {
+            // 排除当天
+            for (int i = 1; i < 60 + 1; i++) {
+                EmDailyK k = dailyKs.get(size - 1 - i);
+                amts.add(k.getAmt());
+            }
+        } else {
+            for (int i = 0; i < 60; i++) {
+                EmDailyK k = dailyKs.get(size - 1 - i);
+                amts.add(k.getAmt());
+            }
+        }
+
+        Collections.sort(amts);
         int avg = 6;
         BigDecimal total = BigDecimal.ZERO;
         for (int i = 0; i < avg; i++) {
@@ -833,7 +850,10 @@ public class EmClient {
     public List<EmCList> xuanguCList() {
         List<EmCList> list = this.getClistDefaultSize(false);
         List<String> xuangu = xuangu();
-        return new ArrayList<>(list.stream().filter(e -> xuangu.contains(e.getF12Code())).toList());
+        return new ArrayList<>(list.stream()
+                .filter(e -> e.getF6Amt().compareTo(B1_5Y) > 0
+                        && xuangu.contains(e.getF12Code()))
+                .toList());
     }
 
     public List<String> xuangu() {
@@ -849,7 +869,7 @@ public class EmClient {
             log.info("xuangu {}", s);
             codes.addAll(xuangu(s));
             try {
-                Thread.sleep(1000);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -1279,25 +1299,7 @@ public class EmClient {
     }
 
     public static boolean tradeTime() {
-
-        if (LocalDate.now().getDayOfWeek().getValue() > 5) {
-            return false;
-        }
-
-        if (MARKET_STOP_DAY.contains(LocalDate.now())) {
-            return false;
-        }
-
-        if (LocalTime.now().isBefore(LocalTime.of(9, 29))
-                || LocalTime.now().isAfter(LocalTime.of(15, 1))) {
-            return false;
-        }
-        if (LocalTime.now().isAfter(LocalTime.of(11, 31))
-                && LocalTime.now().isBefore(LocalTime.of(12, 59))) {
-            return false;
-        }
-
-        return true;
+        return TradeTimeUtil.isTradeDay() && TradeTimeUtil.isTradeTime().equals(TradeTimeEnum.TRADE);
     }
 
     public static String getEastUrl(String code) {
@@ -1339,7 +1341,7 @@ public class EmClient {
         BigDecimal cc = ks.get(ks.size() - 1).getClose();
         for (int i = 0; i < 5; i++) {
             if (cc.compareTo(last[i]) < 0) {
-                log.info("code={},cc < ma", code);
+                log.info("code={},最近收盘价 < ma", code);
                 return false;
             }
         }

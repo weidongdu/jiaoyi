@@ -45,7 +45,7 @@ public class AmtFlow implements BaseFlow {
 
         CommonInfo.CODE_K_MAP.forEach((code, k) -> {
             if (CommonInfo.TYPE_CODES_MAP.get(TypeEnum.INDEX_INCLUDE.getType()).contains(code)) {
-                if (k.getAmt().compareTo(k.getVma5()) > 0
+                if (k.getAmt().compareTo(BDUtil.B1_5Y) > 0
                         && k.getVma5().compareTo(BDUtil.B1_5Y) > 0
                         && k.getPct().compareTo(BigDecimal.ZERO) > 0) {
 

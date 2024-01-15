@@ -1,21 +1,19 @@
 package pro.jiaoyi.eastm.controller;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import pro.jiaoyi.common.util.BDUtil;
+import org.springframework.web.bind.annotation.*;
+import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.eastm.dao.entity.ThemeScoreEntity;
+import pro.jiaoyi.eastm.dao.entity.WeiboEntity;
 import pro.jiaoyi.eastm.dao.repo.ThemeScoreRepo;
+import pro.jiaoyi.eastm.service.WeiboService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
+import java.time.ZoneOffset;
+import java.util.*;
 
 @RestController
 @RequestMapping("/data")
@@ -95,7 +93,7 @@ public class DataController {
         array.add(head);
 
         for (ThemeScoreEntity themeScore : list) {
-            if (!themes.contains(themeScore.getF1Theme())){
+            if (!themes.contains(themeScore.getF1Theme())) {
                 continue;
             }
 
@@ -120,6 +118,37 @@ public class DataController {
 
         return map;
     }
+
+    /*
+        {
+        "ts": 1626950400000,
+        "arr" : [{
+
+               "uid":"",
+               "content":"",
+               "mid":"",
+               "createTime":""
+
+        }]
+        }
+         */
+    @Resource
+    private WeiboService weiboService;
+
+    @PostMapping("/wb")
+    @CrossOrigin
+    public String wb(@RequestBody JSONObject jsonObject) {
+        Long ts = jsonObject.getLong("ts");
+        JSONArray jsonArray = jsonObject.getJSONArray("arr");
+        List<WeiboEntity> weiboEntityList = jsonArray.toJavaList(WeiboEntity.class);
+        for (WeiboEntity weiboEntity : weiboEntityList) {
+            // timestamp to beijing time
+            weiboEntity.setCreateTime(DateUtil.toLocalDateTime(new Date(ts)));
+        }
+        weiboService.send(weiboEntityList);
+        return "ok";
+    }
+
 }
 
 

@@ -20,5 +20,7 @@ public class CommonInfo {
             TypeEnum.ZZ500,
             TypeEnum.ZZ1000,
             TypeEnum.INDEX_INCLUDE,
-            TypeEnum.INDEX_EXCLUDE,};
+            TypeEnum.INDEX_EXCLUDE,
+            TypeEnum.EM_MA_UP,
+    };
 }

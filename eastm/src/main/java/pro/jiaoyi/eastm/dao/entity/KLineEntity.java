@@ -118,6 +118,42 @@ public class KLineEntity {
     private BigDecimal vl120;
     private BigDecimal vl250;
 
+    /**
+     * 涨跌幅5日
+     */
+    private BigDecimal pct5;
+    private BigDecimal pct10;
+    private BigDecimal pct20;
+    private BigDecimal pct30;
+    private BigDecimal pct60;
+    private BigDecimal pct120;
+    private BigDecimal pct250;
+
+    /**
+     * (最高- 最低)/ 最高 涨跌幅
+     * 有前后关系
+     */
+    private BigDecimal maxHighLowPct5;
+    private BigDecimal maxHighLowPct10;
+    private BigDecimal maxHighLowPct20;
+    private BigDecimal maxHighLowPct30;
+    private BigDecimal maxHighLowPct60;
+    private BigDecimal maxHighLowPct120;
+    private BigDecimal maxHighLowPct250;
+
+
+    /**
+     * (最高 - 最低)/ 最低 涨跌幅
+     * 有前后关系
+     */
+    private BigDecimal maxLowHighPct5;
+    private BigDecimal maxLowHighPct10;
+    private BigDecimal maxLowHighPct20;
+    private BigDecimal maxLowHighPct30;
+    private BigDecimal maxLowHighPct60;
+    private BigDecimal maxLowHighPct120;
+    private BigDecimal maxLowHighPct250;
+
 
 
 }
