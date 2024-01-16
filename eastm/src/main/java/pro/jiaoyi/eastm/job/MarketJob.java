@@ -534,7 +534,7 @@ public class MarketJob {
      */
     public static final Set<String> CODE_MA_BLOCK_SET = new HashSet<>();
 
-    @Scheduled(cron = "0 15 06 ? * MON-FRI")
+    @Scheduled(cron = "0 15 06,15 ? * MON-FRI")
     public void initMaMap() {
         CODE_MA_BLOCK_SET.clear();
         MONITOR_CODE_AMT_MAP.clear();
@@ -610,7 +610,8 @@ public class MarketJob {
                     .append("<br>").append("price=").append(em.getF2Close()).append(" pct=").append(em.getF3Pct()).append(" speed=").append(em.getF22Speed())
                     .append("<br>").append("m1=").append(fx).append(" amt=").append(BDUtil.amtHuman(m1));
 
-            wxUtil.send(content.toString());
+            String encode = URLEncoder.encode(content.toString(), StandardCharsets.UTF_8);
+            wxUtil.send(encode);
             if (count == null) {
                 WX_SEND_COUNT_MAP.put(key, 1);
             } else {
@@ -621,6 +622,7 @@ public class MarketJob {
     }
 
     //9:30 - 11:30 , 13:00 - 15:00
+
     @Scheduled(cron = "0/5 0/1 * * * ?")
     public void runCrossMa() {
 
@@ -701,6 +703,8 @@ public class MarketJob {
             log.info("cross ma: {}", emCList.getF14Name() + emCList.getF12Code());
         }
     }
+
+
 
     /*
     获取K线, 排除今日

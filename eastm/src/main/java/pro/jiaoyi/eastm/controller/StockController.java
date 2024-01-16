@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pro.jiaoyi.common.util.BDUtil;
 import pro.jiaoyi.eastm.api.EmClient;
+import pro.jiaoyi.eastm.config.WxUtil;
+import pro.jiaoyi.eastm.flow.common.CommonInfo;
 import pro.jiaoyi.eastm.job.JobAlert;
 import pro.jiaoyi.eastm.model.EmDailyK;
 
@@ -25,7 +27,11 @@ public class StockController {
     @Resource
     private EmClient emClient;
 
+    @Resource
+    private WxUtil wxUtil;
+
     public static final Map<String, BigDecimal> MONITOR_CODE_AMT_MAP = new HashMap<>();
+
 
     @GetMapping("/vol/hour")
     public JSONObject volHour(String code) {
@@ -39,8 +45,9 @@ public class StockController {
         jsonObject.put("vol", amtHour);
         if (!MONITOR_CODE_AMT_MAP.containsKey(code)) {
             MONITOR_CODE_AMT_MAP.put(code, amtHour);
+            String name = emClient.getCodeNameMap(false).get(code);
+            wxUtil.send("监控" + name + code);
         }
-
         return jsonObject;
     }
 
@@ -57,6 +64,8 @@ public class StockController {
         if (codeCheck(code)) {
             BigDecimal amtHour = getAmtHour(code);
             MONITOR_CODE_AMT_MAP.put(code, amtHour);
+            String name = emClient.getCodeNameMap(false).get(code);
+            wxUtil.send("监控" + name + code);
         }
         return MONITOR_CODE_AMT_MAP;
     }

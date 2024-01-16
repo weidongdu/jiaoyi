@@ -87,8 +87,8 @@ public class KlineFlow implements BaseFlow {
             }
 
             //如何比较两个enum 是否相等
-            if (!isTradeTime().equals(TradeTimeEnum.POST) || !isTradeDay()) {
-                log.info("只有盘后才操作保存");
+            if (isTradeTime().equals(TradeTimeEnum.TRADE) && isTradeDay()) {
+                log.info("只有盘中不保存");
                 continue;
             }
 
