@@ -272,7 +272,7 @@ public class EmClient {
             list.add(cList);
         }
 
-        log.info("获取当日市场全部股票代码以及数据 size={}", list.size());
+        log.debug("获取当日市场全部股票代码以及数据 size={}", list.size());
         return list;
     }
 

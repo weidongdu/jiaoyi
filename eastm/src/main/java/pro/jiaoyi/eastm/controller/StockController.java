@@ -45,8 +45,6 @@ public class StockController {
         jsonObject.put("vol", amtHour);
         if (!MONITOR_CODE_AMT_MAP.containsKey(code)) {
             MONITOR_CODE_AMT_MAP.put(code, amtHour);
-            String name = emClient.getCodeNameMap(false).get(code);
-            wxUtil.send("监控" + name + code);
         }
         return jsonObject;
     }

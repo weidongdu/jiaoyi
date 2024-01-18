@@ -113,4 +113,10 @@ public class DateUtil {
         LocalDateTime now = LocalDateTime.now();
         return now.format(DateTimeFormatter.ofPattern(PATTERN_yyyyMMdd_HHmmss));
     }
+
+    public static String secondTs() {
+        long time = new Date().getTime();
+        //移除最后三位 MS -> S
+        return String.valueOf(time).substring(0, String.valueOf(time).length() - 3);
+    }
 }

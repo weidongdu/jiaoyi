@@ -135,8 +135,9 @@ public class OkHttpUtil {
         Request request = buildRequest(url, headers);
         return sendDefault(request);
     }
+
     public byte[] getForBytes(String url, Map<String, String> headers, Map<String, String> params) {
-        Request request = buildRequest(url, headers,params);
+        Request request = buildRequest(url, headers, params);
         return sendDefault(request);
     }
 
@@ -148,6 +149,54 @@ public class OkHttpUtil {
         RequestBody formBody = formBuilder.build();
         Request req = buildRequest(url, headers, formBody);
         return send(req);
+    }
+
+    //基本的Post Form请求
+    public byte[] postFormForBytes(String url, Map<String, String> headers, Map<String, String> params) {
+        FormBody.Builder formBuilder = new FormBody.Builder();
+        params.forEach(formBuilder::add);
+        RequestBody formBody = formBuilder.build();
+        Request req = buildRequest(url, headers, formBody);
+        return sendDefault(req);
+    }    //基本的Post Form请求
+
+    public String postImg(String url, Map<String, String> headers, String fileAbsPath) {
+
+        File file = new File(fileAbsPath);
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("image", file.getName(),
+                        RequestBody.create(MediaType.parse("image/png"), file))
+                .addFormDataPart("image_type", "message")
+                .build();
+
+        Request.Builder builder = new Request.Builder();
+        if (headers != null) {
+            headers.forEach(builder::addHeader);
+        }
+        Request request = builder
+                .url(url)
+                .post(requestBody)
+                .build();
+
+        try (Response response = client.newCall(request).execute();) {
+
+            if (!response.isSuccessful()) {
+                throw new IOException("Unexpected code " + response);
+            }
+
+            // Process the response here
+            String string = response.body().string();
+            //{"code":0,"data":{"image_key":"img_v3_0277_fa5c1197-af35-42eb-980f-3afc70ebf6cg"},"msg":"success"}
+            log.info("response={}", string);
+            response.close();
+
+            return string;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     /**

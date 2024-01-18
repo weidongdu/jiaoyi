@@ -1,8 +1,10 @@
 package pro.jiaoyi.eastm.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.eastm.dao.entity.ThemeScoreEntity;
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/data")
 public class DataController {
@@ -148,6 +151,7 @@ public class DataController {
         weiboService.send(weiboEntityList);
         return "ok";
     }
+
 
 }
 

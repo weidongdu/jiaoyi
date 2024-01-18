@@ -15,9 +15,18 @@ public class WxUtil {
     public void send(String content) {
         String wxUrl = "http://8.142.9.14:28887/fei/send?content=";
         String url = wxUrl + content;
-
         try {
-            httpUtil.get(url,null);
+            httpUtil.get(url, null);
+        } catch (Exception e) {
+            log.error("send to wx error {}", e.getMessage());
+        }
+    }
+
+    public void sendImg(String filePath) {
+        String wxUrl = "http://8.142.9.14:28887/fei/send/img/upload?filePath=";
+        String url = wxUrl + filePath;
+        try {
+            httpUtil.get(url, null);
         } catch (Exception e) {
             log.error("send to wx error {}", e.getMessage());
         }

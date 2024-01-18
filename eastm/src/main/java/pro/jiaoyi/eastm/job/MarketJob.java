@@ -15,19 +15,15 @@ import pro.jiaoyi.common.util.CollectionsUtil;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.FileUtil;
 import pro.jiaoyi.eastm.api.EmClient;
-import pro.jiaoyi.eastm.api.EmRealTimeClient;
 import pro.jiaoyi.eastm.config.VipIndexEnum;
 import pro.jiaoyi.eastm.config.WxUtil;
 import pro.jiaoyi.eastm.dao.entity.OpenEmCListEntity;
 import pro.jiaoyi.eastm.dao.entity.ThemeScoreEntity;
 import pro.jiaoyi.eastm.dao.repo.OpenEmCListRepo;
 import pro.jiaoyi.eastm.dao.repo.ThemeScoreRepo;
-import pro.jiaoyi.eastm.model.EastSpeedInfo;
 import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
-import pro.jiaoyi.eastm.model.fenshi.DetailTrans;
-import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiTrans;
-import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiVo;
+import pro.jiaoyi.eastm.service.ImgService;
 import pro.jiaoyi.eastm.service.SpeedService;
 
 import java.math.BigDecimal;
@@ -54,6 +50,9 @@ public class MarketJob {
     private OpenEmCListRepo openEmCListRepo;
     @Resource
     private WxUtil wxUtil;
+
+    @Resource
+    private ImgService imgService;
 
     //1. 获取开盘竞价
     @Scheduled(cron = "30 25 9 * * ?")
@@ -329,12 +328,13 @@ public class MarketJob {
     @Resource
     private ThemeScoreRepo themeScoreRepo;
 
-    @Scheduled(cron = "30 0/5 * * * ?")
+    @Scheduled(cron = "30 0/10 * * * ?")
     @Async
     public void themePct() {
         if (!EmClient.tradeTime()) {
             return;
         }
+
 
         List<EmCList> list = emClient.getClistDefaultSize(true);
         List<EmCList> pList = list.stream().filter(e ->
@@ -468,6 +468,7 @@ public class MarketJob {
             top100.append("<br>");
         }
 
+        String img = "";
         //随机取 hsl 中的数据
         if (hsl.size() > 0) {
             Random rand = new Random();
@@ -479,14 +480,16 @@ public class MarketJob {
             for (String theme : themes) {
                 top100.append(theme).append(" ");
             }
+            img = (em.getF12Code());
             String url = EmClient.getEastUrl(em.getF12Code());
             top100.append("<br>").append(url);
         }
 
-
         String encodeTop100 = URLEncoder.encode(top100.toString(), StandardCharsets.UTF_8);
-
         wxUtil.send(encodeTop100);
+        if (img.length() > 0) {
+            imgService.sendImg(img,"");
+        }
 
         ArrayList<ThemeScoreEntity> themeScoreEntities = new ArrayList<>(sortMap.size());
         LocalDateTime now = LocalDateTime.now();
@@ -537,8 +540,10 @@ public class MarketJob {
     @Scheduled(cron = "0 15 06,15 ? * MON-FRI")
     public void initMaMap() {
         CODE_MA_BLOCK_SET.clear();
-        MONITOR_CODE_AMT_MAP.clear();
         CODE_KS_CACHE_COUNT.set(0);
+        if (LocalTime.now().getHour() >= 15) {
+            MONITOR_CODE_AMT_MAP.clear();
+        }
     }
 
     @Resource
@@ -548,15 +553,45 @@ public class MarketJob {
     //type-code
     private static final Map<String, Integer> WX_SEND_COUNT_MAP = new HashMap<>();
 
+    public String pct(BigDecimal up, BigDecimal low) {
+        BigDecimal p = (up.subtract(low)).divide(low, 4, RoundingMode.HALF_UP);
+        return BDUtil.amtHuman(p);
+    }
+
     public void runSpeedMonitor(List<EmCList> list) {
-        log.info("runSpeedMonitor map : {}", JSON.toJSONString(MONITOR_CODE_AMT_MAP.keySet()));
+        log.debug("runSpeedMonitor map : {}", JSON.toJSONString(MONITOR_CODE_AMT_MAP.keySet()));
         if (MONITOR_CODE_AMT_MAP.size() == 0) return;
 
-        List<EmCList> codes = list.stream().filter(em ->
+        //sort by speed
+        List<EmCList> listIn = list.stream().filter(em ->
                 MONITOR_CODE_AMT_MAP.containsKey(em.getF12Code())
-                        && em.getF3Pct().compareTo(BigDecimal.ZERO) > 0
+        ).sorted(Comparator.comparing(EmCList::getF22Speed).reversed()).toList();
+
+
+        log.info("\n\n");
+
+        for (EmCList emCList : listIn) {
+            if (emCList.getF22Speed().compareTo(BigDecimal.ZERO) > 0) {
+                log.info("{},ohlc {} {} {} {},pct={},amt={},fAmt={},speed={}",
+                        emCList.getF12Code() + emCList.getF14Name(),
+
+                        emCList.getF17Open(),
+                        emCList.getF15High(),
+                        emCList.getF16Low(),
+                        emCList.getF2Close(),
+                        emCList.getF3Pct(),
+                        BDUtil.amtHuman(emCList.getF6Amt()),
+                        BDUtil.amtHuman(new BigDecimal("0.1").multiply(MONITOR_CODE_AMT_MAP.get(emCList.getF12Code()))),
+                        emCList.getF22Speed());
+            }
+        }
+
+        List<EmCList> codes = listIn.stream().filter(em ->
+                em.getF3Pct().compareTo(BigDecimal.ZERO) > 0
                         && em.getF3Pct().compareTo(BDUtil.B5) < 0
-                        && em.getF22Speed().compareTo(BDUtil.B1) >= 0).toList();
+                        && em.getF22Speed().compareTo(BDUtil.B1) >= 0
+        ).toList();
+
 
         if (codes.size() == 0) {
             return;
@@ -570,7 +605,7 @@ public class MarketJob {
             String key = "[speed]" + em.getF12Code();
             Integer count = WX_SEND_COUNT_MAP.get(key);
             if (count != null && count > 2) {
-                log.info("wx send count >= 3: {}", em.getF14Name());
+                log.info("wx send count >= 3: {},移除监控", em.getF14Name());
                 continue;
             }
 
@@ -581,6 +616,7 @@ public class MarketJob {
                 log.info("fAmt={} 成交额小于500万: {}", fAmt, em.getF14Name());
                 continue;
             }
+
 
             Map<String, BigDecimal> amtMap = speedService.getWindowAmt(em.getF12Code(), em.getF14Name(), map);
             if (amtMap.size() == 0) {
@@ -642,9 +678,10 @@ public class MarketJob {
 
 
         for (EmCList emCList : lowList) {
-//            log.info("initMaMap: {}", emCList.getF12Code());
             String code = emCList.getF12Code();
-            if (CODE_MA_BLOCK_SET.contains(code)) continue;
+            if (CODE_MA_BLOCK_SET.contains(code)) {
+                continue;
+            }
 
             List<EmDailyK> dailyKs = getKsCache(code);
             if (dailyKs == null || dailyKs.size() < 65) {
@@ -699,11 +736,12 @@ public class MarketJob {
             String url = EmClient.getEastUrl(emCList.getF12Code());
             content += "<br>" + url;
             String encode = URLEncoder.encode(content, StandardCharsets.UTF_8);
-            wxUtil.send(encode);
+            if (emCList.getF22Speed().compareTo(BDUtil.B1) >= 1) {
+                wxUtil.send(encode);
+            }
             log.info("cross ma: {}", emCList.getF14Name() + emCList.getF12Code());
         }
     }
-
 
 
     /*
@@ -734,5 +772,6 @@ public class MarketJob {
 
     public static final Map<String, List<EmDailyK>> CODE_KS_CACHE_MAP = new HashMap<>();
     public static final AtomicInteger CODE_KS_CACHE_COUNT = new AtomicInteger(0);
+
 
 }
