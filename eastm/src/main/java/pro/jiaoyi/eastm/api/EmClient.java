@@ -296,10 +296,10 @@ public class EmClient {
             List<EmCList> list = clist.stream()
                     .sorted(comparator)
                     .filter(e ->
+                            //v=0 amt=0 close=0 pct=0 code=000003PT金田A
                             !(e.getF14Name().contains("退"))//排除退市
-                                    && e.getF2Close().compareTo(B5) > 0 //股价 > 5
-                                    && e.getF3Pct().compareTo(BN3) > 0 //股价 > 5
-                    )
+                                    && e.getF2Close().compareTo(BigDecimal.ZERO) > 0
+                                    && e.getF5Vol().compareTo(BigDecimal.ZERO) > 0)
                     .toList();
 
             ArrayList<EmCList> results = new ArrayList<>(list);

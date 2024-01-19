@@ -5,8 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.flow.job.DailyJob;
 import pro.jiaoyi.eastm.flow.KlineFlow;
+import pro.jiaoyi.eastm.model.EmCList;
+
+import java.util.List;
 
 @SpringBootTest
 @Slf4j
@@ -16,20 +20,15 @@ class FlowTests {
     void contextLoads() {
     }
 
-    @Autowired
-    private KlineFlow dataFlow;
-
-//    @Test
-//    public void run() {
-//        dataFlow.run();
-//    }
-
     @Resource
-    private DailyJob dailyJob;
-
+    private EmClient emClient;
     @Test
     public void run() {
-        dailyJob.execute();
+        List<EmCList> list = emClient.getClistDefaultSize(true);
+        for (EmCList emCList : list) {
+            log.info("v={} amt={} close={} pct={} code={}",
+                    emCList.getF5Vol(), emCList.getF6Amt(), emCList.getF2Close(), emCList.getF3Pct(), emCList.getF12Code()+emCList.getF14Name());
+        }
     }
 
 

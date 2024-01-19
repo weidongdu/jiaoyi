@@ -58,13 +58,17 @@ public class BDUtil {
     public static final BigDecimal BN1 = new BigDecimal("-1");
     public static final BigDecimal BN3 = new BigDecimal("-3");
 
+    public static String pct(BigDecimal up, BigDecimal low) {
+        BigDecimal p = (up.subtract(low)).divide(low, 4, RoundingMode.HALF_UP);
+        return BDUtil.amtHuman(p);
+    }
 
     public static String p100(BigDecimal b) {
         if (b == null) return "null";
         return b.multiply(B100).setScale(2, RoundingMode.HALF_UP).toPlainString();
     }
 
-    public static String p100(BigDecimal b,int scale) {
+    public static String p100(BigDecimal b, int scale) {
         if (b == null) return "null";
         return b.multiply(B100).setScale(scale, RoundingMode.HALF_UP).toPlainString();
     }

@@ -289,6 +289,19 @@ public class MaUtil {
     }
 
 
+
+    public static boolean highK(List<BigDecimal> list, int p) {
+        if (list == null || list.size() < p) {
+            return false;
+        }
+
+        //取 list 最后 p 个, 排出最后一个
+        List<BigDecimal> subList = list.subList(list.size() - p, list.size() - 1);
+        BigDecimal max = subList.stream().max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+        BigDecimal last = list.get(list.size() - 1);
+        return last.compareTo(max) > 0;
+    }
+
     public static void main(String[] args) {
         BigDecimal[] pa = new BigDecimal[10];
 

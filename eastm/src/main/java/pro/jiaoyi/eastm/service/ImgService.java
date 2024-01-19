@@ -20,6 +20,7 @@ public class ImgService {
     private WxUtil wxUtil;
 
     private String download(String url, String fileName) {
+        log.info("download {} {}", url, fileName);
         byte[] bytes = okHttpUtil.getForBytes(url, null);
         //将bytes 存储为本地图片
         try {
@@ -74,11 +75,14 @@ public class ImgService {
         return secid;
     }
 
-    public void sendImg(String code, String name){
-        String fileAbsPath = downloadKline(code, name);
-        if (fileAbsPath != null){
+    public void sendImg(String code) {
+        log.info("sendImg {}", code);
+        String fileAbsPath = downloadKline(code, "");
+        if (fileAbsPath != null) {
             wxUtil.sendImg(fileAbsPath);
         }
     }
+
+
 
 }

@@ -4,6 +4,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import pro.jiaoyi.common.util.BDUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.flow.common.FlowNo;
 import pro.jiaoyi.eastm.flow.common.TradeTimeEnum;
@@ -50,7 +51,10 @@ public class IndexFlow implements BaseFlow {
         log.info("{} run {}", this.getClass().getSimpleName(), getNo());
         //准备基础数据
         List<EmCList> emList = emClient.getClistDefaultSize(true);
-        CommonInfo.EM_LIST = emList;
+        CommonInfo.EM_LIST = emList.stream().filter(em ->
+                em.getF3Pct().compareTo(BDUtil.BN3) > 0
+                        && em.getF6Amt().compareTo(BDUtil.B5000W) > 0
+        ).toList();
 
         for (EmCList emCList : emList) {
             CommonInfo.CODE_NAME_MAP.put(emCList.getF12Code(), emCList.getF14Name());
