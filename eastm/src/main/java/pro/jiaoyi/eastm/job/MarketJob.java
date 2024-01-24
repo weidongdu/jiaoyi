@@ -12,12 +12,17 @@ import org.springframework.stereotype.Component;
 import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.util.BDUtil;
 import pro.jiaoyi.common.util.CollectionsUtil;
+import pro.jiaoyi.common.util.EmojiUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.config.WxUtil;
+import pro.jiaoyi.eastm.dao.entity.CloseEmCListEntity;
 import pro.jiaoyi.eastm.dao.entity.OpenEmCListEntity;
 import pro.jiaoyi.eastm.dao.entity.ThemeScoreEntity;
+import pro.jiaoyi.eastm.dao.entity.TickEmCListEntity;
+import pro.jiaoyi.eastm.dao.repo.CloseEmCListRepo;
 import pro.jiaoyi.eastm.dao.repo.OpenEmCListRepo;
 import pro.jiaoyi.eastm.dao.repo.ThemeScoreRepo;
+import pro.jiaoyi.eastm.dao.repo.TickEmCListRepo;
 import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
 import pro.jiaoyi.eastm.service.ImgService;
@@ -48,6 +53,11 @@ public class MarketJob {
     private ThemeScoreRepo themeScoreRepo;
     @Resource
     private OpenEmCListRepo openEmCListRepo;
+    @Resource
+    private CloseEmCListRepo closeEmCListRepo;
+    @Resource
+    private TickEmCListRepo tickEmCListRepo;
+
     @Resource
     private WxUtil wxUtil;
     @Resource
@@ -90,6 +100,22 @@ public class MarketJob {
     @Scheduled(cron = "30 25 9 * * ?")
     public void runOpen() {
         open("");
+    }
+
+    @Scheduled(cron = "30 5 15 * * ?")
+    public void runClose() {
+
+        List<EmCList> list = emClient.getClistDefaultSize(true);
+        if (list == null || list.size() == 0) {
+            return;
+        }
+        closeEmCListRepo.deleteAll();
+        for (EmCList emCList : list) {
+            CloseEmCListEntity entity = copyClose(emCList, LocalDateTime.now());
+            log.info("保存close信息: {}", entity);
+            closeEmCListRepo.saveAndFlush(entity);
+            log.info("保存close成功: {}", entity.getF14Name());
+        }
     }
 
     @Scheduled(cron = "30 0/10 * * * ?")
@@ -203,12 +229,41 @@ public class MarketJob {
             openEmCListRepo.saveAndFlush(entity);
             log.info("保存开盘信息成功: {}", entity.getF14Name());
         }
-
-
     }
 
     public OpenEmCListEntity copyOpen(EmCList emCList, LocalDateTime now) {
         OpenEmCListEntity entity = new OpenEmCListEntity();
+
+        entity.setF2Close(emCList.getF2Close());//    private BigDecimal f2Close;//最新价//        "f2": 11.9,
+        entity.setF3Pct(emCList.getF3Pct());//    private BigDecimal f3Pct;//涨跌幅//        "f3": -0.92,
+        entity.setF4Chg(emCList.getF4Chg());//    private BigDecimal f4Chg;//涨跌额//        "f4": -0.11,
+        entity.setF5Vol(emCList.getF5Vol());//    private BigDecimal f5Vol;//成交量(手)//        "f5": 305362,
+        entity.setF6Amt(emCList.getF6Amt());//    private BigDecimal f6Amt;//成交额//        "f6": 364294854.36,
+        entity.setF7Amp(emCList.getF7Amp());//    private BigDecimal f7Amp;//振幅//        "f7": 0.92,
+        entity.setF8Turnover(emCList.getF8Turnover());//    private BigDecimal f8Turnover;//换手率//        "f8": 0.16,
+        entity.setF9Pe(emCList.getF9Pe());//    private BigDecimal f9Pe;//市盈率(动态)//        "f9": 3.95,
+        entity.setF10VolRatio(emCList.getF10VolRatio());//    private BigDecimal f10VolRatio;//量比//        "f10": 2.8,
+        entity.setF12Code(emCList.getF12Code());//    private String f12Code;//代码//        "f12": "000001",
+        entity.setF14Name(emCList.getF14Name());//    private String f14Name;//名称//        "f14": "平安银行",
+        entity.setF15High(emCList.getF15High());//    private BigDecimal f15High;//最高//        "f15": 12.0,
+        entity.setF16Low(emCList.getF16Low());//    private BigDecimal f16Low;//最低//        "f16": 11.89,
+        entity.setF17Open(emCList.getF17Open());//    private BigDecimal f17Open;//今开//        "f17": 11.99,
+        entity.setF18Close(emCList.getF18Close());//    private BigDecimal f18Close;//昨收//        "f18": 12.01,
+        entity.setF22Speed(emCList.getF22Speed());//    private BigDecimal f22Speed;//涨速//        "f22": -0.25,
+        entity.setF23Pb(emCList.getF23Pb());//    private BigDecimal f23Pb;//市净率//        "f23": 0.61
+        entity.setF100bk(emCList.getF100bk());//    private String f100bk;//所属板块//        "f100": "银行"
+
+        entity.setTradeDate(now.toLocalDate().toString().replaceAll("-", ""));//    private String tradeDate;//交易日
+        entity.setF1Amt(BDUtil.BN1);//    private BigDecimal f1Amt;//1min 成交额 定量
+        entity.setOpenX(BDUtil.BN1);//    private BigDecimal openX;//相比昨日成交额 倍数
+        entity.setCreateTime(now);//    private LocalDateTime createTime;
+        entity.setUpdateTime(now);//    private LocalDateTime updateTime;
+
+        return entity;
+    }
+
+    public CloseEmCListEntity copyClose(EmCList emCList, LocalDateTime now) {
+        CloseEmCListEntity entity = new CloseEmCListEntity();
 
         entity.setF2Close(emCList.getF2Close());//    private BigDecimal f2Close;//最新价//        "f2": 11.9,
         entity.setF3Pct(emCList.getF3Pct());//    private BigDecimal f3Pct;//涨跌幅//        "f3": -0.92,
@@ -544,7 +599,9 @@ public class MarketJob {
         List<EmCList> list = emClient.getClistDefaultSize(true);
         runSpeedMonitor(list);
 //        runCrossMa(list);
-        tick(EM_CLIST_PRE, list);
+        if (EM_CLIST_PRE != null && EM_CLIST_PRE.size() > 0) {
+            tick(EM_CLIST_PRE, list);
+        }
         EM_CLIST_PRE = list;
     }
 
@@ -654,34 +711,75 @@ public class MarketJob {
     }
 
 
+    private static String TRIN_SIDE_PRE = "";
+    private static Integer TRIN_SIDE_COUNTER = 0;
+
     public void tick(List<EmCList> preList, List<EmCList> now) {
         if (preList == null || preList.size() == 0
                 || now == null || now.size() == 0) {
             return;
         }
 
-        HashMap<String, EmCList> p = new HashMap<>(preList.size());
+
+        //全市场 绝对涨跌数量
+        int absUp = 0;//pct
+        int absDn = 0;//pct
+        int absZ = 0;//pct
+
+        //全市场 按实体涨跌数量
+        int openUp = 0;//tick up
+        int openDn = 0;//tick down
+        int openZ = 0;//tick zero
+
+
+        //tick级 涨跌数量
+        int tickUp = 0;
+        int tickDn = 0;
+        int tickZ = 0;
+
+
+        BigDecimal tickUpAmt = BigDecimal.ZERO;
+        BigDecimal tickDnAmt = BigDecimal.ZERO;
+        BigDecimal tickZAmt = BigDecimal.ZERO;
+
+
+        Map<String, EmCList> p = new HashMap<>(preList.size());
         for (EmCList em : preList) {
             p.put(em.getF12Code(), em);
-        }
+            if (em.getF3Pct().compareTo(BDUtil.B1) > 0) {
+                absUp++;
+            } else if (em.getF3Pct().compareTo(BDUtil.BN1) < 0) {
+                absDn++;
+            } else {
+                absZ++;
+            }
 
-        int w = 10000;
-        int up = 0;
-        int dn = 0;
-        BigDecimal upAmt = BigDecimal.ONE;
-        BigDecimal dnAmt = BigDecimal.ONE;
+            if (em.getF2Close().compareTo(em.getF17Open()) > 0) {
+                openUp++;
+            } else if (em.getF2Close().compareTo(em.getF17Open()) < 0) {
+                openDn++;
+            } else {
+                openZ++;
+            }
+        }
 
         for (EmCList em : now) {
             EmCList pre = p.get(em.getF12Code());
+            if (pre == null) continue;
+
             BigDecimal amtDiff = em.getF6Amt().subtract(pre.getF6Amt());
             if (em.getF2Close().compareTo(pre.getF2Close()) > 0) {
-                upAmt = upAmt.add(amtDiff);
-                up++;
+                tickUpAmt = tickUpAmt.add(amtDiff);
+                tickUp++;
+                continue;
             }
             if (em.getF2Close().compareTo(pre.getF2Close()) < 0) {
-                dnAmt = dnAmt.add(amtDiff);
-                dn++;
+                tickDnAmt = tickDnAmt.add(amtDiff);
+                tickDn++;
+                continue;
             }
+            tickZ++;
+            tickZAmt = tickZAmt.add(amtDiff);
         }
 
 
@@ -699,56 +797,76 @@ public class MarketJob {
         // 1 股数相同 ==>当相同数据的股票 , 但是下跌占用的资金更多, (抱团, 资金偏好) 说明资金更愿意往下跌的股票上面去
         // 2 amt相同 ==>说明 太容易涨了
 
+        int tick = tickUp - tickDn;// up - down
+        BigDecimal tickPct = new BigDecimal(tick).divide(new BigDecimal(now.size()), 4, RoundingMode.HALF_UP);
 
-        //含意就是 单位资金 推动股票上涨的比例
-        BigDecimal upAmtRatio = new BigDecimal(up * w).divide(upAmt, 4, RoundingMode.HALF_UP);
-        //含意就是 单位资金 推动股票下跌的比例
-        BigDecimal dnAmtRatio = new BigDecimal(dn * w).divide(dnAmt, 4, RoundingMode.HALF_UP);
+        BigDecimal amt = tickUpAmt.add(tickDnAmt).add(tickZAmt);
+        BigDecimal upAmtRatio = amt.compareTo(BigDecimal.ZERO) == 0 ? amt : tickUpAmt.divide(amt, 4, RoundingMode.HALF_UP);
+        BigDecimal dnAmtRatio = amt.compareTo(BigDecimal.ZERO) == 0 ? amt : tickDnAmt.divide(amt, 4, RoundingMode.HALF_UP);
+        BigDecimal zAmtRatio = amt.compareTo(BigDecimal.ZERO) == 0 ? amt : tickZAmt.divide(amt, 4, RoundingMode.HALF_UP);
 
-        BigDecimal r = dnAmtRatio.compareTo(BigDecimal.ZERO) > 0 ? upAmtRatio.divide(dnAmtRatio, 2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
+        BigDecimal sudr = tickDn == 0 ? BigDecimal.ZERO : new BigDecimal(tickUp).divide(new BigDecimal(tickDn), 2, RoundingMode.HALF_UP);
+        BigDecimal audr = dnAmtRatio.compareTo(BigDecimal.ZERO) == 0 ? dnAmtRatio : upAmtRatio.divide(dnAmtRatio, 2, RoundingMode.HALF_UP);
+        BigDecimal nudr = audr.subtract(sudr);
 
-        String type = "----";
-        int updn = up - dn;
-        BigDecimal dr = BigDecimal.ONE.subtract(r).multiply(BDUtil.B100).abs();
-        BigDecimal udr = BigDecimal.ZERO;
-        if (updn != 0) {
-            //含义是 updn 打出了dr 的幅度
-            udr = dr.divide(new BigDecimal(updn).abs(), 4, RoundingMode.HALF_UP);
+
+        BigDecimal trin = ((tickDnAmt.compareTo(BigDecimal.ZERO) == 0 || tickUpAmt.compareTo(BigDecimal.ZERO) == 0) ? BigDecimal.ZERO : sudr.divide(tickUpAmt.divide(tickDnAmt, 4, RoundingMode.HALF_UP), 2, RoundingMode.HALF_UP));
+
+        TickEmCListEntity t = new TickEmCListEntity();
+        t.setId(null);
+        t.setAbsUp(absUp);//pct
+        t.setAbsDn(absDn);//pct
+        t.setAbsZ(absZ);//pct
+
+        t.setOpenUp(openUp);
+        t.setOpenDn(openDn);
+        t.setOpenZ(openZ);
+
+        t.setTickUp(tickUp);
+        t.setTickDn(tickDn);
+        t.setTickZ(tickZ);
+
+        t.setTick(tick);// up - down
+        t.setTickPct(tickPct);// (up - down) / total
+
+        t.setTickUpAmt(tickUpAmt);
+        t.setTickDnAmt(tickDnAmt);
+        t.setTickZAmt(tickZAmt);
+
+        t.setUpAmtRatio(upAmtRatio);// up - down
+        t.setDnAmtRatio(dnAmtRatio);// (up - down) / total
+        t.setZAmtRatio(zAmtRatio);// (up - down) / total
+
+        t.setSudr(sudr);
+        t.setAudr(audr);
+        t.setNudr(nudr);
+
+        t.setTrin(trin);//(tup/aup) / (tdn/adn)
+        t.setCreateTime(LocalDateTime.now());
+
+        tickEmCListRepo.saveAndFlush(t);
+
+        String side = (nudr.compareTo(BigDecimal.ZERO) > 0 ? EmojiUtil.UPs : EmojiUtil.DOWNs)
+                + (trin.compareTo(new BigDecimal("1.05")) < 0
+                && trin.compareTo(new BigDecimal("0.95")) > 0 ? ("-") : (nudr.multiply(new BigDecimal(tick)).compareTo(BigDecimal.ZERO) > 0 ? EmojiUtil.Right : "x"));
+
+        if (side.equals(TRIN_SIDE_PRE)) {
+            TRIN_SIDE_COUNTER++;
+        } else {
+            TRIN_SIDE_COUNTER = 1;
         }
+        TRIN_SIDE_PRE = side;
 
-        if (updn > 100) {
-            if (r.compareTo(new BigDecimal("0.95")) <= 0) {
-                type = "up配合[抱涨]";
-            }
-            if (r.compareTo(new BigDecimal("1.05")) >= 0) {
-                type = "up背离[抱跌]";
-            }
-        }
-
-        if (updn < -100) {
-            if (r.compareTo(new BigDecimal("0.95")) <= 0) {
-                type = "dn背离[抱涨]";
-            }
-            if (r.compareTo(new BigDecimal("1.05")) >= 0) {
-                type = "dn配合[抱跌]";
-            }
-        }
-
-        log.info("up={}dn={}upA={}dnA={}amt={}TICKP={}TICK={}TRIN={}type={}udr={}",
-
-                String.format("%-8s", up),
-                String.format("%-8s", dn),
-                String.format("%-8s", BDUtil.amtHuman(upAmt)),
-                String.format("%-8s", BDUtil.amtHuman(dnAmt)),
-                String.format("%-8s", BDUtil.amtHuman(upAmt.add(dnAmt))),
-                String.format("%-8s", BDUtil.p100(new BigDecimal(updn).divide(new BigDecimal(now.size()), 4, RoundingMode.HALF_UP))),
-                String.format("%-8s", updn),
-                String.format("%-8s", r),
-                String.format("%-10s", type),
-                udr
+        log.info("绝对={} 实体={} 秒={} amt={} tick={} sudr={} audr={} trin={}",
+                String.format("%-10s", absUp + ":" + absDn),
+                String.format("%-10s", openUp + ":" + openDn),
+                String.format("%-10s", tickUp + ":" + tickDn),
+                String.format("%-15s", BDUtil.amtHuman(tickUpAmt) + ":" + BDUtil.amtHuman(tickDnAmt)),
+                String.format("%-15s", tick + "[" + BDUtil.p100(tickPct) + "%]"),
+                String.format("%-8s", sudr),
+                String.format("%-15s", (audr) + "[" + (nudr) + "]"),
+                String.format("%-8s", trin + "[" + side + "][" + TRIN_SIDE_COUNTER + "]")
         );
-
-
     }
 
 }

@@ -58,12 +58,25 @@ public class StockController {
     }
 
     @GetMapping("/monitor")
-    public Object monitor(String code) {
+    public Object monitor(String codes) {
+        if (codes != null) {
+            String[] codeArr = codes.split(",");
+            for (String code : codeArr) {
+                if (codeCheck(code)) {
+                    BigDecimal amtHour = getAmtHour(code);
+                    MONITOR_CODE_AMT_MAP.put(code, amtHour);
+                    String name = emClient.getCodeNameMap(false).get(code);
+                    wxUtil.send("监控" + name + code);
+                }
+            }
+        }
+        return MONITOR_CODE_AMT_MAP;
+    }
+
+    @GetMapping("/monitor/del")
+    public Object monitorDel(String code) {
         if (codeCheck(code)) {
-            BigDecimal amtHour = getAmtHour(code);
-            MONITOR_CODE_AMT_MAP.put(code, amtHour);
-            String name = emClient.getCodeNameMap(false).get(code);
-            wxUtil.send("监控" + name + code);
+            MONITOR_CODE_AMT_MAP.remove(code);
         }
         return MONITOR_CODE_AMT_MAP;
     }
@@ -84,7 +97,6 @@ public class StockController {
             }
         }
         return false;
-
     }
 }
 

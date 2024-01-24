@@ -4,12 +4,14 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,6 +23,8 @@ import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.common.util.FileUtil;
 import pro.jiaoyi.common.util.http.okhttp4.OkHttpUtil;
 import pro.jiaoyi.eastm.config.IndexEnum;
+import pro.jiaoyi.eastm.dao.entity.CloseEmCListEntity;
+import pro.jiaoyi.eastm.dao.repo.CloseEmCListRepo;
 import pro.jiaoyi.eastm.flow.common.TradeTimeEnum;
 import pro.jiaoyi.eastm.model.*;
 import pro.jiaoyi.eastm.util.EmMaUtil;
@@ -52,6 +56,9 @@ public class EmClient {
 
     @Value("${project.dir}")
     private String projectDir;
+
+    @Resource
+    private CloseEmCListRepo closeEmCListRepo;
 
     public static final BigDecimal B100 = new BigDecimal("100");
     public static final BigDecimal B1000 = new BigDecimal("1000");
@@ -277,11 +284,28 @@ public class EmClient {
     }
 
     public List<EmCList> getClistDefaultSize(boolean force) {
+
+
         //从本地缓存先加载
         if (!force) {
             List<EmCList> list = DATE_INDEX_ALL_MAP.get(DateUtil.today());
             if (list != null && list.size() > 0) {
                 return list;
+            }
+        }
+        //如果是非交易时间, 取db
+        if (TradeTimeUtil.isTradeDay() && TradeTimeUtil.isTradeTime().equals(TradeTimeEnum.TRADE)) {
+
+        } else {
+            List<CloseEmCListEntity> all = closeEmCListRepo.findAll();
+            if (all.size() > 0) {
+                ArrayList<EmCList> clist = new ArrayList<>(all.size());
+                for (CloseEmCListEntity c : all) {
+                    EmCList em = new EmCList();
+                    BeanUtils.copyProperties(c, em);
+                    clist.add(em);
+                }
+                return clist;
             }
         }
 
@@ -1414,4 +1438,5 @@ public class EmClient {
 
         return false;
     }
+
 }
