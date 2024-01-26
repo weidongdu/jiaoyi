@@ -11,6 +11,8 @@ public class BDUtil {
     public static final BigDecimal B2000W = new BigDecimal("20000000");
     public static final BigDecimal B1000W = new BigDecimal("10000000");
     public static final BigDecimal B500W = new BigDecimal("5000000");
+    public static final BigDecimal B100W = new BigDecimal("1000000");
+    public static final BigDecimal B50W = new BigDecimal("500000");
     public static final BigDecimal B1W = new BigDecimal("10000");
     public static final BigDecimal B100 = new BigDecimal("100");
     public static final BigDecimal B90 = new BigDecimal("90");

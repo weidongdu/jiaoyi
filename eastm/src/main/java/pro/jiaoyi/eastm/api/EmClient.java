@@ -4,8 +4,11 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -39,6 +42,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -285,6 +289,9 @@ public class EmClient {
 
     public List<EmCList> getClistDefaultSize(boolean force) {
 
+        Comparator<EmCList> comparator = Comparator
+                .comparing(EmCList::getF100bk)
+                .thenComparing(EmCList::getF12Code);
 
         //从本地缓存先加载
         if (!force) {
@@ -305,17 +312,13 @@ public class EmClient {
                     BeanUtils.copyProperties(c, em);
                     clist.add(em);
                 }
-                return clist;
+
+                return clist.stream().sorted(comparator).toList();
             }
         }
 
         List<EmCList> clist = getClist(1, 10000);
         if (clist.size() > 0) {
-            // 按照 bk 排序，相同的 bk 按 pct 排序
-            Comparator<EmCList> comparator = Comparator
-                    .comparing(EmCList::getF100bk)
-                    .thenComparingDouble(emCList -> emCList.getF3Pct().doubleValue())
-                    .reversed();
 
             List<EmCList> list = clist.stream()
                     .sorted(comparator)
@@ -841,6 +844,9 @@ public class EmClient {
 
         ArrayList<BigDecimal> amts = new ArrayList<>();
         int size = dailyKs.size();
+        if (size < 60) {
+            return B1_5Y;
+        }
 
         if (TradeTimeUtil.isTrading()) {
             // 排除当天
@@ -1438,5 +1444,24 @@ public class EmClient {
 
         return false;
     }
+
+
+    public BigDecimal getAmtHour(String code) {
+        if (CACHE_AMT.getIfPresent(code) != null) {
+            return CACHE_AMT.getIfPresent(code);
+        }
+
+        List<EmDailyK> dailyKs =
+                getDailyKs(code, LocalDate.now(), 100, false);
+        BigDecimal amtDay = amtTop10p(dailyKs);
+        BigDecimal amt = amtDay.divide(new BigDecimal(4), 2, RoundingMode.HALF_UP);
+        CACHE_AMT.put(code, amt);
+        return amt;
+    }
+
+    public static final Cache<String, BigDecimal> CACHE_AMT = Caffeine.newBuilder()
+            .expireAfterWrite(4, TimeUnit.DAYS)
+            .maximumSize(1000)
+            .build();
 
 }

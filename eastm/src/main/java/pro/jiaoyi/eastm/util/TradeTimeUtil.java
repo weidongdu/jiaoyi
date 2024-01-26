@@ -8,9 +8,25 @@ import java.time.LocalTime;
 
 public class TradeTimeUtil {
 
-    public static boolean isTrading(){
+    public static boolean isTrading() {
         return isTradeDay() && isTradeTime().equals(TradeTimeEnum.TRADE);
     }
+
+    public static boolean isTradeDay(LocalDate localDate) {
+        // 周六 周日 不是交易日
+        int value = localDate.getDayOfWeek().getValue();
+        if (value == 6 || value == 7) {
+            return false;
+        }
+
+        // 节假日 不是交易日
+        if (EmClient.MARKET_STOP_DAY.contains(localDate)) {
+            return false;
+        }
+
+        return true;
+    }
+
     public static boolean isTradeDay() {
         // 周六 周日 不是交易日
         int value = LocalDate.now().getDayOfWeek().getValue();

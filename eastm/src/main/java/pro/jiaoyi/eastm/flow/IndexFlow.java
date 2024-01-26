@@ -12,6 +12,7 @@ import pro.jiaoyi.eastm.flow.common.TypeEnum;
 import pro.jiaoyi.eastm.flow.common.CommonInfo;
 import pro.jiaoyi.eastm.model.EmCList;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -76,6 +77,14 @@ public class IndexFlow implements BaseFlow {
                 }
                 case ZZ1000 -> {
                     List<String> list = emClient.getIndex1000().stream().map(EmCList::getF12Code).toList();
+                    ArrayList<String> codes = sortCodes(emList, list);
+                    CommonInfo.TYPE_CODES_MAP.put(typeEnum.getType(), codes);
+
+                }
+                case HIGHP -> {
+                    List<String> list = emList.stream().filter(emCList ->
+                                    emCList.getF3Pct().compareTo(BDUtil.B9) > 0)
+                            .map(EmCList::getF12Code).toList();
                     ArrayList<String> codes = sortCodes(emList, list);
                     CommonInfo.TYPE_CODES_MAP.put(typeEnum.getType(), codes);
 

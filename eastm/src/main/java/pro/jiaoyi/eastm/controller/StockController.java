@@ -41,7 +41,7 @@ public class StockController {
             return jsonObject;
         }
 
-        BigDecimal amtHour = getAmtHour(code);
+        BigDecimal amtHour = emClient.getAmtHour(code);
         jsonObject.put("vol", amtHour);
         if (!MONITOR_CODE_AMT_MAP.containsKey(code)) {
             MONITOR_CODE_AMT_MAP.put(code, amtHour);
@@ -50,12 +50,12 @@ public class StockController {
     }
 
 
-    public BigDecimal getAmtHour(String code) {
-        List<EmDailyK> dailyKs =
-                emClient.getDailyKs(code, LocalDate.now(), 100, false);
-        BigDecimal amtDay = emClient.amtTop10p(dailyKs);
-        return amtDay.divide(new BigDecimal(4), 2, RoundingMode.HALF_UP);
-    }
+//    public BigDecimal getAmtHour(String code) {
+//        List<EmDailyK> dailyKs =
+//                emClient.getDailyKs(code, LocalDate.now(), 100, false);
+//        BigDecimal amtDay = emClient.amtTop10p(dailyKs);
+//        return amtDay.divide(new BigDecimal(4), 2, RoundingMode.HALF_UP);
+//    }
 
     @GetMapping("/monitor")
     public Object monitor(String codes) {
@@ -63,7 +63,7 @@ public class StockController {
             String[] codeArr = codes.split(",");
             for (String code : codeArr) {
                 if (codeCheck(code)) {
-                    BigDecimal amtHour = getAmtHour(code);
+                    BigDecimal amtHour = emClient.getAmtHour(code);
                     MONITOR_CODE_AMT_MAP.put(code, amtHour);
                     String name = emClient.getCodeNameMap(false).get(code);
                     wxUtil.send("监控" + name + code);
