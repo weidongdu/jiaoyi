@@ -106,9 +106,29 @@ public class MarketJob {
     public void runClose() {
 
         List<EmCList> list = emClient.getClistDefaultSize(true);
-        if (list == null || list.size() == 0) {
+        if (list == null || list.isEmpty()) {
             return;
         }
+        //过滤 一字板, hsl < 3%
+        List<EmCList> yi = list.stream().filter(em ->
+                em.getF2Close().compareTo(BigDecimal.ONE) > 0
+                        && em.getF3Pct().compareTo(BigDecimal.ONE) > 0
+                        && em.getF8Turnover().compareTo(BDUtil.B3) < 0
+                        && em.getF2Close().compareTo(em.getF17Open()) == 0
+                        && em.getF2Close().compareTo(em.getF15High()) == 0
+                        && em.getF2Close().compareTo(em.getF16Low()) == 0
+        ).toList();
+
+        if (!yi.isEmpty()) {
+            log.info("一字板: {}", yi);
+            StringBuilder content = new StringBuilder("一字板");
+            for (EmCList emCList : yi) {
+                content.append("<br>").append(emCList.getF14Name()).append("_").append(emCList.getF12Code());
+            }
+            String encode = URLEncoder.encode(content.toString(), StandardCharsets.UTF_8);
+            wxUtil.send(encode);
+        }
+
         closeEmCListRepo.deleteAll();
         for (EmCList emCList : list) {
             CloseEmCListEntity entity = copyClose(emCList, LocalDateTime.now());
@@ -504,7 +524,7 @@ public class MarketJob {
 
     public void runSpeedMonitor(List<EmCList> list) {
         log.debug("runSpeedMonitor map : {}", JSON.toJSONString(MONITOR_CODE_AMT_MAP.keySet()));
-        if (MONITOR_CODE_AMT_MAP.size() == 0) return;
+        if (MONITOR_CODE_AMT_MAP.isEmpty()) return;
         //sort by speed
         List<EmCList> listIn = list.stream().filter(em ->
                 MONITOR_CODE_AMT_MAP.containsKey(em.getF12Code())
@@ -537,7 +557,7 @@ public class MarketJob {
         ).toList();
 
 
-        if (codes.size() == 0) {
+        if (codes.isEmpty()) {
             return;
         }
 
@@ -577,9 +597,9 @@ public class MarketJob {
             String fcs = "";
             if (fc < 1000) {
                 log.error("分时amt数据不足1000个: {}", em.getF14Name());
-                fcs = "分时amt数据不足1000个";
+                fcs = "分时amt不足" + fc + "个";
             } else {
-                fcs = "分时amt数据_" + fc + "个";
+                fcs = "分时amt_" + fc + "个";
             }
 
             BigDecimal fx = m1.divide(fAmt, 2, RoundingMode.HALF_UP);
@@ -619,7 +639,8 @@ public class MarketJob {
         }
         EM_CLIST_PRE = list;
         //全市场涨速
-        runAllSpeed(list);
+        speedService.addAll(list);
+//        runAllSpeed(list);
         runFenshiM1(list);
     }
 
@@ -629,7 +650,7 @@ public class MarketJob {
 
 
     private void runAllSpeed(List<EmCList> list) {
-        speedService.addAll(list);
+
         BigDecimal b001 = new BigDecimal("0.01");
         List<EmCList> speedList = list.stream().filter(em ->
                 em.getF16Low().compareTo(em.getF18Close()) > 0
@@ -663,11 +684,11 @@ public class MarketJob {
             }
 
             //要求昨天 分时 > 1000 个
-            int fc = speedService.countByCode(code, LocalDate.now());
-            if (fc < 1000) {
-                ALLSPEED_BLOCK_SET.add(code);
-                continue;
-            }
+//            int fc = speedService.countByCode(code, LocalDate.now());
+//            if (fc < 1000) {
+//                ALLSPEED_BLOCK_SET.add(code);
+//                continue;
+//            }
 
             BigDecimal amtHour = emClient.getAmtHour(code);
             BigDecimal fAmt = amtHour.multiply(BDUtil.b0_1);
@@ -975,6 +996,18 @@ public class MarketJob {
             TRIN_SIDE_COUNTER = 1;
         }
         TRIN_SIDE_PRE = side;
+
+        if (trin.compareTo(BDUtil.B3) > 0) {
+            String content = "[底部有效]trin=[" + trin + "]超卖";
+            String encode = URLEncoder.encode(content, StandardCharsets.UTF_8);
+            wxUtil.send(encode);
+        }
+
+        if (trin.compareTo(new BigDecimal("0.3")) < 0) {
+            String content = "[顶部有效]trin=[" + trin + "]超买";
+            String encode = URLEncoder.encode(content, StandardCharsets.UTF_8);
+            wxUtil.send(encode);
+        }
 
         log.info("绝对={} 实体={} 秒={} amt={} tick={} sudr={} audr={} trin={}",
                 String.format("%-10s", absUp + ":" + absDn),

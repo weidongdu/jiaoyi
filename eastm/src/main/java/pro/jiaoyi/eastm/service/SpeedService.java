@@ -127,7 +127,7 @@ public class SpeedService {
     }
 
     public void runFenshiM1(List<EmCList> list) {
-        log.info("runFenshiM1 start");
+        log.debug("runFenshiM1 start");
         long s1 = System.currentTimeMillis();
         //save
         ArrayList<EmCListSimpleEntity> ll = new ArrayList<>();
@@ -156,7 +156,7 @@ public class SpeedService {
             saveCount += ll.size();
             emCListSimpleEntityRepo.saveAll(ll);
         }
-        log.info("runFenshiM1 , save {} end use [{}] ms", saveCount, System.currentTimeMillis() - s1);
+        log.debug("runFenshiM1 , save {} end use [{}] ms", saveCount, System.currentTimeMillis() - s1);
     }
 
     @Transactional

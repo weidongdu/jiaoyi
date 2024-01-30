@@ -296,16 +296,17 @@ public class EmClient {
         //从本地缓存先加载
         if (!force) {
             List<EmCList> list = DATE_INDEX_ALL_MAP.get(DateUtil.today());
-            if (list != null && list.size() > 0) {
+            if (list != null && !list.isEmpty()) {
                 return list;
             }
         }
         //如果是非交易时间, 取db
-        if (TradeTimeUtil.isTradeDay() && TradeTimeUtil.isTradeTime().equals(TradeTimeEnum.TRADE)) {
+        if (TradeTimeUtil.isTradeDay()
+                && (TradeTimeUtil.isTradeTime().equals(TradeTimeEnum.TRADE)) || TradeTimeUtil.isTradeTime().equals(TradeTimeEnum.POST)) {
 
         } else {
             List<CloseEmCListEntity> all = closeEmCListRepo.findAll();
-            if (all.size() > 0) {
+            if (!all.isEmpty()) {
                 ArrayList<EmCList> clist = new ArrayList<>(all.size());
                 for (CloseEmCListEntity c : all) {
                     EmCList em = new EmCList();
@@ -318,7 +319,7 @@ public class EmClient {
         }
 
         List<EmCList> clist = getClist(1, 10000);
-        if (clist.size() > 0) {
+        if (!clist.isEmpty()) {
 
             List<EmCList> list = clist.stream()
                     .sorted(comparator)

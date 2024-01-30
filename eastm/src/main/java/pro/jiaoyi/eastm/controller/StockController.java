@@ -72,6 +72,11 @@ public class StockController {
         }
         return MONITOR_CODE_AMT_MAP;
     }
+    @GetMapping("/monitor/clear")
+    public Object monitorClear() {
+        MONITOR_CODE_AMT_MAP.clear();
+        return MONITOR_CODE_AMT_MAP;
+    }
 
     @GetMapping("/monitor/del")
     public Object monitorDel(String code) {

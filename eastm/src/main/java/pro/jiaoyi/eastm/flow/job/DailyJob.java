@@ -2,6 +2,7 @@ package pro.jiaoyi.eastm.flow.job;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import pro.jiaoyi.eastm.flow.BaseFlow;
@@ -9,10 +10,13 @@ import pro.jiaoyi.eastm.flow.BaseFlow;
 import java.util.Comparator;
 import java.util.List;
 
-//@Component
+@Component
 @Slf4j
 public class DailyJob {
     private final List<BaseFlow> baseFlows;
+
+    @Value("${dailyJob.enable:#{false}}")
+    private boolean enable;
 
     @Autowired
     public DailyJob(List<BaseFlow> baseFlows) {
@@ -23,6 +27,10 @@ public class DailyJob {
     @Scheduled(fixedRate = 1000 * 60 * 60 * 24)
     public void execute() {
         log.info("DailyJob run");
+        if (!enable) {
+            log.info("DailyJob disabled");
+            return;
+        }
         // 按照getNo()排序
         baseFlows.sort(Comparator.comparingInt(BaseFlow::getNo));
         // 依次执行runByDay()

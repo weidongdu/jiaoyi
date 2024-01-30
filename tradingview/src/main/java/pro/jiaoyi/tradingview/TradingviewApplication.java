@@ -1,5 +1,6 @@
 package pro.jiaoyi.tradingview;
 
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
@@ -9,7 +10,21 @@ import pro.jiaoyi.common.util.EmojiUtil;
 @SpringBootApplication
 @ComponentScan(basePackages = {"pro.jiaoyi.*"})
 @EnableAsync
-public class TradingviewApplication {
+public class TradingviewApplication implements CommandLineRunner {
+
+    @Override
+    public void run(String... args) throws Exception {
+        try {
+            System.out.println("TradingviewApplication: run mysqlRL.sh...");
+
+            String sh = "/Users/dwd/dev/GitHub/jiaoyi/eastm/mysqlRL.sh";
+            Runtime.getRuntime().exec(sh);
+
+            System.out.println("TradingviewApplication: run mysqlRL.sh over...");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(TradingviewApplication.class, args);
