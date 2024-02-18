@@ -11,4 +11,9 @@ public class TvView {
     public String chart() {
         return "tv";
     }
+
+    @GetMapping("/tvb")
+    public String chartB() {
+        return "tvb";
+    }
 }

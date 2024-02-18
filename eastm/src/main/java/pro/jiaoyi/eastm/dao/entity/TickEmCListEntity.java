@@ -55,5 +55,6 @@ public class TickEmCListEntity {
     private BigDecimal trin;//(tup/aup) / (tdn/adn)
 
     private LocalDateTime createTime;
+    private String market;
 
 }

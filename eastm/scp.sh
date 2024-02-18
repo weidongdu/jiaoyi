@@ -25,5 +25,3 @@ ssh ubuntu@iz01 << EOF
 sudo supervisorctl restart eastm
 EOF
 
-
-loge

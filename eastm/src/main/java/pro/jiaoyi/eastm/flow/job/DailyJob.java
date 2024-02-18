@@ -28,14 +28,16 @@ public class DailyJob {
     public void execute() {
         log.info("DailyJob run");
         if (!enable) {
-            log.info("DailyJob disabled");
+            log.info("DailyJob disabled, 仅开index flow");
+            for (BaseFlow flow : baseFlows) {
+                if (flow.getClass().getSimpleName().equals("IndexFlow")) {
+                    flow.run();
+                }
+            }
             return;
         }
-        // 按照getNo()排序
         baseFlows.sort(Comparator.comparingInt(BaseFlow::getNo));
-        // 依次执行runByDay()
         for (BaseFlow flow : baseFlows) {
-//            flow.runByDay();
             flow.run();
             log.info("run {} done", flow.getClass().getSimpleName());
         }

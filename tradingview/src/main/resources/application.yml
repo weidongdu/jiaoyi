@@ -39,4 +39,4 @@ spring:
 project:
   dir: /Users/dwd/dev/GitHub/jiaoyi
 dailyJob:
-  enable: true
+  enable: false

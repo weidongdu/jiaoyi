@@ -120,7 +120,7 @@ public class EmClient {
             url = "http://71.push2his.eastmoney.com/api/qt/stock/kline/get?secid=" + code
                     + "&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6" +
                     "&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61" +
-                    "&klt=101&fqt=1&end=20500101&lmt=1000000";
+                    "&klt=101&fqt=1&end=20500101&lmt=" + lmt;
         }
 
         if (code.startsWith("index")) {
@@ -128,7 +128,7 @@ public class EmClient {
             url = "http://22.push2his.eastmoney.com/api/qt/stock/kline/get?secid=" + code
                     + "&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6" +
                     "&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61" +
-                    "&klt=101&fqt=1&end=20500101&lmt=10000";
+                    "&klt=101&fqt=1&end=20500101&lmt=1000";
         }
 
         if (COUNT.incrementAndGet() % 100 == 0) {
@@ -372,6 +372,11 @@ public class EmClient {
 
     public String getBkCodeByBkValue(String value) {
         String code = "";
+        if (BK_MAP.isEmpty()) {
+            List<EmCList> bkList = getIndex(IndexEnum.O_BK.getUrl());
+            initBkMap(bkList);
+        }
+
         for (String bkCode : BK_MAP.keySet()) {
             if (BK_MAP.get(bkCode).equals(value)) {
                 code = bkCode;

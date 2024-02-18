@@ -149,36 +149,48 @@ function updateChartData(data, series) {
     pctSeries.setData([])
     pctSeries.setData(data.p);
 
+    // 这里要注意 , 从板块获取的时候 驼峰命名法 KMaLines
+    let kma = data.kmaLines;
+    if (kma === undefined) {
+        kma = data.KMaLines;
+    }
+
+    let vma = data.vmaLines;
+    if (vma === undefined) {
+        vma = data.VMaLines;
+    }
+
+
     ma5Series.setData([])
-    ma5Series.setData(data.kmaLines.ma5);
+    ma5Series.setData(kma.ma5);
 
     ma10Series.setData([])
-    ma10Series.setData(data.kmaLines.ma10);
+    ma10Series.setData(kma.ma10);
 
     ma20Series.setData([])
-    ma20Series.setData(data.kmaLines.ma20);
+    ma20Series.setData(kma.ma20);
 
     ma30Series.setData([])
-    ma30Series.setData(data.kmaLines.ma30);
+    ma30Series.setData(kma.ma30);
 
     ma60Series.setData([])
-    ma60Series.setData(data.kmaLines.ma60);
+    ma60Series.setData(kma.ma60);
 
     ma120Series.setData([])
-    ma120Series.setData(data.kmaLines.ma120);
+    ma120Series.setData(kma.ma120);
 
     ma250Series.setData([])
-    ma250Series.setData(data.kmaLines.ma250);
+    ma250Series.setData(kma.ma250);
 
     upSeries.setData([])
-    upSeries.setData(data.kmaLines.up);
+    upSeries.setData(kma.up);
 
     dnSeries.setData([])
-    dnSeries.setData(data.kmaLines.dn);
+    dnSeries.setData(kma.dn);
 
     // ma5VolumeSeries.setData(data.vmaLines.ma5);
     ma60VolumeSeries.setData([]);
-    ma60VolumeSeries.setData(data.vmaLines.ma60);
+    ma60VolumeSeries.setData(vma.ma60);
     // hslSeries.setData(data.hsl);
 }
 

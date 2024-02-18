@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>刷图</title>
+    <link rel="stylesheet" href="/css/bulma.min.css">
+    <link rel="stylesheet" href="/css/bulma-switch.min.css">
+    <link rel="stylesheet" href="/css/bulma-tooltip.min.css">
+    <script src="/js/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/tv/lightweight-charts.standalone.production.v4.0.1.js"></script>
+    <script src="/js/tv/tv-option.js"></script>
+    <script src="/js/tv/api.js"></script>
+    <script src="/js/tv/pressKey.js"></script>
+    <script src="/js/tv/tv-api.js"></script>
+
+    <style>
+        .legend {
+            position: absolute;
+            right: 150px;
+            top: 100px;
+            text-align: right;
+            z-index: 1;
+            font-size: 16px;
+            line-height: 18px;
+            font-weight: 300;
+            font-family: "Courier New", Courier, monospace;
+        }
+
+        .section {
+            padding: 1rem;
+        }
+
+        .top-right {
+            position: fixed;
+            top: 5px;
+            right: 20px;
+        }
+    </style>
+</head>
+
+<body>
+<section class="section">
+    <div class="columns">
+        <div class="column is-1">
+            <div id="iSelectType" class="control select is-danger">
+                <select id="iStockTypeOption">
+                    <option value="p7" selected>行业</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="column is-3">
+            <div class="field is-horizontal">
+                <div class="field-body">
+                    <div class="field ">
+
+                        <p class="control" hidden>
+                            <input class="input" id="iCC" type="text" hidden>
+                        </p>
+                    </div>
+                    <div class="field ">
+
+                        <p class="control">
+                            <input class="input" id="iCode" type="text">
+                        </p>
+                    </div>
+                    <div class="field ">
+
+                        <p class="control">
+                            <input class="input" id="iName" type="text">
+                        </p>
+                    </div>
+                    <div class="field ">
+
+                        <p class="control">
+                            <input class="input" id="iIndex" type="text">
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="column is-3">
+            <div class="field is-horizontal">
+                <div class="field-body">
+                    <div class="field ">
+                        <p class="control">
+                            <button class="button has-tooltip-right" onclick="setIndex()" data-tooltip="快捷键[n]"
+                                    id="iSet">
+                                set
+                            </button>
+                        </p>
+                    </div>
+                    <div class="field ">
+                        <p class="control">
+                            <button class="button has-tooltip-right" onclick="next()" data-tooltip="快捷键[n]"
+                                    id="iBtnChart">
+                                后
+                            </button>
+                        </p>
+                    </div>
+                    <div class="field ">
+                        <p class="control">
+                            <button class="button has-tooltip-right" onclick="pre()" data-tooltip="快捷键[n]"
+                                    id="iBtnChartPre">
+                                前
+                            </button>
+                        </p>
+                    </div>
+                    <div class="field ">
+                        <p class="control">
+                            <button class="button has-tooltip-right" id="saveButton">
+                                截图
+                            </button>
+                        </p>
+                    </div>
+                    <div class="field ">
+                        <p class="control">
+                            <button class="button" id="iBtnXueqiu">
+                                <a href="#" id="iLinkxq" target="_blank">雪球</a>
+                            </button>
+                        </p>
+                    </div>
+                    <div class="field ">
+                        <p class="control">
+                            <button class="button is-hidden" id="iBtnFenshi">
+                                <a href="#" id="iLinkFenshi" target="_blank">Fenshi</a>
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="column is-3">
+            <div class="field is-horizontal">
+                <div class="field-body">
+                    <div class="field is-expanded">
+                        <div class="field has-addons">
+                            <p class="control">
+                                <a class="button is-static">
+                                    高
+                                </a>
+                            </p>
+                            <p class="control ">
+                                <input class="input" type="text" id="iHigh" placeholder="">
+                            </p>
+                            <p class="control">
+                                <a class="button is-static">
+                                    低
+                                </a>
+                            </p>
+                            <p class="control">
+                                <input class="input" type="text" id="iLow" placeholder="">
+                            </p>
+
+                            <p class="control">
+                                <button class="button is-static" id="iBtnCalc">
+                                    =
+                                </button>
+                            </p>
+                            <p class="control is-expanded">
+                                <input class="input" type="text" id="iRes" placeholder="">
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="field is-horizontal">
+                <div class="field-body">
+                    <div class="field ">
+                        <p class="control" hidden>
+                        <div class="field has-tooltip-right" hidden data-tooltip="快捷键[,]">
+                            <input id="iMAUpDn" type="checkbox" name="swMAupdn" class="switch is-rounded is-danger"
+                                   checked="checked">
+                            <label for="iMAUpDn">pct</label>
+                        </div>
+                        </p>
+                    </div>
+                    <div class="field ">
+                        <p class="control">
+                        <div class="field has-tooltip-right" data-tooltip="快捷键[m]">
+                            <input id="iMA" type="checkbox" name="swMA" class="switch is-rounded is-danger"
+                                   checked="checked">
+                            <label for="iMA">MA</label>
+                        </div>
+                        </p>
+                    </div>
+                    <div class="field ">
+                        <p class="control">
+                        <div class="field has-tooltip-right" data-tooltip="快捷键[k]">
+                            <input id="iK" type="checkbox" name="swK" class="switch is-rounded is-danger"
+                                   checked="checked">
+                            <label for="iK">K</label>
+                        </div>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</section>
+<section id="main">
+    <div id="charts"></div>
+</section>
+
+<section>
+
+    <br>
+    <div class="container">
+        <div class="field is-grouped is-grouped-multiline" id="iTag">
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    <!--    初始化tv chart     -->
+    const W = 10000;
+    const Y = W * W;
+    let STOCK_LIST = {};
+    let SELECT_LIST = [];
+    let index = 0;
+
+
+    const chart = LightweightCharts.createChart(
+        document.getElementById('charts'), getChartOption()
+    );
+
+
+    //析构数据 initChart(chart);
+    const {
+        kSeries,
+        ma5Series,
+        ma10Series,
+        ma20Series,
+        ma30Series,
+        ma60Series,
+        ma120Series,
+        ma250Series,
+        upSeries,
+        dnSeries,
+        volumeSeries,
+        ma5VolumeSeries,
+        ma60VolumeSeries,
+        pctSeries,
+        hslSeries,
+        ma5HslSeries,
+        ma60HslSeries,
+        oscSeries,
+        ma5OscSeries,
+        ma60OscSeries,
+    } = initChart(chart);
+
+    legend();
+
+    //这里要监听 websocket server 发送的事件 bk
+
+    // 创建WebSocket连接
+    const socket = new WebSocket(baseWsUrl);
+
+    // 连接成功时的回调函数
+    socket.onopen = function() {
+        console.log("WebSocket连接已打开",socket);
+    };
+
+    // 接收到消息时的回调函数
+    socket.onmessage = function(event) {
+        console.log("收到更新消息");
+        const message = JSON.parse(event.data);
+        // 处理收到的消息，更新操作
+        if (message.topic === "/topic/bk") {
+            // 进行相应的更新操作
+            renderChartB(JSON.parse(message.data));
+        }
+    };
+
+    // 连接关闭时的回调函数
+    socket.onclose = function() {
+        console.log("WebSocket连接已关闭");
+    };
+
+    const renderChartB = (data) => {
+        console.log(data);
+        if (data && data.k && data.k.length > 0) {
+            //获取板块图
+            console.log("板块图 k size" , data.k.length);
+            updateChartData(data, {
+                kSeries,
+                ma5Series,
+                ma10Series,
+                ma20Series,
+                ma30Series,
+                ma60Series,
+                ma120Series,
+                ma250Series,
+                upSeries,
+                dnSeries,
+                volumeSeries, // ma5VolumeSeries,
+                ma60VolumeSeries,
+                pctSeries,
+                hslSeries,
+                ma5HslSeries,
+                ma60HslSeries,
+                oscSeries,
+                ma5OscSeries,
+                ma60OscSeries,
+            });
+        }
+    }
+</script>
+</body>
+
+</html>

@@ -1,7 +1,9 @@
 package pro.jiaoyi.tradingview.controller;
 
+import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,9 +19,11 @@ import pro.jiaoyi.tradingview.model.chart.TvMarker;
 import pro.jiaoyi.tradingview.model.chart.TvTimeValue;
 import pro.jiaoyi.tradingview.service.TvService;
 import pro.jiaoyi.tradingview.service.TvTransUtil;
+import pro.jiaoyi.tradingview.websocket.MyWebSocketHandler;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @Slf4j
@@ -28,6 +32,34 @@ public class TvController {
 
     @Autowired
     private TvService tvService;
+    @Autowired
+    private MyWebSocketHandler myWebSocketHandler;
+
+
+    // 这里可以异常返回 不需要返回值
+    @GetMapping("/chart/bk/update")
+//    public void tvChartBkUpdate(@RequestParam String bk) {
+//        //调用websocket 发送 bk 更新
+//        log.info("调用websocket 发送 bk 更新 tvChartBkUpdate code={}", bk);
+//        //data.bk + "&codeType=BkValue"        //BK0475 银行
+//        TvChart tvChart = tvChart(bk, "BkValue");
+//        myWebSocketHandler.send("/topic/bk", JSON.toJSONString(tvChart));
+//    }
+    public void tvChartBkUpdate(@RequestParam String bk) {
+        // 异步处理
+        CompletableFuture.runAsync(() -> {
+            try {
+                // 调用WebSocket发送bk更新
+                log.info("调用WebSocket发送bk更新 tvChartBkUpdate code={}", bk);
+                // data.bk + "&codeType=BkValue"        //BK0475 银行
+                TvChart tvChart = tvChart(bk, "BkValue");
+                myWebSocketHandler.send("/topic/bk", JSON.toJSONString(tvChart));
+            } catch (Exception e) {
+                // 处理异常，例如记录日志或返回错误信息
+                log.error("发送bk更新时发生异常: " + e.getMessage(), e);
+            }
+        });
+    }
 
     @GetMapping("/chart")
     public TvChart tvChart(@RequestParam String code, String codeType) {

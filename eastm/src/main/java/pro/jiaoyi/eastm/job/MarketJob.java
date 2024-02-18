@@ -6,7 +6,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
@@ -18,7 +17,10 @@ import pro.jiaoyi.eastm.config.WxUtil;
 import pro.jiaoyi.eastm.dao.entity.CloseEmCListEntity;
 import pro.jiaoyi.eastm.dao.entity.OpenEmCListEntity;
 import pro.jiaoyi.eastm.dao.entity.TickEmCListEntity;
-import pro.jiaoyi.eastm.dao.repo.*;
+import pro.jiaoyi.eastm.dao.repo.CloseEmCListRepo;
+import pro.jiaoyi.eastm.dao.repo.OpenEmCListRepo;
+import pro.jiaoyi.eastm.dao.repo.ThemeScoreRepo;
+import pro.jiaoyi.eastm.dao.repo.TickEmCListRepo;
 import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
 import pro.jiaoyi.eastm.service.ImgService;
@@ -68,6 +70,7 @@ public class MarketJob {
     public static final Set<String> CODE_MA_BLOCK_SET = new HashSet<>();
     public static final HashSet<String> BLOCK_THEME_SET = new HashSet<>();
     private static final Map<String, Integer> WX_SEND_COUNT_MAP = new HashMap<>();
+    private static final Map<String, BigDecimal> TRIN_MAP = new HashMap<>();
     //    public static final Map<String, List<EmDailyK>> CODE_KS_CACHE_MAP = new HashMap<>();
     public static final AtomicInteger CODE_KS_CACHE_COUNT = new AtomicInteger(0);
     private static List<EmCList> EM_CLIST_PRE = null;
@@ -105,6 +108,10 @@ public class MarketJob {
     @Scheduled(cron = "30 5 15 * * ?")
     public void runClose() {
 
+        if (!TradeTimeUtil.isTradeDay()) {
+            return;
+        }
+
         List<EmCList> list = emClient.getClistDefaultSize(true);
         if (list == null || list.isEmpty()) {
             return;
@@ -138,11 +145,11 @@ public class MarketJob {
         }
     }
 
-    @Scheduled(cron = "30 0/10 * * * ?")
-    @Async
-    public void runThemePct() {
-        themePct();
-    }
+//    @Scheduled(cron = "30 0/10 * * * ?")
+//    @Async
+//    public void runThemePct() {
+//        themePct();
+//    }
 
     @Scheduled(cron = "0 15 06,15 ? * MON-FRI")
     public void initMaMap() {
@@ -635,7 +642,7 @@ public class MarketJob {
         runSpeedMonitor(list);
 //        runCrossMa(list);
         if (EM_CLIST_PRE != null && EM_CLIST_PRE.size() > 0) {
-            tick(EM_CLIST_PRE, list);
+            tickByMarket(EM_CLIST_PRE, list);
         }
         EM_CLIST_PRE = list;
         //全市场涨速
@@ -854,12 +861,54 @@ public class MarketJob {
     private static String TRIN_SIDE_PRE = "";
     private static Integer TRIN_SIDE_COUNTER = 0;
 
-    public void tick(List<EmCList> preList, List<EmCList> now) {
+    public void tickByMarket(List<EmCList> preList, List<EmCList> now) {
+
+        if (LocalTime.now().isAfter(LocalTime.of(14, 57)) ||
+                LocalTime.now().isBefore(LocalTime.of(9, 30))) {
+            return;
+        }
+
+        log.info("");
+        tick(preList, now, "all");//1 全市
+        tick(preList, now, "sh");//2 上证
+        tick(preList, now, "sz");//3 深证
+        tick(preList, now, "cf");//4 创业板
+//        tick(preList, now, "kc");
+//        tick(preList, now, "bj");
+
+    }
+
+    public void tick(List<EmCList> preList, List<EmCList> now, String market) {
+        //要区分不同板块
+
         if (preList == null || preList.size() == 0
                 || now == null || now.size() == 0) {
             return;
         }
 
+        if (market.equals("sh")) {
+            log.debug("上海 market: {}", market);
+            preList = preList.stream().filter(e -> e.getF12Code().startsWith("6")).toList();
+            now = now.stream().filter(e -> e.getF12Code().startsWith("6")).toList();
+        } else if (market.equals("sz")) {
+            log.debug("深圳 market: {}", market);
+            preList = preList.stream().filter(e -> e.getF12Code().startsWith("0") || e.getF12Code().startsWith("3")).toList();
+            now = now.stream().filter(e -> e.getF12Code().startsWith("0") || e.getF12Code().startsWith("3")).toList();
+        } else if (market.equals("cf")) {
+            log.debug("创业板 market: {}", market);
+            preList = preList.stream().filter(e -> e.getF12Code().startsWith("3")).toList();
+            now = now.stream().filter(e -> e.getF12Code().startsWith("3")).toList();
+        } else if (market.equals("kc")) {
+            log.debug("科创板 market: {}", market);
+            preList = preList.stream().filter(e -> e.getF12Code().startsWith("68") || e.getF12Code().startsWith("69")).toList();
+            now = now.stream().filter(e -> e.getF12Code().startsWith("68") || e.getF12Code().startsWith("69")).toList();
+        } else if (market.equals("bj")) {
+            log.debug("北郊所 market: {}", market);
+            preList = preList.stream().filter(e -> e.getF12Code().startsWith("8") || e.getF12Code().startsWith("4")).toList();
+            now = now.stream().filter(e -> e.getF12Code().startsWith("8") || e.getF12Code().startsWith("4")).toList();
+        } else {
+            log.debug("market: {}", market);
+        }
 
         //全市场 绝对涨跌数量
         int absUp = 0;//pct
@@ -983,9 +1032,13 @@ public class MarketJob {
 
         t.setTrin(trin);//(tup/aup) / (tdn/adn)
         t.setCreateTime(LocalDateTime.now());
+        t.setMarket(market);
 
         tickEmCListRepo.saveAndFlush(t);
 
+        if (trin.compareTo(BigDecimal.ZERO) == 0) {
+            return;
+        }
         String side = (nudr.compareTo(BigDecimal.ZERO) > 0 ? EmojiUtil.UPs : EmojiUtil.DOWNs)
                 + (trin.compareTo(new BigDecimal("1.05")) < 0
                 && trin.compareTo(new BigDecimal("0.95")) > 0 ? ("-") : (nudr.multiply(new BigDecimal(tick)).compareTo(BigDecimal.ZERO) > 0 ? EmojiUtil.Right : "x"));
@@ -997,19 +1050,59 @@ public class MarketJob {
         }
         TRIN_SIDE_PRE = side;
 
+        BigDecimal h = TRIN_MAP.get("H");
+        BigDecimal l = TRIN_MAP.get("L");
+        if (h == null) {
+            h = BigDecimal.ONE;
+        }
+        if (l == null) {
+            l = BigDecimal.ONE;
+        }
+
+        //h > 1.2 开始,
+        //l < 0.8 开始
+
+        String name = getMarketName(market);
+        if (trin.compareTo(h) > 0) {
+            h = trin;
+            TRIN_MAP.put("H", h);
+            if (h.compareTo(new BigDecimal("2")) > 0) {
+                String content = "trin=[" + trin + "]日内新高,超卖" + "[" + name + "]";
+//                String encode = URLEncoder.encode(content, StandardCharsets.UTF_8);
+//                wxUtil.send(encode);
+                log.info("{}", content);
+//                trinPctRecent(market);
+            }
+        }
+
+        if (trin.compareTo(l) < 0) {
+            l = trin;
+            TRIN_MAP.put("L", l);
+            if (l.compareTo(new BigDecimal("0.5")) < 0) {
+                String content = "trin=[" + trin + "]日内新低,超买" + "[" + name + "]";
+//                String encode = URLEncoder.encode(content, StandardCharsets.UTF_8);
+//                wxUtil.send(encode);
+                log.info("{}", content);
+//                trinPctRecent(market);
+            }
+        }
+
         if (trin.compareTo(BDUtil.B3) > 0) {
-            String content = "[底部有效]trin=[" + trin + "]超卖";
+            String content = "[底部有效]trin=[" + trin + "]超卖" + "[" + name + "]";
             String encode = URLEncoder.encode(content, StandardCharsets.UTF_8);
             wxUtil.send(encode);
+            trinPctRecent(market);
         }
 
         if (trin.compareTo(new BigDecimal("0.3")) < 0) {
-            String content = "[顶部有效]trin=[" + trin + "]超买";
+            String content = "[顶部有效]trin=[" + trin + "]超买" + "[" + name + "]";
             String encode = URLEncoder.encode(content, StandardCharsets.UTF_8);
             wxUtil.send(encode);
+            trinPctRecent(market);
         }
 
-        log.info("绝对={} 实体={} 秒={} amt={} tick={} sudr={} audr={} trin={}",
+        log.info("{} 绝对={} 实体={} 秒={} amt={} tick={} sudr={} audr={} trin={}",
+                String.format("%-4s", "[" + market + "]"),
                 String.format("%-10s", absUp + ":" + absDn),
                 String.format("%-10s", openUp + ":" + openDn),
                 String.format("%-10s", tickUp + ":" + tickDn),
@@ -1023,5 +1116,59 @@ public class MarketJob {
 
     private String st(int width, String s) {
         return String.format("%-" + width + "s", s);
+    }
+
+    //查询trin 最近 10分钟 5钟 3钟 的比例
+    public void trinPctRecent(String market) {
+
+
+        if (LocalTime.now().isAfter(LocalTime.of(14, 57)) ||
+                LocalTime.now().isBefore(LocalTime.of(9, 30))) {
+            return;
+        }
+//        List<TickEmCListEntity> m10 = tickEmCListRepo.findByCreateTimeAfter(LocalDateTime.now().minusMinutes(10));
+        List<TickEmCListEntity> m10 = tickEmCListRepo.findByCreateTimeAfterAndMarketEquals(LocalDateTime.now().minusMinutes(10), market);
+        if (m10.size() < 50) {
+            return;
+        }
+        List<TickEmCListEntity> m5 = m10.stream().filter(e -> e.getCreateTime().isAfter(LocalDateTime.now().minusMinutes(5))).toList();
+        List<TickEmCListEntity> m1 = m5.stream().filter(e -> e.getCreateTime().isAfter(LocalDateTime.now().minusMinutes(1))).toList();
+
+        //trin > 1 的数量
+        long trinUp = m10.stream().filter(e -> e.getTrin().compareTo(BigDecimal.ONE) > 0).count();
+        long trinDn = m10.size() - trinUp;
+
+        long trinUp5 = m5.stream().filter(e -> e.getTrin().compareTo(BigDecimal.ONE) > 0).count();
+        long trinDn5 = m5.size() - trinUp5;
+
+        long trinUp1 = m1.stream().filter(e -> e.getTrin().compareTo(BigDecimal.ONE) > 0).count();
+        long trinDn1 = m1.size() - trinUp1;
+
+        // dn up 比例 如果up是0 , 给一个 -1
+        BigDecimal trinPct = new BigDecimal(trinDn).divide(new BigDecimal(m10.size()), 2, RoundingMode.HALF_UP);
+        BigDecimal trinPct5 = new BigDecimal(trinDn5).divide(new BigDecimal(m5.size()), 2, RoundingMode.HALF_UP);
+        BigDecimal trinPct1 = new BigDecimal(trinDn1).divide(new BigDecimal(m1.size()), 2, RoundingMode.HALF_UP);
+
+        String name = getMarketName(market);
+        String content = "t10_t5_t1=[" + trinPct + "]_[" + trinPct5 + "]_[" + trinPct1 + "]" + "[" + name + "]";
+        String encode = URLEncoder.encode(content, StandardCharsets.UTF_8);
+        wxUtil.send(encode);
+    }
+
+    String getMarketName(String market) {
+
+        String name = "全市场";
+        if (market.equals("sh")) {
+            name = "上证";
+        } else if (market.equals("sz")) {
+            name = "深证";
+        } else if (market.equals("cf")) {
+            name = "创业板";
+        } else if (market.equals("kc")) {
+            name = "科创板";
+        } else if (market.equals("bj")) {
+            name = "北郊所";
+        }
+        return name;
     }
 }

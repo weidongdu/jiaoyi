@@ -210,8 +210,8 @@ $(document).keydown(function (e) {
     }
 
 
-
 });
+
 function mock() {
     console.log('k', k);
     console.log('v', v);
@@ -305,47 +305,21 @@ const renderChart = (data) => {
         lastDay = k.time;
         lastCode = data.code;
         //判断是否切换了板块bk
-        let bk = false;
-        if (bk && lastBk !== data.bk) {
-            // alert(lastBk + " -> " + data.bk);
 
-            // <div class="notification is-danger is-light">
-            //   <button class="delete"></button>
-            //   Primar lorem ipsum dolor sit amet, consectetur
-            //   adipiscing elit lorem ipsum dolor. <strong>Pellentesque risus mi</strong>, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum <a>felis venenatis</a> efficitur.
-            // </div>
-
-            notify(data.bk);
-
-
+        if (lastBk !== data.bk) {
+            //切换了板块 , 要向tvb 发送 update , 加载bk k线图
             lastBk = data.bk;
             //获取板块图
-            getTvChart(data.bk + "&codeType=BkValue", (data) => {
-                index--;
-                updateChartData(data, {
-                    kSeries,
-                    ma5Series,
-                    ma10Series,
-                    ma20Series,
-                    ma30Series,
-                    ma60Series,
-                    ma120Series,
-                    ma250Series,
-                    upSeries,
-                    dnSeries,
-                    volumeSeries, // ma5VolumeSeries,
-                    ma60VolumeSeries,
-                    pctSeries,
-                    hslSeries,
-                    ma5HslSeries,
-                    ma60HslSeries,
-                    oscSeries,
-                    ma5OscSeries,
-                    ma60OscSeries,
-                })
-            })
+            //发送 http get请求
+            let url = baseUrl + "/tv/chart/bk/update" + "?bk=" + lastBk;
 
-        } else {
+            //通过jquery get 获取 json
+            $.get(url, function (data) {
+                console.log(data);
+            });
+        }
+
+        {
             updateChartData(data, {
                 kSeries,
                 ma5Series,
