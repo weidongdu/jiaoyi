@@ -38,26 +38,21 @@ public class TvController {
 
     // 这里可以异常返回 不需要返回值
     @GetMapping("/chart/bk/update")
-//    public void tvChartBkUpdate(@RequestParam String bk) {
-//        //调用websocket 发送 bk 更新
-//        log.info("调用websocket 发送 bk 更新 tvChartBkUpdate code={}", bk);
-//        //data.bk + "&codeType=BkValue"        //BK0475 银行
-//        TvChart tvChart = tvChart(bk, "BkValue");
-//        myWebSocketHandler.send("/topic/bk", JSON.toJSONString(tvChart));
-//    }
     public void tvChartBkUpdate(@RequestParam String bk) {
         // 异步处理
         CompletableFuture.runAsync(() -> {
-            try {
-                // 调用WebSocket发送bk更新
-                log.info("调用WebSocket发送bk更新 tvChartBkUpdate code={}", bk);
-                // data.bk + "&codeType=BkValue"        //BK0475 银行
-                TvChart tvChart = tvChart(bk, "BkValue");
-                myWebSocketHandler.send("/topic/bk", JSON.toJSONString(tvChart));
-            } catch (Exception e) {
-                // 处理异常，例如记录日志或返回错误信息
-                log.error("发送bk更新时发生异常: " + e.getMessage(), e);
+            // 调用WebSocket发送bk更新
+            log.info("调用WebSocket发送bk更新 tvChartBkUpdate code={}", bk);
+            if (bk == null || bk.isEmpty()) {
+                return;
             }
+            if (myWebSocketHandler.sessionCount() == 0) {
+                log.info("没有WebSocket连接，不发送bk更新");
+                return;
+            }
+            // data.bk + "&codeType=BkValue"        //BK0475 银行
+            TvChart tvChart = tvChart(bk, "BkValue");
+            myWebSocketHandler.send("/topic/bk", JSON.toJSONString(tvChart));
         });
     }
 

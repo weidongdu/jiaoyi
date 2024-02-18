@@ -16,6 +16,9 @@ public class MyWebSocketHandler implements WebSocketHandler {
 
     private List<WebSocketSession> sessions = new ArrayList<>();
 
+    public int sessionCount() {
+        return sessions.size();
+    }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -28,21 +31,11 @@ public class MyWebSocketHandler implements WebSocketHandler {
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
         // 当接收到WebSocket消息时调用此方法
-        System.out.println("接收到消息：" + message.getPayload());
+        log.info("接收到消息：" + message.getPayload());
 
         // 处理消息逻辑...
 
         // 发送消息给客户端
-
-        // 发送消息给所有客户端
-        for (WebSocketSession clientSession : sessions) {
-            try {
-                clientSession.sendMessage(new TextMessage("Hello, Client!"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
     }
 
     public void send(String topic, String data) {
@@ -54,7 +47,7 @@ public class MyWebSocketHandler implements WebSocketHandler {
             try {
                 clientSession.sendMessage(new TextMessage(message.toJSONString()));
             } catch (IOException e) {
-                e.printStackTrace();
+                log.warn("发送消息给客户端失败", e);
             }
         }
 
