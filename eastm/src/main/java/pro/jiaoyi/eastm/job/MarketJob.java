@@ -35,6 +35,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -254,9 +257,9 @@ public class MarketJob {
 
         for (EmCList emCList : openList) {
             OpenEmCListEntity entity = copyOpen(emCList, LocalDateTime.now());
-            log.info("保存开盘信息: {}", entity);
+//            log.info("保存开盘信息: {}", entity);
             openEmCListRepo.saveAndFlush(entity);
-            log.info("保存开盘信息成功: {}", entity.getF14Name());
+//            log.info("保存开盘信息成功: {}", entity.getF14Name());
         }
 
         //删除昨日数据
@@ -650,9 +653,18 @@ public class MarketJob {
 //        runAllSpeed(list);
         runFenshiM1(list);
     }
+//
 
-    private void runFenshiM1(List<EmCList> list) {
-        speedService.runFenshiM1(list);
+    ExecutorService executor = Executors.newFixedThreadPool(10);
+    public void runFenshiM1(List<EmCList> list) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                speedService.runFenshiM1(list);
+            } catch (Exception e) {
+                // 处理异常，例如记录日志或采取其他适当的处理措施
+                log.info("runFenshiM1 error: {}", e.getMessage());
+            }
+        }, executor);
     }
 
 
@@ -886,14 +898,17 @@ public class MarketJob {
             return;
         }
 
+        boolean wxSendFlag = false;
         if (market.equals("sh")) {
             log.debug("上海 market: {}", market);
             preList = preList.stream().filter(e -> e.getF12Code().startsWith("6")).toList();
             now = now.stream().filter(e -> e.getF12Code().startsWith("6")).toList();
+            wxSendFlag = true;
         } else if (market.equals("sz")) {
             log.debug("深圳 market: {}", market);
             preList = preList.stream().filter(e -> e.getF12Code().startsWith("0") || e.getF12Code().startsWith("3")).toList();
             now = now.stream().filter(e -> e.getF12Code().startsWith("0") || e.getF12Code().startsWith("3")).toList();
+            wxSendFlag = true;
         } else if (market.equals("cf")) {
             log.debug("创业板 market: {}", market);
             preList = preList.stream().filter(e -> e.getF12Code().startsWith("3")).toList();
@@ -908,6 +923,7 @@ public class MarketJob {
             now = now.stream().filter(e -> e.getF12Code().startsWith("8") || e.getF12Code().startsWith("4")).toList();
         } else {
             log.debug("market: {}", market);
+            wxSendFlag = true;
         }
 
         //全市场 绝对涨跌数量
@@ -1087,14 +1103,14 @@ public class MarketJob {
             }
         }
 
-        if (trin.compareTo(BDUtil.B3) > 0) {
+        if (trin.compareTo(BDUtil.B3) > 0 && wxSendFlag) {
             String content = "[底部有效]trin=[" + trin + "]超卖" + "[" + name + "]";
             String encode = URLEncoder.encode(content, StandardCharsets.UTF_8);
             wxUtil.send(encode);
             trinPctRecent(market);
         }
 
-        if (trin.compareTo(new BigDecimal("0.3")) < 0) {
+        if (trin.compareTo(new BigDecimal("0.3")) < 0 && wxSendFlag) {
             String content = "[顶部有效]trin=[" + trin + "]超买" + "[" + name + "]";
             String encode = URLEncoder.encode(content, StandardCharsets.UTF_8);
             wxUtil.send(encode);

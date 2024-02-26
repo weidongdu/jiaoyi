@@ -3,6 +3,7 @@ package pro.jiaoyi.eastm.model;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Data
@@ -12,6 +13,7 @@ public class EmCListSimple {
     private String f12Code;//代码//        "f12": "000001",
     private String f14Name;//名称//        "f14": "平安银行",
     private String tradeDate;//交易日
+    private LocalDateTime localDateTime;//交易日
 
     @Override
     public boolean equals(Object o) {

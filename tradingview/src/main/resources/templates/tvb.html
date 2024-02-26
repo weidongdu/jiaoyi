@@ -263,8 +263,17 @@
 
     //这里要监听 websocket server 发送的事件 bk
 
+    // 从浏览器地址栏获取IP地址和端口号
+    const ipAddress = window.location.hostname;
+    const port = window.location.port;
+
     // 创建WebSocket连接
+    const baseWsUrl = `ws://${ipAddress}:${port}/websocket`;
     const socket = new WebSocket(baseWsUrl);
+
+    // 创建WebSocket连接
+    //const baseWsUrl = "ws://lo:28890/websocket";
+    // const socket = new WebSocket(baseWsUrl);
 
     // 连接成功时的回调函数
     socket.onopen = function() {

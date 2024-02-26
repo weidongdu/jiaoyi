@@ -1,6 +1,5 @@
 //根据code 获取 tv chart
 const baseUrl = "http://localhost:28890";
-const baseWsUrl = "ws://localhost:28890/websocket";
 
 //记录当前随机股票code + end time
 

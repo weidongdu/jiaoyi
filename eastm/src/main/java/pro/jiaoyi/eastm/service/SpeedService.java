@@ -1,5 +1,6 @@
 package pro.jiaoyi.eastm.service;
 
+import com.alibaba.fastjson2.JSON;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import jakarta.annotation.Resource;
@@ -24,7 +25,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -36,24 +39,23 @@ public class SpeedService {
     @Resource
     private EmCListSimpleEntityRepo emCListSimpleEntityRepo;
 
-    private static final List<EmCListSimple> CACHE_EM_SEQ_LIST = new ArrayList<>();
+    private static final List<EmCListSimple> CACHE_EM_SEQ_LIST = new CopyOnWriteArrayList<>();
 
     public void addAll(List<EmCList> list) {
+        LocalDateTime now = LocalDateTime.now();
+        String nowStr = DateUtil.ldtToStr(now, DateUtil.PATTERN_yyyyMMdd_HHmmss);
         for (EmCList emCList : list) {
             EmCListSimple emCListSimple = new EmCListSimple();
             emCListSimple.setF6Amt(emCList.getF6Amt());
             emCListSimple.setF12Code(emCList.getF12Code());
             emCListSimple.setF14Name(emCList.getF14Name());
-            emCListSimple.setTradeDate(DateUtil.tsToStr(new Date().getTime(), DateUtil.PATTERN_yyyyMMdd_HHmmss));
+            emCListSimple.setTradeDate(nowStr);
+            emCListSimple.setLocalDateTime(now);
             CACHE_EM_SEQ_LIST.add(emCListSimple);
         }
         //这里要记录下来, 用来做什么呢, 用来排除掉 突然暴量 但是平是成交都是100w以下的
-
         //清理 70s 前的数据
-        CACHE_EM_SEQ_LIST.removeIf(emCListSimple -> {
-            LocalDateTime localDateTime = DateUtil.strToLocalDateTime(emCListSimple.getTradeDate(), DateUtil.PATTERN_yyyyMMdd_HHmmss);
-            return localDateTime.isBefore(LocalDateTime.now().minusSeconds(70));
-        });
+        CACHE_EM_SEQ_LIST.removeIf(emCListSimple -> emCListSimple.getLocalDateTime().isBefore(now.minusSeconds(70)));
     }
 
     private static final Cache<String, String> BLOCK_CODE_MAP = Caffeine.newBuilder()
@@ -113,50 +115,79 @@ public class SpeedService {
         return BigDecimal.ZERO;
     }
 
+    //如果code 全部遍历 性能太差
     //获取最近60s 内的成交量
-    public BigDecimal getFenshiAmtSimple(String code) {
-        //累计计算最近90s 内的list 成交量
-        List<EmCListSimple> lastS = CACHE_EM_SEQ_LIST.stream().filter(em -> em.getF12Code().equals(code)).toList();
+//    public BigDecimal getFenshiAmtSimple(String code) {
+//        //累计计算最近90s 内的list 成交量
+//        //耗时统计
+//        List<EmCListSimple> lastS = CACHE_EM_SEQ_LIST.stream().filter(em -> em.getF12Code().equals(code)).toList();
+//
+//        if (lastS.size() > 1) {
+//            EmCListSimple first = lastS.get(0);
+//            EmCListSimple last = lastS.get(lastS.size() - 1);
+//            return last.getF6Amt().subtract(first.getF6Amt());
+//        }
+//        return BDUtil.BN1;
+//    }
 
-        if (lastS.size() > 1) {
-            EmCListSimple first = lastS.get(0);
-            EmCListSimple last = lastS.get(lastS.size() - 1);
-            return last.getF6Amt().subtract(first.getF6Amt());
+
+    //获取最近60s 内的成交量
+    public Map<String, BigDecimal> getFenshiAmtSimpleMap() {
+        //累计计算最近90s 内的list 成交量
+        //耗时统计
+        Map<String, BigDecimal> CACHE_FENSHI_AMT_MAP = new HashMap<>();
+
+        Map<String, List<EmCListSimple>> groupedData = CACHE_EM_SEQ_LIST.stream()
+                .sorted(Comparator.comparing(EmCListSimple::getTradeDate)) // 按交易日排序
+                .collect(Collectors.groupingBy(EmCListSimple::getF12Code));
+
+        for (List<EmCListSimple> group : groupedData.values()) {
+            if (!group.isEmpty()) {
+                EmCListSimple first = group.get(0);
+                EmCListSimple last = group.get(group.size() - 1);
+                BigDecimal diff = last.getF6Amt().subtract(first.getF6Amt());
+                CACHE_FENSHI_AMT_MAP.put(first.getF12Code(), diff);
+            }
         }
-        return BDUtil.BN1;
+
+        return CACHE_FENSHI_AMT_MAP;
     }
 
+    //设置异步
     public void runFenshiM1(List<EmCList> list) {
-        log.debug("runFenshiM1 start");
+        log.info("runFenshiM1 start");
         long s1 = System.currentTimeMillis();
         //save
         ArrayList<EmCListSimpleEntity> ll = new ArrayList<>();
 
         int saveCount = 0;
+        LocalDateTime now = LocalDateTime.now();
+        log.info("runFenshiM1 , for pre {} ms", System.currentTimeMillis() - s1);
+        Map<String, BigDecimal> mapFenshiAmt = getFenshiAmtSimpleMap();
         for (EmCList emCList : list) {
             EmCListSimpleEntity em = new EmCListSimpleEntity();
-            BigDecimal m1 = getFenshiAmtSimple(emCList.getF12Code());
-            if (m1.compareTo(BDUtil.B100W) < 0 || m1.compareTo(BDUtil.BN1) == 0) {
+//            BigDecimal m1 = getFenshiAmtSimple(emCList.getF12Code());
+            BigDecimal m1 = mapFenshiAmt.get(emCList.getF12Code());
+            if (m1 == null || m1.compareTo(BDUtil.B100W) < 0 || m1.compareTo(BDUtil.BN1) == 0) {
                 continue;
             }
             em.setF6Amt(m1);
             em.setF12Code(emCList.getF12Code());
-            em.setTradeDate(LocalDateTime.now());
+            em.setTradeDate(now);
             ll.add(em);
 
-            if (ll.size() > 100) {
+            if (ll.size() > 1000) {
                 //save
                 saveCount += ll.size();
                 emCListSimpleEntityRepo.saveAll(ll);
                 ll.clear();
             }
         }
-
         if (!ll.isEmpty()) {
             saveCount += ll.size();
             emCListSimpleEntityRepo.saveAll(ll);
         }
-        log.debug("runFenshiM1 , save {} end use [{}] ms", saveCount, System.currentTimeMillis() - s1);
+        log.info("runFenshiM1 finish, save {} end use [{}] ms", saveCount, System.currentTimeMillis() - s1);
     }
 
     @Transactional

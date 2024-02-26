@@ -28,12 +28,14 @@ public class DailyJob {
     public void execute() {
         log.info("DailyJob run");
         if (!enable) {
-            log.info("DailyJob disabled, 仅开index flow");
-            for (BaseFlow flow : baseFlows) {
-                if (flow.getClass().getSimpleName().equals("IndexFlow")) {
-                    flow.run();
-                }
-            }
+//线上注释掉
+//            log.info("DailyJob disabled, 仅开index flow");
+//            for (BaseFlow flow : baseFlows) {
+//                if (flow.getClass().getSimpleName().equals("IndexFlow")) {
+//                    flow.run();
+//                }
+//            }
+
             return;
         }
         baseFlows.sort(Comparator.comparingInt(BaseFlow::getNo));
@@ -41,5 +43,6 @@ public class DailyJob {
             flow.run();
             log.info("run {} done", flow.getClass().getSimpleName());
         }
+        log.info("run finish");
     }
 }

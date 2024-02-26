@@ -7,4 +7,5 @@ public class FlowNo {
     public static final int AMT = 2;
     public static final int FENSHI = 3;
     public static final int RANGE = 4;
+    public static final int STATS = 5;
 }

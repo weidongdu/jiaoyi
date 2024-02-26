@@ -119,4 +119,10 @@ public class DateUtil {
         //移除最后三位 MS -> S
         return String.valueOf(time).substring(0, String.valueOf(time).length() - 3);
     }
+
+    public static String ldtToStr(LocalDateTime dateTime, String pattern) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+        return dateTime.format(formatter);
+    }
+
 }

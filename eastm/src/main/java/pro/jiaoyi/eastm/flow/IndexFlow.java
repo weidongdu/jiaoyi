@@ -91,7 +91,8 @@ public class IndexFlow implements BaseFlow {
                 }
 
                 case INDEX_INCLUDE -> {
-                    List<String> list = CommonInfo.TYPE_CODES_MAP.get(CYCF.getType());
+                    List<String> list = new ArrayList<>();
+                    list.addAll(CommonInfo.TYPE_CODES_MAP.get(CYCF.getType()));
                     list.addAll(CommonInfo.TYPE_CODES_MAP.get(HS300.getType()));
                     list.addAll(CommonInfo.TYPE_CODES_MAP.get(ZZ500.getType()));
                     list.addAll(CommonInfo.TYPE_CODES_MAP.get(ZZ1000.getType()));
