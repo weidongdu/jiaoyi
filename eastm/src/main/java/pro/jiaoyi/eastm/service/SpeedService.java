@@ -155,14 +155,13 @@ public class SpeedService {
 
     //设置异步
     public void runFenshiM1(List<EmCList> list) {
-        log.info("runFenshiM1 start");
+        log.debug("runFenshiM1 start");
         long s1 = System.currentTimeMillis();
         //save
         ArrayList<EmCListSimpleEntity> ll = new ArrayList<>();
 
         int saveCount = 0;
         LocalDateTime now = LocalDateTime.now();
-        log.info("runFenshiM1 , for pre {} ms", System.currentTimeMillis() - s1);
         Map<String, BigDecimal> mapFenshiAmt = getFenshiAmtSimpleMap();
         for (EmCList emCList : list) {
             EmCListSimpleEntity em = new EmCListSimpleEntity();
@@ -187,7 +186,7 @@ public class SpeedService {
             saveCount += ll.size();
             emCListSimpleEntityRepo.saveAll(ll);
         }
-        log.info("runFenshiM1 finish, save {} end use [{}] ms", saveCount, System.currentTimeMillis() - s1);
+        log.debug("runFenshiM1 finish, save {} end use [{}] ms", saveCount, System.currentTimeMillis() - s1);
     }
 
     @Transactional

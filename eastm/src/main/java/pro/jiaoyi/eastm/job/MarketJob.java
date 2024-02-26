@@ -23,6 +23,7 @@ import pro.jiaoyi.eastm.dao.repo.ThemeScoreRepo;
 import pro.jiaoyi.eastm.dao.repo.TickEmCListRepo;
 import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
+import pro.jiaoyi.eastm.service.FenshiAmtSummaryService;
 import pro.jiaoyi.eastm.service.ImgService;
 import pro.jiaoyi.eastm.service.SpeedService;
 import pro.jiaoyi.eastm.util.TradeTimeUtil;
@@ -108,6 +109,11 @@ public class MarketJob {
         open("");
     }
 
+
+    @Resource
+    private FenshiAmtSummaryService fenshiAmtSummaryService;
+
+
     @Scheduled(cron = "30 5 15 * * ?")
     public void runClose() {
 
@@ -146,6 +152,10 @@ public class MarketJob {
             closeEmCListRepo.saveAndFlush(entity);
             log.info("保存close成功: {}", entity.getF14Name());
         }
+
+        fenshiAmtSummaryService.executeSummary();
+
+
     }
 
 //    @Scheduled(cron = "30 0/10 * * * ?")
