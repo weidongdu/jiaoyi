@@ -29,12 +29,12 @@ public class DailyJob {
         log.info("DailyJob run");
         if (!enable) {
 //线上注释掉
-//            log.info("DailyJob disabled, 仅开index flow");
-//            for (BaseFlow flow : baseFlows) {
-//                if (flow.getClass().getSimpleName().equals("IndexFlow")) {
-//                    flow.run();
-//                }
-//            }
+            log.info("DailyJob disabled, 仅开index flow");
+            for (BaseFlow flow : baseFlows) {
+                if (flow.getClass().getSimpleName().equals("IndexFlow")) {
+                    flow.run();
+                }
+            }
 
             return;
         }

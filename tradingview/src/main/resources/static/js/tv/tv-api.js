@@ -192,6 +192,7 @@ function updateChartData(data, series) {
     ma60VolumeSeries.setData([]);
     ma60VolumeSeries.setData(vma.ma60);
     // hslSeries.setData(data.hsl);
+
 }
 
 function legend() {
@@ -209,12 +210,19 @@ function legend() {
 
     chart.subscribeCrosshairMove(param => {
         // console.log('param', param)
+        if (!param.point) {
+            return;
+        }
         if (param.time) {
 
             let code = $("#iCode").val();
             let name = $("#iName").val();
 
             const data = param.seriesData.get(kSeries);
+            if(data === undefined){
+                return;
+            }
+            // let time = data.time;
             let time = data.time;
             let open = toFix(data.open, 2);
             let close = toFix(data.close, 2);

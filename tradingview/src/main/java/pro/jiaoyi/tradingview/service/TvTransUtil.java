@@ -38,7 +38,7 @@ public class TvTransUtil {
 
 
     public TvChart tranEmDailyKLineToTv(List<EmDailyK> ks) {
-        if (ks == null || ks.size() == 0) {
+        if (ks == null || ks.isEmpty()) {
             return null;
         }
 
