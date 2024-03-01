@@ -6,15 +6,15 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import pro.jiaoyi.common.util.BDUtil;
 import pro.jiaoyi.eastm.api.EmClient;
+import pro.jiaoyi.eastm.dao.entity.FenshiAmtSummaryEntity;
+import pro.jiaoyi.eastm.dao.repo.FenshiAmtSummaryRepo;
+import pro.jiaoyi.eastm.flow.common.CommonInfo;
 import pro.jiaoyi.eastm.flow.common.FlowNo;
 import pro.jiaoyi.eastm.flow.common.TradeTimeEnum;
 import pro.jiaoyi.eastm.flow.common.TypeEnum;
-import pro.jiaoyi.eastm.flow.common.CommonInfo;
 import pro.jiaoyi.eastm.model.EmCList;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import static pro.jiaoyi.eastm.flow.common.TypeEnum.*;
@@ -30,6 +30,8 @@ public class IndexFlow implements BaseFlow {
 
     @Resource
     private EmClient emClient;
+    @Resource
+    private FenshiAmtSummaryRepo fenshiAmtSummaryRepo;
 
     @Override
     public void runByDay() {
@@ -88,6 +90,20 @@ public class IndexFlow implements BaseFlow {
                     ArrayList<String> codes = sortCodes(emList, list);
                     CommonInfo.TYPE_CODES_MAP.put(typeEnum.getType(), codes);
 
+                }
+                case FENSHI_P -> {
+                    List<FenshiAmtSummaryEntity> dbList = fenshiAmtSummaryRepo.findByMaxTradeDate();
+                    for (FenshiAmtSummaryEntity summary : dbList) {
+                        CommonInfo.CODE_FENSHI_AMT_MAP.put(summary.getF12code(), summary.getCount());
+                    }
+                    List<String> list = new ArrayList<>();
+                    for (FenshiAmtSummaryEntity summary : dbList) {
+                        if (summary.getCount() >= 2000) {
+                            list.add(summary.getF12code());
+                        }
+                    }
+                    ArrayList<String> codes = sortCodes(emList, list);
+                    CommonInfo.TYPE_CODES_MAP.put(typeEnum.getType(), codes);
                 }
 
                 case INDEX_INCLUDE -> {

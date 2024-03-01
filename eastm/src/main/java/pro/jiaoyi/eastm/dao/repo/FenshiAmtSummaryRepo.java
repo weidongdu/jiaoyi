@@ -19,5 +19,12 @@ public interface FenshiAmtSummaryRepo extends JpaRepository<FenshiAmtSummaryEnti
     @Query(nativeQuery = true, value = "SELECT f12code, COUNT(*) AS count FROM t_fenshi_amt WHERE DATE(trade_date) = :tradeDate GROUP BY f12code")
     List<Object[]> executeNativeQuery(@Param("tradeDate") LocalDate tradeDate);
 
+    @Query("SELECT f FROM FenshiAmtSummaryEntity f WHERE f.tradeDate = (SELECT MAX(f2.tradeDate) FROM FenshiAmtSummaryEntity f2)")
+    List<FenshiAmtSummaryEntity> findByMaxTradeDate();
+
+    @Query(nativeQuery = true, value =  "select * from t_fenshi_amt_summary t where t.`f12code` = ?1  order by id desc LIMIT ?2")
+    List<FenshiAmtSummaryEntity> findRecentDataByCode(String code, int n);
+
+
 
 }

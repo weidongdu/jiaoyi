@@ -99,7 +99,7 @@ public class KlineFlow implements BaseFlow {
             }
 
             List<KLineEntity> kLineEntities = dkToKLineEntity(ks);
-            log.info("kLineEntities size={}", kLineEntities.size());
+            log.debug("kLineEntities size={}", kLineEntities.size());
 
             //更新common info
             KLineEntity k = kLineEntities.get(kLineEntities.size() - 1);

@@ -244,32 +244,10 @@ function mock() {
 
 
 function notify(content) {
-    // <div class="notification is-danger is-light">
-    //   <button class="delete"></button>
-    //   Primar lorem ipsum dolor sit amet, consectetur
-    //   adipiscing elit lorem ipsum dolor. <strong>Pellentesque risus mi</strong>, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum <a>felis venenatis</a> efficitur.
-    // </div>
-
-    //    <div class="notification is-warning top-right ">
-    //         <p id="iNotify">互联网服务</p>
-    //     </div>
-
 
     let c1 = "notification is-danger top-right"
     let div = document.createElement("div");
     div.setAttribute("class", c1);
-    //
-    // let mod = Date.now() % 3;
-    // let div = document.createElement("div");
-    // if (mod === 0) {
-    //     div.setAttribute("class", c1);
-    // }
-    // if (mod === 1) {
-    //     div.setAttribute("class", c2);
-    // }
-    // if (mod === 2) {
-    //     div.setAttribute("class", c3);
-    // }
     let p = document.createElement("p");
     p.innerText = content;
     div.appendChild(p);
@@ -295,6 +273,109 @@ function singleStockChart() {
 
 }
 
+// 根据数值获取颜色
+function getColor(value) {
+    // 根据您的需求定义每个数值对应的颜色
+    // 这里只是一个示例，您可以根据实际情况进行修改
+    if (!value || value < 1000) {
+        return "green";
+    } else if (value < 2000) {
+        return "yellow";
+    } else {
+        return "red";
+    }
+}
+
+// 处理背景的函数
+function updateBackground(arr) {
+    if (!arr) {
+        console.log("arr is null");
+        return;
+    }
+    // 获取 iInfo 元素的子元素列表
+    // 获取 iInfo 元素
+    let iInfo = document.getElementById("iInfo");
+
+    // 获取 iInfo 元素中类名为 colorDiv 的子元素列表
+    let colorDivsOld = iInfo.querySelectorAll(".colorDiv");
+    if (colorDivsOld) {
+        // 遍历 colorDivs 列表，将每个元素从 DOM 中移除
+        for (let i = 0; i < colorDivsOld.length; i++) {
+            let part = colorDivsOld[i];
+            // 删除 container 元素的所有子元素
+            while (part.firstChild) {
+                part.removeChild(part.firstChild);
+            }
+            part.remove();
+        }
+
+        // 删除 iInfo 元素中的 container（如果存在）
+        let container = iInfo.querySelector(".container");
+        if (container) {
+            container.remove();
+        }
+    }
+
+
+    // 创建一个新的容器元素用于水平排列
+    let container = document.createElement('div');
+    container.style.display = "flex";
+    container.style.flexWrap = "nowrap";
+
+    // 计算每个部分的宽度和高度
+    let width = 100 / arr.length;
+    let height = '20px';
+
+    // 创建长度为 n 的 colorDivs 数组
+    for (let i = 0; i < arr.length; i++) {
+        let div = document.createElement('div');
+        div.className = 'colorDiv';
+
+        // 创建显示 value 的文本节点
+        let text = (i + 1) + '-' + (arr[i] / 2880 * 100).toFixed(0) + "%";
+        let valueNode = document.createTextNode(text);
+
+        // 设置文字颜色
+        let textColor = getTextColor(getColor(arr[i]));
+        div.style.color = textColor;
+
+        div.appendChild(valueNode);
+
+        div.style.width = width + "%";
+        div.style.height = height;
+        // 设置 div 元素的高度与文本内容一样高
+        div.style.backgroundColor = getColor(arr[i]);
+        // div.style.height = div.clientHeight + "px";
+        container.appendChild(div);
+    }
+    iInfo.appendChild(container);
+}
+
+// 获取与背景色对比的文字颜色
+function getTextColor(backgroundColor) {
+    let rgb;
+    if (backgroundColor === "red") {
+        rgb = [255, 0, 0];
+    } else if (backgroundColor === "yellow") {
+        rgb = [255, 255, 0];
+    } else if (backgroundColor === "green") {
+        rgb = [0, 128, 0];
+    } else {
+        // 如果颜色名称不匹配，可以返回默认的文字颜色
+        return "#000000"; // 返回黑色文字颜色
+    }
+    // 将背景色转换为 RGB 格式
+    // let rgb = backgroundColor.match(/\d+/g);
+    let r = parseInt(rgb[0]);
+    let g = parseInt(rgb[1]);
+    let b = parseInt(rgb[2]);
+
+    // 计算亮度
+    let brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+    // 根据亮度选择文字颜色
+    return brightness > 125 ? "#000000" : "#FFFFFF";
+}
 
 const renderChart = (data) => {
     // console.log(data.k);
@@ -304,6 +385,41 @@ const renderChart = (data) => {
         p = data.p[data.p.length - 1];
         lastDay = k.time;
         lastCode = data.code;
+        //设置分时code count
+        // let fsCount = data.fsCount;
+        // 获取输入框的值数组
+        // let values = data.fsCount;
+
+        // 数据数组
+        if (data.fsCount) {
+            var str = data.fsCount
+            console.log(str);
+            var arr = str.split(',');
+            console.log(arr);
+            if (arr.length > 0) {
+                updateBackground(arr);
+            }
+        }
+
+        // if (fsCount) {
+        //     $("#iRes").val(fsCount);
+        //     if (fsCount < 1000) {
+        //         // 条件满足时，添加背景警告效果
+        //         document.getElementById("iInfo").style.backgroundColor = "red";
+        //         document.getElementById("iInfo").style.border = "1px solid red";
+        //     } else if (fsCount < 2000) {
+        //         document.getElementById("iInfo").style.backgroundColor = "orange";
+        //         document.getElementById("iInfo").style.border = "1px solid orange";
+        //     } else {
+        //         // 条件不满足时，移除背景警告效果
+        //         document.getElementById("iInfo").style.backgroundColor = "";
+        //         document.getElementById("iInfo").style.border = "";
+        //     }
+        // } else {
+        //     $("#iRes").val(0);
+        // }
+
+
         //判断是否切换了板块bk
 
         if (lastBk !== data.bk) {

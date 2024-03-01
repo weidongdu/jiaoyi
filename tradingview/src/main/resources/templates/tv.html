@@ -19,7 +19,7 @@
         .legend {
             position: absolute;
             right: 150px;
-            top: 100px;
+            top: 120px;
             text-align: right;
             z-index: 1;
             font-size: 16px;
@@ -41,7 +41,7 @@
 </head>
 
 <body>
-<section class="section">
+<section class="section" id="iInfo">
     <div class="columns">
         <div class="column is-1">
             <div id="iSelectType" class="control select is-danger">
@@ -161,28 +161,6 @@
                 <div class="field-body">
                     <div class="field is-expanded">
                         <div class="field has-addons">
-                            <p class="control">
-                                <a class="button is-static">
-                                    高
-                                </a>
-                            </p>
-                            <p class="control ">
-                                <input class="input" type="text" id="iHigh" placeholder="">
-                            </p>
-                            <p class="control">
-                                <a class="button is-static">
-                                    低
-                                </a>
-                            </p>
-                            <p class="control">
-                                <input class="input" type="text" id="iLow" placeholder="">
-                            </p>
-
-                            <p class="control">
-                                <button class="button is-static" id="iBtnCalc">
-                                    =
-                                </button>
-                            </p>
                             <p class="control is-expanded">
                                 <input class="input" type="text" id="iRes" placeholder="">
                             </p>
@@ -192,42 +170,40 @@
             </div>
         </div>
 
-        <div class="column">
-            <div class="field is-horizontal">
-                <div class="field-body">
-                    <div class="field ">
-                        <p class="control" hidden>
-                        <div class="field has-tooltip-right" hidden data-tooltip="快捷键[,]">
-                            <input id="iMAUpDn" type="checkbox" name="swMAupdn" class="switch is-rounded is-danger"
-                                   checked="checked">
-                            <label for="iMAUpDn">pct</label>
-                        </div>
-                        </p>
-                    </div>
-                    <div class="field ">
-                        <p class="control">
-                        <div class="field has-tooltip-right" data-tooltip="快捷键[m]">
-                            <input id="iMA" type="checkbox" name="swMA" class="switch is-rounded is-danger"
-                                   checked="checked">
-                            <label for="iMA">MA</label>
-                        </div>
-                        </p>
-                    </div>
-                    <div class="field ">
-                        <p class="control">
-                        <div class="field has-tooltip-right" data-tooltip="快捷键[k]">
-                            <input id="iK" type="checkbox" name="swK" class="switch is-rounded is-danger"
-                                   checked="checked">
-                            <label for="iK">K</label>
-                        </div>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--        <div class="column">-->
+<!--            <div class="field is-horizontal">-->
+<!--                <div class="field-body">-->
+<!--                    <div class="field ">-->
+<!--                        <p class="control" hidden>-->
+<!--                        <div class="field has-tooltip-right" hidden data-tooltip="快捷键[,]">-->
+<!--                            <input id="iMAUpDn" type="checkbox" name="swMAupdn" class="switch is-rounded is-danger"-->
+<!--                                   checked="checked">-->
+<!--                            <label for="iMAUpDn">pct</label>-->
+<!--                        </div>-->
+<!--                        </p>-->
+<!--                    </div>-->
+<!--                    <div class="field ">-->
+<!--                        <p class="control">-->
+<!--                        <div class="field has-tooltip-right" data-tooltip="快捷键[m]">-->
+<!--                            <input id="iMA" type="checkbox" name="swMA" class="switch is-rounded is-danger"-->
+<!--                                   checked="checked">-->
+<!--                            <label for="iMA">MA</label>-->
+<!--                        </div>-->
+<!--                        </p>-->
+<!--                    </div>-->
+<!--                    <div class="field ">-->
+<!--                        <p class="control">-->
+<!--                        <div class="field has-tooltip-right" data-tooltip="快捷键[k]">-->
+<!--                            <input id="iK" type="checkbox" name="swK" class="switch is-rounded is-danger"-->
+<!--                                   checked="checked">-->
+<!--                            <label for="iK">K</label>-->
+<!--                        </div>-->
+<!--                        </p>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
     </div>
-
-
 </section>
 <section id="main">
     <div id="charts"></div>

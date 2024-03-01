@@ -9,6 +9,8 @@ import pro.jiaoyi.common.util.FileUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.config.IndexEnum;
 import pro.jiaoyi.eastm.config.VipIndexEnum;
+import pro.jiaoyi.eastm.dao.entity.FenshiAmtSummaryEntity;
+import pro.jiaoyi.eastm.dao.repo.FenshiAmtSummaryRepo;
 import pro.jiaoyi.eastm.flow.common.CommonInfo;
 import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
@@ -33,6 +35,8 @@ public class TvService {
     private TvTransUtil tvTransUtil;
     @Autowired
     private EmClient emClient;
+    @Autowired
+    private FenshiAmtSummaryRepo fenshiAmtSummaryRepo;
 
     /**
      * 获取 tv chart 数据
@@ -46,7 +50,26 @@ public class TvService {
         if ("BkValue".equalsIgnoreCase(codeType)) {
             code = emClient.getBkCodeByBkValue(code);
         }
-        return getTvChart(code, date, limit);
+        TvChart tvChart = getTvChart(code, date, limit);
+        extractedFsCount(code, tvChart);
+        return tvChart;
+    }
+
+    private void extractedFsCount(String code, TvChart tvChart) {
+        List<FenshiAmtSummaryEntity> fs = fenshiAmtSummaryRepo.findRecentDataByCode(code, 30);
+        StringBuilder fsCount = new StringBuilder();
+        if (!fs.isEmpty()) {
+            //倒序遍历
+            for (int i = fs.size() - 1; i >= 0; i--) {
+                FenshiAmtSummaryEntity f = fs.get(i);
+                fsCount.append(f.getCount()).append(",");
+            }
+            //删除最后 ,
+            if (!fsCount.isEmpty()) {
+                fsCount = new StringBuilder(fsCount.substring(0, fsCount.length() - 1));
+            }
+        }
+        tvChart.setFsCount(fsCount.toString());
     }
 
     public TvChart getTvChart(String code, LocalDate date, Integer limit) {
@@ -85,6 +108,7 @@ public class TvService {
         return CommonInfo.TYPE_CODES_MAP;
 
     }
+
     public Map<String, List<String>> getAllIndex(boolean sync) {
         if (COUNTER.getAndIncrement() == 0 && sync) {
             //init

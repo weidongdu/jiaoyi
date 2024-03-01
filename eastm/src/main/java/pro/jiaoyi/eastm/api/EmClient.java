@@ -1459,6 +1459,12 @@ public class EmClient {
 
         List<EmDailyK> dailyKs =
                 getDailyKs(code, LocalDate.now(), 100, false);
+        if (dailyKs == null || dailyKs.isEmpty()) {
+            log.error("getDailyKs error code={}", code);
+            CACHE_AMT.put(code, B1_5Y);
+            return B1_5Y;
+        }
+
         BigDecimal amtDay = amtTop10p(dailyKs);
         BigDecimal amt = amtDay.divide(new BigDecimal(4), 2, RoundingMode.HALF_UP);
         CACHE_AMT.put(code, amt);

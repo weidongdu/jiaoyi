@@ -13,6 +13,7 @@ public class CommonInfo {
     public static final Map<String, String> CODE_NAME_MAP = new HashMap<>();
     public static final Map<String, KLineEntity> CODE_K_MAP = new HashMap<>();
     public static final Map<String, List<String>> TYPE_CODES_MAP = new HashMap<>();
+    public static final Map<String, Long> CODE_FENSHI_AMT_MAP = new HashMap<>();
     public static final TypeEnum[] INDEX_ARR = {
             TypeEnum.ALL,
             TypeEnum.CYCF,
@@ -23,5 +24,6 @@ public class CommonInfo {
             TypeEnum.INDEX_INCLUDE,
             TypeEnum.INDEX_EXCLUDE,
             TypeEnum.EM_MA_UP,
+            TypeEnum.FENSHI_P,
     };
 }

@@ -11,6 +11,7 @@ import java.util.Map;
 
 @Data
 public class TvChart {
+    private String fsCount;
     private String code;
     private String name;
     private String bk;
