@@ -598,7 +598,7 @@ class EastmKlineTests {
             }
             String body = FileUtil.readFromFile(abs);
             JSONObject data = JSONObject.parseObject(body).getJSONObject("data");
-            log.info("body length={}", body.length());
+            log.debug("body length={}", body.length());
 
             if (data != null) {
                 EastGetStockFenShiVo vo = data.toJavaObject(EastGetStockFenShiVo.class);

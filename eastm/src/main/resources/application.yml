@@ -20,6 +20,13 @@ spring:
       ddl-auto: update   #ddl-auto:设为 create 表示每次都重新建表
     show-sql: false
 
+  mvc:
+    cors:
+      allowed-origins: "*"
+      allowed-methods: POST
+      allowed-headers: "*"
+
+
 logging:
   level:
     pro:

@@ -145,7 +145,6 @@ $(document).keydown(function (e) {
         $('input[name=swK]').click();
     }
 
-
     if (77 === e.keyCode) {//m
         $('input[name=swMA]').click();
     }
@@ -182,6 +181,9 @@ $(document).keydown(function (e) {
 
     if (84 === e.keyCode) {//t
         selectType();
+    }
+    if (82 === e.keyCode) {//t
+        remark();
     }
 
     if (191 === e.keyCode) {// code = / ?
@@ -461,4 +463,59 @@ const renderChart = (data) => {
     }
 
 
+}
+
+
+
+function remark(){
+    console.log('remark')
+
+    // 获取模态框元素
+    var modal = document.getElementById('myModal');
+    modal.classList.add('is-active');
+    // 获取输入框和确定按钮
+    var codeInput = document.getElementById('codeInput');
+    codeInput.value = $("#iCode").val();
+
+    var remarkInput = document.getElementById('remarkInput');
+    var confirmButton = document.getElementById('confirmButton');
+    var cancelBtn = document.getElementById('cancelBtn');
+
+    // 当点击确定按钮时
+    confirmButton.addEventListener('click', function() {
+        // 获取输入框中的值
+
+        var code = codeInput.value;
+        var remark = remarkInput.value;
+
+        // 创建 JSON 对象
+        var data = [
+            {
+                "code": code,
+                "remark": remark
+            }
+        ];
+
+        // 调用接口
+        fetch('http://8.142.9.14:28890/stock/remark', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('备注信息已添加',data);
+            })
+            .catch(error => {
+                console.error('添加备注信息时出错:', error);
+            });
+        // 关闭模态框
+        modal.classList.remove('is-active');
+    });
+    cancelBtn.addEventListener('click', function() {
+        // 关闭模态框
+        modal.classList.remove('is-active');
+    });
 }

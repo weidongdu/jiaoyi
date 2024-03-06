@@ -46,28 +46,7 @@
         <div class="column is-1">
             <div id="iSelectType" class="control select is-danger">
                 <select id="iStockTypeOption" onchange="selectType()">
-                    <!--                    <option value="p7">p7</option>-->
-                    <!--                    <option value="zp7">zp7</option>-->
-                    <!--                    <option value="all_index">all指数</option>-->
-                    <!--                    <option value="all_index_v60">all指数(v60<1.5亿)</option>-->
-                    <!--                    <option value="all">all</option>-->
-                    <!--                    <option value="all_v60">all(v60<1.5亿)</option>-->
-                    <!--                    <option value="zuijin">最近</option>-->
-                    <!--                    <option value="other">其他</option>-->
-                    <!--                    <option value="ZT">涨停板</option>-->
-                    <!--                    <option value="hk">hk</option>-->
-                    <!--                    <option value="amtMa60">5倍AmtMa60</option>-->
-                    <!--                    <option value="Tshadow">上影线</option>-->
-                    <!--                    <option value="Kcross">穿越均线</option>-->
-                    <!--                    <option value="longMost">一年内最大涨幅</option>-->
-                    <!--                    <option value="longMostRecent">一年内最大涨幅(今日收盘)</option>-->
-                    <!--                    <option value="shortMost">一年内最大跌幅</option>-->
-                    <!--                    <option value="shortMostRecent">一年内最大跌幅(今日收盘)</option>-->
                     <!--                    <option value="icyb">创业成分</option>-->
-                    <!--                    <option value="i300">沪深300</option>-->
-                    <!--                    <option value="i500">中证500</option>-->
-                    <!--                    <option value="i1000">中证1000</option>-->
-                    <!--                    <option value="kc50">科创50</option>-->
                 </select>
             </div>
         </div>
@@ -169,40 +148,6 @@
                 </div>
             </div>
         </div>
-
-<!--        <div class="column">-->
-<!--            <div class="field is-horizontal">-->
-<!--                <div class="field-body">-->
-<!--                    <div class="field ">-->
-<!--                        <p class="control" hidden>-->
-<!--                        <div class="field has-tooltip-right" hidden data-tooltip="快捷键[,]">-->
-<!--                            <input id="iMAUpDn" type="checkbox" name="swMAupdn" class="switch is-rounded is-danger"-->
-<!--                                   checked="checked">-->
-<!--                            <label for="iMAUpDn">pct</label>-->
-<!--                        </div>-->
-<!--                        </p>-->
-<!--                    </div>-->
-<!--                    <div class="field ">-->
-<!--                        <p class="control">-->
-<!--                        <div class="field has-tooltip-right" data-tooltip="快捷键[m]">-->
-<!--                            <input id="iMA" type="checkbox" name="swMA" class="switch is-rounded is-danger"-->
-<!--                                   checked="checked">-->
-<!--                            <label for="iMA">MA</label>-->
-<!--                        </div>-->
-<!--                        </p>-->
-<!--                    </div>-->
-<!--                    <div class="field ">-->
-<!--                        <p class="control">-->
-<!--                        <div class="field has-tooltip-right" data-tooltip="快捷键[k]">-->
-<!--                            <input id="iK" type="checkbox" name="swK" class="switch is-rounded is-danger"-->
-<!--                                   checked="checked">-->
-<!--                            <label for="iK">K</label>-->
-<!--                        </div>-->
-<!--                        </p>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
     </div>
 </section>
 <section id="main">
@@ -213,11 +158,37 @@
 
     <br>
     <div class="container">
-
         <div class="field is-grouped is-grouped-multiline" id="iTag">
         </div>
     </div>
+
+    <div class="container">
+        <!-- 添加模态框 -->
+        <div id="myModal" class="modal">
+
+            <div class="modal-background"></div>
+            <div class="modal-content">
+                <div class="field">
+                    <label class="label">Code</label>
+                    <div class="control">
+                        <input id="codeInput" class="input" type="text" placeholder="请输入Code">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">备注信息</label>
+                    <div class="control">
+                        <input id="remarkInput" class="input" type="text" placeholder="请输入备注信息">
+                    </div>
+                </div>
+                <button id="confirmButton" class="button is-primary">确定</button>
+                <button id="cancelBtn" class="button">取消</button>
+            </div>
+        </div>
+    </div>
+
 </section>
+
+
 
 <script type="text/javascript">
     <!--    初始化tv chart     -->
@@ -296,6 +267,7 @@
     });
 
     legend();
+
 
 </script>
 </body>

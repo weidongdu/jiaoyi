@@ -252,7 +252,7 @@ public class EmRealTimeClient {
             byte[] bytes = okHttpUtil.getForBytes(url(code), hMap);
             String body = new String(bytes, Charset.defaultCharset());
             JSONObject data = JSONObject.parseObject(body).getJSONObject("data");
-            log.info("body length={}", body.length());
+            log.debug("body length={}", body.length());
 
             if (data != null) {
                 EastGetStockFenShiVo vo = data.toJavaObject(EastGetStockFenShiVo.class);
@@ -277,7 +277,7 @@ public class EmRealTimeClient {
             }
             String body = FileUtil.readFromFile(abs);
             JSONObject data = JSONObject.parseObject(body).getJSONObject("data");
-            log.info("body length={}", body.length());
+            log.debug("body length={}", body.length());
 
             if (data != null) {
                 EastGetStockFenShiVo vo = data.toJavaObject(EastGetStockFenShiVo.class);

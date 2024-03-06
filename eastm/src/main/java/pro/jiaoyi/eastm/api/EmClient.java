@@ -154,6 +154,10 @@ public class EmClient {
             }
 
             EmDataKline data = emResult.getData();
+            if (data == null){
+                log.error("data is null:{}", s);
+                return Collections.emptyList();
+            }
             List<String> klines = data.getKlines();
 
             int size = klines.size();

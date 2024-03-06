@@ -1,11 +1,11 @@
 package pro.jiaoyi.eastm.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pro.jiaoyi.common.util.BDUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.config.WxUtil;
@@ -22,6 +22,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/stock")
+@Slf4j
 public class StockController {
 
     @Resource
@@ -31,6 +32,7 @@ public class StockController {
     private WxUtil wxUtil;
 
     public static final Map<String, BigDecimal> MONITOR_CODE_AMT_MAP = new HashMap<>();
+    public static final Map<String, String> CODE_REMARK_MAP = new HashMap<>();
 
 
     @GetMapping("/vol/hour")
@@ -72,6 +74,32 @@ public class StockController {
         }
         return MONITOR_CODE_AMT_MAP;
     }
+
+    @PostMapping("/remark")
+    @CrossOrigin(origins = "*", methods = {RequestMethod.POST}, allowedHeaders = "*")
+    public Object remark(@RequestBody String json) {
+        log.info("remark json:{}", json);
+        if (StringUtils.hasText(json)) {
+            JSONArray array = JSONArray.parseArray(json);
+            for (int i = 0; i < array.size(); i++) {
+                JSONObject jsonObject = array.getJSONObject(i);
+                String code = jsonObject.getString("code");
+                String remark = jsonObject.getString("remark");
+                if (codeCheck(code)) {
+                    CODE_REMARK_MAP.put(code, remark);
+                }
+            }
+        }
+        return CODE_REMARK_MAP;
+    }
+
+    @GetMapping("/remark/clear")
+    public Object remarkClear() {
+        CODE_REMARK_MAP.clear();
+        return CODE_REMARK_MAP;
+    }
+
+
     @GetMapping("/monitor/clear")
     public Object monitorClear() {
         MONITOR_CODE_AMT_MAP.clear();

@@ -15,12 +15,10 @@ import pro.jiaoyi.common.util.EmojiUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.config.WxUtil;
 import pro.jiaoyi.eastm.dao.entity.CloseEmCListEntity;
+import pro.jiaoyi.eastm.dao.entity.EmCListSimpleEntity;
 import pro.jiaoyi.eastm.dao.entity.OpenEmCListEntity;
 import pro.jiaoyi.eastm.dao.entity.TickEmCListEntity;
-import pro.jiaoyi.eastm.dao.repo.CloseEmCListRepo;
-import pro.jiaoyi.eastm.dao.repo.OpenEmCListRepo;
-import pro.jiaoyi.eastm.dao.repo.ThemeScoreRepo;
-import pro.jiaoyi.eastm.dao.repo.TickEmCListRepo;
+import pro.jiaoyi.eastm.dao.repo.*;
 import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.model.EmDailyK;
 import pro.jiaoyi.eastm.service.FenshiAmtSummaryService;
@@ -42,9 +40,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static pro.jiaoyi.eastm.controller.StockController.CODE_REMARK_MAP;
 import static pro.jiaoyi.eastm.controller.StockController.MONITOR_CODE_AMT_MAP;
 
-@Component
+//@Component
 @Slf4j
 public class MarketJob {
     @Resource
@@ -59,6 +58,8 @@ public class MarketJob {
     private CloseEmCListRepo closeEmCListRepo;
     @Resource
     private TickEmCListRepo tickEmCListRepo;
+    @Resource
+    private EmCListSimpleEntityRepo emCListSimpleEntityRepo;
 
     @Resource
     private WxUtil wxUtil;
@@ -116,6 +117,7 @@ public class MarketJob {
 
     @Scheduled(cron = "30 5 15 * * ?")
     public void runClose() {
+        CODE_REMARK_MAP.clear();
 
         if (!TradeTimeUtil.isTradeDay()) {
             return;
@@ -558,16 +560,44 @@ public class MarketJob {
 
                 BigDecimal m1 = speedService.getFenshiAmtSimple(emCList.getF12Code(), 65);
                 BigDecimal fx = m1.divide(BDUtil.b0_1.multiply(MONITOR_CODE_AMT_MAP.get(emCList.getF12Code())), 2, RoundingMode.HALF_UP);
-                log.info("{}[{}]  {}[{}] ,m1={}[{}],amt={},fAmt={}",
+
+                if (CODE_REMARK_MAP.get(emCList.getF12Code()) != null) {
+                    log.info("{} => {}", emCList.getF12Code() + emCList.getF14Name(), CODE_REMARK_MAP.get(emCList.getF12Code()));
+                }
+                //这里显示一个数据, 就是当日 最高的成交额 前10 平均, 以及当前最近10个 平均
+
+                List<EmCListSimpleEntity> amtTop10 = emCListSimpleEntityRepo.findByF12codeAndTradeDateOOrderByF6AmtDesc(emCList.getF12Code());
+                BigDecimal a10 = BigDecimal.ZERO;
+                if (amtTop10 != null && !amtTop10.isEmpty()) {
+                    a10 = amtTop10.stream().map(EmCListSimpleEntity::getF6Amt).reduce(BigDecimal.ZERO, BigDecimal::add).divide(BigDecimal.valueOf(amtTop10.size()), 0, RoundingMode.HALF_UP);
+                }
+                List<EmCListSimpleEntity> idTop10 = emCListSimpleEntityRepo.findByF12codeOrderByIdDesc(emCList.getF12Code());
+                BigDecimal i10 = BigDecimal.ZERO;
+                if (idTop10 != null && !idTop10.isEmpty()) {
+                    i10 = idTop10.stream().map(EmCListSimpleEntity::getF6Amt).reduce(BigDecimal.ZERO, BigDecimal::add).divide(BigDecimal.valueOf(idTop10.size()), 0, RoundingMode.HALF_UP);
+                }
+
+                //i10 与 a10 比例
+                BigDecimal ida = BigDecimal.ZERO;
+                if (i10.compareTo(BigDecimal.ZERO) > 0 && a10.compareTo(BigDecimal.ZERO) > 0 ){
+                    ida = i10.divide(a10, 2, RoundingMode.HALF_UP);
+                }
+
+                log.info("{}[p{}]  {}[s{}] ,m1={}[{}],fAmt={},amt={}, a10={}, i10={}, 最近占比={}x",
                         emCList.getF12Code() + emCList.getF14Name(),
                         emCList.getF3Pct(),
                         emCList.getF2Close(),
                         emCList.getF22Speed(),
                         BDUtil.amtHuman(m1),
                         BDUtil.amtHuman(fx),
+                        BDUtil.amtHuman(BDUtil.b0_1.multiply(MONITOR_CODE_AMT_MAP.get(emCList.getF12Code()))),
                         BDUtil.amtHuman(emCList.getF6Amt()),
-                        BDUtil.amtHuman(BDUtil.b0_1.multiply(MONITOR_CODE_AMT_MAP.get(emCList.getF12Code())))
+                        BDUtil.amtHuman(a10),
+                        BDUtil.amtHuman(i10),
+                        ida
                 );
+
+
             }
         }
 
@@ -662,10 +692,12 @@ public class MarketJob {
         speedService.addAll(list);
 //        runAllSpeed(list);
         runFenshiM1(list);
+//        speedService.runA10i10(list);
     }
 //
 
     ExecutorService executor = Executors.newFixedThreadPool(10);
+
     public void runFenshiM1(List<EmCList> list) {
         CompletableFuture.runAsync(() -> {
             try {

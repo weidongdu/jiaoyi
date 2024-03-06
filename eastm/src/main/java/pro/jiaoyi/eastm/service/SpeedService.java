@@ -22,8 +22,10 @@ import pro.jiaoyi.eastm.model.fenshi.EastGetStockFenShiVo;
 import pro.jiaoyi.eastm.util.TradeTimeUtil;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +37,8 @@ public class SpeedService {
 
     @Resource
     private EmRealTimeClient emRealTimeClient;
+    @Resource
+    private EmClient emClient;
 
     @Resource
     private EmCListSimpleEntityRepo emCListSimpleEntityRepo;
@@ -173,6 +177,10 @@ public class SpeedService {
             em.setF6Amt(m1);
             em.setF12Code(emCList.getF12Code());
             em.setTradeDate(now);
+
+            em.setF2Close(emCList.getF2Close());
+            em.setF3Pct(emCList.getF3Pct());
+
             ll.add(em);
 
             if (ll.size() > 1000) {
@@ -204,6 +212,47 @@ public class SpeedService {
     public int countByCode(String code, LocalDate l) {
         //删除 LocalDate l 之前的数据
         return emCListSimpleEntityRepo.countByCode(l.atStartOfDay(), code);
+    }
+
+    @Async
+    public void runA10i10(List<EmCList> list) {
+
+        if (!EmClient.tradeTime()) {
+            return;
+        }
+        if (LocalTime.now().isBefore(LocalTime.of(9, 31))) {
+            return;
+        }
+        BigDecimal b099 = new BigDecimal("0.98");
+        BigDecimal b088 = new BigDecimal("0.88");
+        List<EmCList> pList = list.stream().filter(
+                em -> em.getF3Pct().compareTo(BigDecimal.ZERO) > 0
+                        && em.getF2Close().compareTo(b099.multiply(em.getF15High())) > 0
+                        && em.getF22Speed().compareTo(b088) > 0
+        ).toList();
+
+        long l1 = System.currentTimeMillis();
+        log.info("runA10i10 start, size: {}", pList.size());
+        for (EmCList em : pList) {
+            String code = em.getF12Code();
+            List<EmCListSimpleEntity> a10 = emCListSimpleEntityRepo.findByF12codeAndTradeDateOOrderByF6AmtDesc(code);
+            List<EmCListSimpleEntity> i10 = emCListSimpleEntityRepo.findByF12codeOrderByIdDesc(code);
+
+            if (a10 == null || a10.isEmpty() || i10 == null || i10.isEmpty()) {
+                continue;
+            }
+
+            BigDecimal a10Amt = a10.stream().map(EmCListSimpleEntity::getF6Amt).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal i10Amt = i10.stream().map(EmCListSimpleEntity::getF6Amt).reduce(BigDecimal.ZERO, BigDecimal::add);
+            if (i10Amt.compareTo(BigDecimal.ZERO) > 0 && a10Amt.compareTo(BigDecimal.ZERO) > 0) {
+                BigDecimal x = i10Amt.divide(a10Amt, 2, RoundingMode.HALF_UP);
+                if (x.compareTo(b088) > 0) {
+                    log.info("{}: {} x={}", code + em.getF14Name(), em.getF3Pct(), x);
+                }
+            }
+        }
+
+        log.info("runA10i10 finish use [{}] ms", System.currentTimeMillis() - l1);
     }
 
 
