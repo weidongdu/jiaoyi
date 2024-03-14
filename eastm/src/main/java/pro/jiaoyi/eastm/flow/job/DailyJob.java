@@ -10,7 +10,7 @@ import pro.jiaoyi.eastm.flow.BaseFlow;
 import java.util.Comparator;
 import java.util.List;
 
-@Component
+//@Component
 @Slf4j
 public class DailyJob {
     private final List<BaseFlow> baseFlows;
@@ -28,16 +28,9 @@ public class DailyJob {
     public void execute() {
         log.info("DailyJob run");
         if (!enable) {
-//线上注释掉
-            log.info("DailyJob disabled, 仅开index flow");
-            for (BaseFlow flow : baseFlows) {
-                if (flow.getClass().getSimpleName().equals("IndexFlow")) {
-                    flow.run();
-                }
-            }
-
             return;
         }
+
         baseFlows.sort(Comparator.comparingInt(BaseFlow::getNo));
         for (BaseFlow flow : baseFlows) {
             flow.run();

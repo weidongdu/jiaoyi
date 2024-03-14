@@ -27,6 +27,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -42,6 +43,10 @@ public class SpeedService {
 
     @Resource
     private EmCListSimpleEntityRepo emCListSimpleEntityRepo;
+    @Resource
+    private ImgService imgService;
+
+    public static final HashSet<String> imgSet = new HashSet<>();
 
     private static final List<EmCListSimple> CACHE_EM_SEQ_LIST = new CopyOnWriteArrayList<>();
 
@@ -214,7 +219,7 @@ public class SpeedService {
         return emCListSimpleEntityRepo.countByCode(l.atStartOfDay(), code);
     }
 
-    @Async
+
     public void runA10i10(List<EmCList> list) {
 
         if (!EmClient.tradeTime()) {
@@ -223,18 +228,26 @@ public class SpeedService {
         if (LocalTime.now().isBefore(LocalTime.of(9, 31))) {
             return;
         }
-        BigDecimal b099 = new BigDecimal("0.98");
+        BigDecimal b099 = new BigDecimal("0.95");
         BigDecimal b088 = new BigDecimal("0.88");
+        BigDecimal b104 = new BigDecimal("1.04");
         List<EmCList> pList = list.stream().filter(
-                em -> em.getF3Pct().compareTo(BigDecimal.ZERO) > 0
+                em -> em.getF15High().compareTo(BigDecimal.ZERO) > 0
+                        && em.getF18Close().compareTo(BigDecimal.ZERO) > 0
+                        && em.getF15High().compareTo(b104.multiply(em.getF18Close())) < 0
+                        && em.getF3Pct().compareTo(BigDecimal.ONE) > 0
                         && em.getF2Close().compareTo(b099.multiply(em.getF15High())) > 0
                         && em.getF22Speed().compareTo(b088) > 0
         ).toList();
 
         long l1 = System.currentTimeMillis();
         log.info("runA10i10 start, size: {}", pList.size());
+        Map<String, List<String>> bkCodeNameMap = new ConcurrentHashMap<>();
         for (EmCList em : pList) {
             String code = em.getF12Code();
+            String name = em.getF14Name();
+            String bk = em.getF100bk();
+
             List<EmCListSimpleEntity> a10 = emCListSimpleEntityRepo.findByF12codeAndTradeDateOOrderByF6AmtDesc(code);
             List<EmCListSimpleEntity> i10 = emCListSimpleEntityRepo.findByF12codeOrderByIdDesc(code);
 
@@ -242,18 +255,34 @@ public class SpeedService {
                 continue;
             }
 
+            if (bk == null) {
+                log.info("bk is null: {}", code + name);
+            }
+
             BigDecimal a10Amt = a10.stream().map(EmCListSimpleEntity::getF6Amt).reduce(BigDecimal.ZERO, BigDecimal::add);
             BigDecimal i10Amt = i10.stream().map(EmCListSimpleEntity::getF6Amt).reduce(BigDecimal.ZERO, BigDecimal::add);
-            if (i10Amt.compareTo(BigDecimal.ZERO) > 0 && a10Amt.compareTo(BigDecimal.ZERO) > 0) {
+            if (i10Amt.compareTo(BigDecimal.valueOf(50000000)) > 0 && a10Amt.compareTo(BigDecimal.ZERO) > 0) {
                 BigDecimal x = i10Amt.divide(a10Amt, 2, RoundingMode.HALF_UP);
                 if (x.compareTo(b088) > 0) {
-                    log.info("{}: {} x={}", code + em.getF14Name(), em.getF3Pct(), x);
+                    log.debug("{}: {} x={}", code + em.getF14Name(), em.getF3Pct(), x);
+                    // 加入bk map
+                    List<String> codes = bkCodeNameMap.get(bk);
+                    String s = code + name + "_" + em.getF3Pct() + "_" + BDUtil.amtHuman(i10Amt) + "_" + x;
+                    imgService.sendImg(code);
+                    if (codes == null) {
+                        List<String> codeNameList = new ArrayList<>();
+                        codeNameList.add(s);
+                        bkCodeNameMap.put(bk, codeNameList);
+                    } else {
+                        codes.add(s);
+                    }
+
                 }
             }
         }
-
-        log.info("runA10i10 finish use [{}] ms", System.currentTimeMillis() - l1);
+        if (!bkCodeNameMap.isEmpty()) {
+            bkCodeNameMap.forEach((b, l) -> log.info("{} => {}", b, JSON.toJSONString(l)));
+        }
+        log.debug("runA10i10 finish use [{}] ms", System.currentTimeMillis() - l1);
     }
-
-
 }

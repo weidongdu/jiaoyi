@@ -75,16 +75,26 @@ public class BDUtil {
         return b.multiply(B100).setScale(scale, RoundingMode.HALF_UP).toPlainString();
     }
 
-    public static String amtHuman(BigDecimal b) {
-        if (b == null) return "0";
-        if (b.compareTo(B1Y) > 0) {
-            return b.divide(B1Y, 2, RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP).toPlainString() + "亿";
-        }
-        if (b.compareTo(B1W) > 0) {
-            return b.divide(B1W, 2, RoundingMode.HALF_UP).setScale(0, RoundingMode.HALF_UP).toPlainString() + "万";
+    public static String amtHuman(BigDecimal ab) {
+        if (ab == null) return "0";
+
+        boolean flagN = false;
+        BigDecimal b = ab;
+        if (ab.compareTo(BigDecimal.ZERO) < 0) {
+            flagN = true;
+            b = ab.abs();
         }
 
-        return b.setScale(2, RoundingMode.HALF_UP).toPlainString();
+        if (b.compareTo(B1Y) > 0) {
+            String s = b.divide(B1Y, 2, RoundingMode.HALF_UP).setScale(2, RoundingMode.HALF_UP).toPlainString() + "亿";
+            return flagN ? "-" + s : s;
+        }
+        if (b.compareTo(B1W) > 0) {
+            String s = b.divide(B1W, 2, RoundingMode.HALF_UP).setScale(0, RoundingMode.HALF_UP).toPlainString() + "万";
+            return flagN ? "-" + s : s;
+        }
+        String s = b.setScale(2, RoundingMode.HALF_UP).toPlainString();
+        return flagN ? "-" + s : s;
     }
 
 }

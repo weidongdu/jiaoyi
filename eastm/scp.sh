@@ -25,3 +25,4 @@ ssh ubuntu@iz01 << EOF
 sudo supervisorctl restart eastm
 EOF
 
+ssh ubuntu@iz01 tail -f /var/log/eastm.out.log

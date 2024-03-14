@@ -4,14 +4,20 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 import pro.jiaoyi.common.util.DateUtil;
+import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.dao.entity.ThemeScoreEntity;
 import pro.jiaoyi.eastm.dao.entity.WeiboEntity;
 import pro.jiaoyi.eastm.dao.repo.ThemeScoreRepo;
+import pro.jiaoyi.eastm.model.EmCList;
 import pro.jiaoyi.eastm.service.WeiboService;
+import pro.jiaoyi.eastm.util.TradeTimeUtil;
+import pro.jiaoyi.eastm.util.sina.SinaTicktimeDataUtil;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -150,6 +156,93 @@ public class DataController {
         return "ok";
     }
 
+
+    @Resource
+    private SinaTicktimeDataUtil sinaTicktimeDataUtil;
+    @Resource
+    private EmClient emClient;
+
+//    @GetMapping("/sina/init")
+//    @Async
+//    public void init() {
+//        List<EmCList> list = emClient.getClistDefaultSize(true);
+////        boolean flag = false;
+//        for (EmCList em : list) {
+//            log.info("em={}", em);
+//            //时间 start 2024-02-19 -> now
+//            //时间 end now
+//
+////            String s = "000650";
+////            if (s.equals(em.getF12Code())) {
+////                flag = true;
+////            }
+////            if (!flag) {
+////                continue;
+////            }
+//
+//            if (em.getF5Vol().compareTo(BigDecimal.ONE) <= 0
+//                    || em.getF2Close().compareTo(BigDecimal.ONE) <= 0
+//                    || em.getF15High().compareTo(BigDecimal.ONE) <= 0
+//            ) {
+//                log.info("pass code:{},name:{},vol:{},close:{}", em.getF12Code(), em.getF14Name(), em.getF5Vol(), em.getF2Close());
+//                continue;
+//            }
+//
+//
+//            String symbol = em.getF12Code();
+//            for (int i = 0; i < 30; i++) {
+//                LocalDate start = LocalDate.of(2024, 2, 20);
+//                LocalDate limit = LocalDate.of(2024, 3, 9);
+//                start = start.plusDays(i);
+//                if (!TradeTimeUtil.isTradeDay(start) || start.isAfter(limit)) {
+//                    log.info("{} 非交易日", start);
+//                    continue;
+//                }
+//
+//                String day = start.toString();
+//                try {
+//                    sinaTicktimeDataUtil.getTicktimeData(symbol, day);
+//                    Thread.sleep(1000);
+//                } catch (Exception e) {
+//                    log.error("{}", e);
+//                }
+//            }
+//
+//        }
+//
+//
+//    }
+
+    @GetMapping("/sina/sum")
+    @Async
+    public void tickSum(String day) {
+        if (!TradeTimeUtil.isTradeDay() || day == null || day.isEmpty()) {
+            return;
+        }
+
+        List<EmCList> list = emClient.getClistDefaultSize(true);
+        for (EmCList em : list) {
+
+            if (em.getF5Vol().compareTo(BigDecimal.ONE) <= 0
+                    || em.getF2Close().compareTo(BigDecimal.ONE) <= 0
+                    || em.getF15High().compareTo(BigDecimal.ONE) <= 0) {
+                log.info("pass code:{},name:{},vol:{},close:{}", em.getF12Code(), em.getF14Name(), em.getF5Vol(), em.getF2Close());
+                continue;
+            }
+
+            String symbol = em.getF12Code();
+
+            try {
+                sinaTicktimeDataUtil.getTicktimeData(symbol, day, true);
+                Thread.sleep(1000);
+            } catch (Exception e) {
+                log.error("{}", e);
+            }
+
+        }
+
+
+    }
 
 }
 

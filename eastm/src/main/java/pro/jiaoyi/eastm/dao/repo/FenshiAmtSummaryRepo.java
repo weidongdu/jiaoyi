@@ -26,5 +26,5 @@ public interface FenshiAmtSummaryRepo extends JpaRepository<FenshiAmtSummaryEnti
     List<FenshiAmtSummaryEntity> findRecentDataByCode(String code, int n);
 
 
-
+    FenshiAmtSummaryEntity findByF12codeAndTradeDate(String f12code, String tradeDate);
 }

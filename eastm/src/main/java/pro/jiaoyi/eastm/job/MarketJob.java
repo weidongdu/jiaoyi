@@ -6,7 +6,9 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
 import pro.jiaoyi.common.util.BDUtil;
@@ -25,6 +27,7 @@ import pro.jiaoyi.eastm.service.FenshiAmtSummaryService;
 import pro.jiaoyi.eastm.service.ImgService;
 import pro.jiaoyi.eastm.service.SpeedService;
 import pro.jiaoyi.eastm.util.TradeTimeUtil;
+import pro.jiaoyi.eastm.util.sina.SinaTicktimeDataUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -43,7 +46,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static pro.jiaoyi.eastm.controller.StockController.CODE_REMARK_MAP;
 import static pro.jiaoyi.eastm.controller.StockController.MONITOR_CODE_AMT_MAP;
 
-//@Component
+@Component
 @Slf4j
 public class MarketJob {
     @Resource
@@ -114,6 +117,8 @@ public class MarketJob {
     @Resource
     private FenshiAmtSummaryService fenshiAmtSummaryService;
 
+    @Resource
+    private SinaTicktimeDataUtil sinaTicktimeDataUtil;
 
     @Scheduled(cron = "30 5 15 * * ?")
     public void runClose() {
@@ -127,6 +132,7 @@ public class MarketJob {
         if (list == null || list.isEmpty()) {
             return;
         }
+
         //过滤 一字板, hsl < 3%
         List<EmCList> yi = list.stream().filter(em ->
                 em.getF2Close().compareTo(BigDecimal.ONE) > 0
@@ -155,11 +161,32 @@ public class MarketJob {
             log.info("保存close成功: {}", entity.getF14Name());
         }
 
-        fenshiAmtSummaryService.executeSummary();
-
-
+//        fenshiAmtSummaryService.executeSummary();
+        runSinaJob(list);
     }
 
+    public void runSinaJob(List<EmCList> list) {
+        log.info("run sina fenshi tick job");
+        for (EmCList em : list) {
+
+            log.info("em={}", em);
+            if (em.getF5Vol().compareTo(BigDecimal.ONE) <= 0
+                    || em.getF2Close().compareTo(BigDecimal.ONE) <= 0
+                    || em.getF15High().compareTo(BigDecimal.ONE) <= 0) {
+                log.info("pass code:{},name:{},vol:{},close:{}", em.getF12Code(), em.getF14Name(), em.getF5Vol(), em.getF2Close());
+                continue;
+            }
+
+            String symbol = em.getF12Code();
+            String day = LocalDate.now().toString();
+            try {
+                sinaTicktimeDataUtil.getTicktimeData(symbol, day, true);
+                Thread.sleep(1000);
+            } catch (Exception e) {
+                log.error("{}", e);
+            }
+        }
+    }
 //    @Scheduled(cron = "30 0/10 * * * ?")
 //    @Async
 //    public void runThemePct() {
@@ -177,10 +204,23 @@ public class MarketJob {
         }
     }
 
-    @Scheduled(cron = "0/5 0/1 * * * ?")
-    public void runTrading() {
-        tradingAlert();
-    }
+
+    @Autowired
+    private ThreadPoolTaskExecutor taskExecutor;
+
+//    @Scheduled(cron = "0/5 * 9-15 ? * MON-FRI")
+//    public Future<Void> runTrading() {
+//        tradingAlert();
+//        return new AsyncResult<>(null);
+//    }
+
+
+//
+//    @Scheduled(cron = "0/5 0/1 * * * ?")
+//    public void runTrading() {
+//        log.info("runTrading");
+//        tradingAlert();
+//    }
 
 
     public void open(String source) {
@@ -210,9 +250,53 @@ public class MarketJob {
             openList = emClient.getClistDefaultSize(true);
         }
 
-        if (openList == null || openList.size() == 0) {
+        if (openList == null || openList.isEmpty()) {
             return;
         }
+
+
+        List<EmCList> openHigh = openList.stream().filter(
+                e -> e.getF3Pct().compareTo(BDUtil.B1) > 0
+                        && e.getF3Pct().abs().compareTo(BDUtil.B5) < 0
+                        && e.getF6Amt().compareTo(BDUtil.B1000W) > 0
+        ).toList();
+
+        try {
+            if (!openHigh.isEmpty()) {
+                for (EmCList em : openHigh) {
+                    log.info("高开: {}", em);
+                    String code = em.getF12Code();
+                    List<EmDailyK> kList = emClient.getDailyKs(code, LocalDate.now(), 100, true);
+                    if (kList == null || kList.size() < 100) {
+                        continue;
+                    }
+
+                    BigDecimal dayAmtTop10 = emClient.amtTop10p(kList);
+                    BigDecimal hourAmt = dayAmtTop10.divide(BigDecimal.valueOf(4), 0, RoundingMode.HALF_UP);
+                    BigDecimal fAmt = hourAmt.multiply(BDUtil.b0_1);
+                    if (em.getF6Amt().compareTo(BigDecimal.valueOf(20).multiply(fAmt)) > 0) {
+                        //满足放量20x
+                        boolean high30 = true;
+                        for (int i = 1; i <= 30; i++) {
+                            if (em.getF17Open().compareTo(kList.get(kList.size() - 1 - i).getClose()) < 0) {
+                                log.info("高开放量: {}", em);
+                                high30 = false;
+                                break;
+                            }
+                        }
+                        if (high30) {
+                            String content = "30k_高开_放量_" + em.getF14Name() + "_" + em.getF12Code();
+                            String encode = URLEncoder.encode(content, StandardCharsets.UTF_8);
+                            wxUtil.send(encode);
+                        }
+                    }
+
+                }
+            }
+        } catch (Exception e) {
+            log.error("{}", e);
+        }
+
 
         List<EmCList> fList = openList.stream().filter(
                 e -> e.getF3Pct().abs().compareTo(BDUtil.B1) < 0
@@ -579,7 +663,7 @@ public class MarketJob {
 
                 //i10 与 a10 比例
                 BigDecimal ida = BigDecimal.ZERO;
-                if (i10.compareTo(BigDecimal.ZERO) > 0 && a10.compareTo(BigDecimal.ZERO) > 0 ){
+                if (i10.compareTo(BigDecimal.ZERO) > 0 && a10.compareTo(BigDecimal.ZERO) > 0) {
                     ida = i10.divide(a10, 2, RoundingMode.HALF_UP);
                 }
 
@@ -935,8 +1019,8 @@ public class MarketJob {
     public void tick(List<EmCList> preList, List<EmCList> now, String market) {
         //要区分不同板块
 
-        if (preList == null || preList.size() == 0
-                || now == null || now.size() == 0) {
+        if (preList == null || preList.isEmpty()
+                || now == null || now.isEmpty()) {
             return;
         }
 
