@@ -234,7 +234,6 @@ public class DataController {
 
             try {
                 sinaTicktimeDataUtil.getTicktimeData(symbol, day, true);
-                Thread.sleep(1000);
             } catch (Exception e) {
                 log.error("{}", e);
             }
