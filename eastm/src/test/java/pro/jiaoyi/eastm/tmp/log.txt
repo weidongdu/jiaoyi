@@ -1,0 +1,1528 @@
+2024-03-05T13:35:44.494+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":90625822.00,"bk":"专业服务","close":13.83,"code":"300012","high":14.02,"hsl":0.43,"low":13.72,
+"name":"华测检测","open":13.88,"osc":2.16,"pct":-0.65,"pctChange":-0.09,"period":"day1","preClose":13.92,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":65592}
+
+2024-03-05T13:35:44.494+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:35:44.494+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=58 k={"amt":176475415.00,"bk":"专业服务","close":14.01,"code":"300012","high":14.10,"hsl":0.83,"low":13.54,
+"name":"华测检测","open":13.61,"osc":4.10,"pct":2.56,"pctChange":0.35,"period":"day1","preClose":13.66,
+"tradeDate":"20231228","tsClose":1703692800000,"tsOpen":1703692800000,"vol":127059}
+
+2024-03-05T13:35:44.494+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:35:45.499+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=74 k={"amt":78439569.00,"bk":"专业服务","close":9.29,"code":"300887","high":9.83,"hsl":2.27,"low":9.18,
+"name":"谱尼测试","open":9.82,"osc":6.63,"pct":-5.30,"pctChange":-0.52,"period":"day1","preClose":9.81,
+"tradeDate":"20240122","tsClose":1705852800000,"tsOpen":1705852800000,"vol":82252}
+
+2024-03-05T13:35:45.499+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:35:46.894+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=96 k={"amt":298903594.00,"bk":"专业服务","close":12.10,"code":"603776","high":12.10,"hsl":10.93,"low":10.68,
+"name":"永安行","open":10.79,"osc":12.91,"pct":10.00,"pctChange":1.10,"period":"day1","preClose":11.00,
+"tradeDate":"20240229","tsClose":1709136000000,"tsOpen":1709136000000,"vol":253793}
+
+2024-03-05T13:35:47.080+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=97 k={"amt":39239325.00,"bk":"专业服务","close":46.09,"code":"688293","high":46.10,"hsl":1.12,"low":43.99,
+"name":"奥浦迈","open":44.88,"osc":4.67,"pct":2.06,"pctChange":0.93,"period":"day1","preClose":45.16,
+"tradeDate":"20240301","tsClose":1709222400000,"tsOpen":1709222400000,"vol":8730}
+
+2024-03-05T13:35:48.212+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=95 k={"amt":989885019.53,"bk":"专用设备","close":13.19,"code":"002009","high":14.22,"hsl":18.85,"low":12.97,
+"name":"天奇股份","open":14.22,"osc":9.67,"pct":2.01,"pctChange":0.26,"period":"day1","preClose":12.93,
+"tradeDate":"20240228","tsClose":1709049600000,"tsOpen":1709049600000,"vol":704229}
+
+2024-03-05T13:35:48.460+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":17666868.00,"bk":"专用设备","close":8.78,"code":"002111","high":8.94,"hsl":0.42,"low":8.75,
+"name":"威海广泰","open":8.91,"osc":2.13,"pct":-1.57,"pctChange":-0.14,"period":"day1","preClose":8.92,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":20065}
+
+2024-03-05T13:35:48.460+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:35:48.596+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=97 k={"amt":18743625.00,"bk":"专用设备","close":11.25,"code":"002209","high":11.25,"hsl":1.08,"low":11.25,
+"name":"达 意 隆","open":11.25,"osc":0.00,"pct":9.97,"pctChange":1.02,"period":"day1","preClose":10.23,
+"tradeDate":"20240301","tsClose":1709222400000,"tsOpen":1709222400000,"vol":16661}
+
+2024-03-05T13:35:48.596+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:35:49.197+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":94276542.25,"bk":"专用设备","close":5.77,"code":"002529","high":6.46,"hsl":6.19,"low":5.77,
+"name":"海源复材","open":6.44,"osc":10.76,"pct":-9.98,"pctChange":-0.64,"period":"day1","preClose":6.41,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":160812}
+
+2024-03-05T13:35:49.197+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:35:55.060+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=96 k={"amt":332998056.00,"bk":"专用设备","close":34.59,"code":"301338","high":34.59,"hsl":29.50,"low":29.11,
+"name":"凯格精机","open":29.90,"osc":16.92,"pct":6.83,"pctChange":2.21,"period":"day1","preClose":32.38,
+"tradeDate":"20240229","tsClose":1709136000000,"tsOpen":1709136000000,"vol":101177}
+
+2024-03-05T13:35:55.233+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=96 k={"amt":362223210.00,"bk":"专用设备","close":61.22,"code":"301512","high":61.67,"hsl":47.91,"low":53.97,
+"name":"智信精密","open":58.00,"osc":13.41,"pct":6.66,"pctChange":3.82,"period":"day1","preClose":57.40,
+"tradeDate":"20240229","tsClose":1709136000000,"tsOpen":1709136000000,"vol":63875}
+
+2024-03-05T13:35:58.122+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=93 k={"amt":37184429.00,"bk":"专用设备","close":21.16,"code":"603337","high":21.28,"hsl":0.37,"low":20.50,
+"name":"杰克股份","open":20.54,"osc":3.79,"pct":2.87,"pctChange":0.59,"period":"day1","preClose":20.57,
+"tradeDate":"20240226","tsClose":1708876800000,"tsOpen":1708876800000,"vol":17744}
+
+2024-03-05T13:35:58.954+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=91 k={"amt":145662994.00,"bk":"专用设备","close":30.83,"code":"603960","high":30.83,"hsl":1.81,"low":30.83,
+"name":"克来机电","open":30.83,"osc":0.00,"pct":9.99,"pctChange":2.80,"period":"day1","preClose":28.03,
+"tradeDate":"20240222","tsClose":1708531200000,"tsOpen":1708531200000,"vol":47247}
+
+2024-03-05T13:35:58.954+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:35:59.037+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=76 k={"amt":35258696.00,"bk":"专用设备","close":25.64,"code":"688001","high":26.28,"hsl":0.32,"low":24.60,
+"name":"华兴源创","open":26.01,"osc":6.54,"pct":-0.12,"pctChange":-0.03,"period":"day1","preClose":25.67,
+"tradeDate":"20240124","tsClose":1706025600000,"tsOpen":1706025600000,"vol":13946}
+
+2024-03-05T13:35:59.037+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:35:59.198+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=68 k={"amt":63538769.00,"bk":"专用设备","close":26.89,"code":"688097","high":28.12,"hsl":2.51,"low":26.84,
+"name":"博众精工","open":28.12,"osc":4.57,"pct":-4.07,"pctChange":-1.14,"period":"day1","preClose":28.03,
+"tradeDate":"20240112","tsClose":1704988800000,"tsOpen":1704988800000,"vol":23297}
+
+2024-03-05T13:35:59.198+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:35:59.658+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=84 k={"amt":43262831.00,"bk":"专用设备","close":33.08,"code":"688290","high":35.21,"hsl":2.21,"low":31.20,
+"name":"景业智能","open":34.17,"osc":11.74,"pct":-3.19,"pctChange":-1.09,"period":"day1","preClose":34.17,
+"tradeDate":"20240205","tsClose":1707062400000,"tsOpen":1707062400000,"vol":13300}
+
+2024-03-05T13:35:59.658+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:35:59.738+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":190494227.00,"bk":"专用设备","close":15.00,"code":"688328","high":17.00,"hsl":20.07,"low":14.21,
+"name":"深科达","open":17.00,"osc":16.64,"pct":-10.55,"pctChange":-1.77,"period":"day1","preClose":16.77,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":123488}
+
+2024-03-05T13:35:59.811+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=78 k={"amt":63732408.00,"bk":"专用设备","close":18.54,"code":"688377","high":19.73,"hsl":1.74,"low":18.30,
+"name":"迪威尔","open":19.50,"osc":7.33,"pct":-4.92,"pctChange":-0.96,"period":"day1","preClose":19.50,
+"tradeDate":"20240126","tsClose":1706198400000,"tsOpen":1706198400000,"vol":33925}
+
+2024-03-05T13:35:59.812+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:05.329+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=57 k={"amt":59470983.00,"bk":"中药","close":2.51,"code":"600252","high":2.53,"hsl":0.69,"low":2.48,
+"name":"中恒集团","open":2.52,"osc":1.99,"pct":0.00,"pctChange":0.00,"period":"day1","preClose":2.51,
+"tradeDate":"20231227","tsClose":1703606400000,"tsOpen":1703606400000,"vol":237772}
+
+2024-03-05T13:36:05.329+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:05.329+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=59 k={"amt":86200590.00,"bk":"中药","close":2.51,"code":"600252","high":2.53,"hsl":1.00,"low":2.51,
+"name":"中恒集团","open":2.51,"osc":0.79,"pct":-0.40,"pctChange":-0.01,"period":"day1","preClose":2.52,
+"tradeDate":"20231229","tsClose":1703779200000,"tsOpen":1703779200000,"vol":342197}
+
+2024-03-05T13:36:05.329+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:05.830+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=72 k={"amt":138746009.00,"bk":"中药","close":56.33,"code":"600976","high":57.02,"hsl":1.63,"low":54.55,
+"name":"健民集团","open":56.96,"osc":4.31,"pct":-1.69,"pctChange":-0.97,"period":"day1","preClose":57.30,
+"tradeDate":"20240118","tsClose":1705507200000,"tsOpen":1705507200000,"vol":24954}
+
+2024-03-05T13:36:05.830+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:06.507+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":28465497.00,"bk":"中药","close":14.82,"code":"605199","high":15.06,"hsl":0.48,"low":14.81,
+"name":"葫芦娃","open":15.00,"osc":1.67,"pct":-1.20,"pctChange":-0.18,"period":"day1","preClose":15.00,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":19099}
+
+2024-03-05T13:36:06.508+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:06.806+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=94 k={"amt":587733523.15,"bk":"互联网服务","close":2.94,"code":"002195","high":2.94,"hsl":3.63,"low":2.76,
+"name":"岩山科技","open":2.78,"osc":6.45,"pct":5.38,"pctChange":0.15,"period":"day1","preClose":2.79,
+"tradeDate":"20240227","tsClose":1708963200000,"tsOpen":1708963200000,"vol":2050719}
+
+2024-03-05T13:36:06.849+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=54 k={"amt":193639318.96,"bk":"互联网服务","close":16.33,"code":"002232","high":16.87,"hsl":2.87,"low":16.21,
+"name":"启明信息","open":16.68,"osc":3.94,"pct":-2.45,"pctChange":-0.41,"period":"day1","preClose":16.74,
+"tradeDate":"20231222","tsClose":1703174400000,"tsOpen":1703174400000,"vol":117244}
+
+2024-03-05T13:36:06.849+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:07.434+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":53381905.00,"bk":"互联网服务","close":5.35,"code":"002766","high":5.41,"hsl":1.18,"low":5.28,
+"name":"索菱股份","open":5.37,"osc":2.42,"pct":-0.56,"pctChange":-0.03,"period":"day1","preClose":5.38,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":99987}
+
+2024-03-05T13:36:07.435+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:10.847+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":92058251.00,"bk":"互联网服务","close":5.84,"code":"300290","high":5.96,"hsl":2.46,"low":5.79,
+"name":"荣科科技","open":5.96,"osc":2.88,"pct":-1.18,"pctChange":-0.07,"period":"day1","preClose":5.91,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":157523}
+
+2024-03-05T13:36:10.847+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:11.502+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=96 k={"amt":358547278.00,"bk":"互联网服务","close":12.49,"code":"300399","high":12.86,"hsl":16.58,"low":10.00,
+"name":"天利科技","open":10.94,"osc":24.44,"pct":6.75,"pctChange":0.79,"period":"day1","preClose":11.70,
+"tradeDate":"20240229","tsClose":1709136000000,"tsOpen":1709136000000,"vol":321173}
+
+2024-03-05T13:36:13.300+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":9359773.00,"bk":"互联网服务","close":1.53,"code":"600070","high":1.65,"hsl":1.16,"low":1.53,
+"name":"ST富润","open":1.60,"osc":7.45,"pct":-4.97,"pctChange":-0.08,"period":"day1","preClose":1.61,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":58973}
+
+2024-03-05T13:36:13.300+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:14.089+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=69 k={"amt":227743857.00,"bk":"互联网服务","close":44.25,"code":"600845","high":44.64,"hsl":0.30,"low":43.97,
+"name":"宝信软件","open":44.47,"osc":1.51,"pct":-0.52,"pctChange":-0.23,"period":"day1","preClose":44.48,
+"tradeDate":"20240115","tsClose":1705248000000,"tsOpen":1705248000000,"vol":51452}
+
+2024-03-05T13:36:14.089+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:16.580+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=84 k={"amt":10168489.06,"bk":"互联网服务","close":8.90,"code":"833030","high":9.55,"hsl":5.06,"low":8.50,
+"name":"立方控股","open":9.40,"osc":11.08,"pct":-6.12,"pctChange":-0.58,"period":"day1","preClose":9.48,
+"tradeDate":"20240205","tsClose":1707062400000,"tsOpen":1707062400000,"vol":11327}
+
+2024-03-05T13:36:16.580+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:17.779+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":20248121.00,"bk":"交运设备","close":38.10,"code":"301322","high":38.98,"hsl":2.01,"low":38.06,
+"name":"绿通科技","open":38.81,"osc":2.37,"pct":-1.83,"pctChange":-0.71,"period":"day1","preClose":38.81,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":5274}
+
+2024-03-05T13:36:17.779+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:18.140+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=96 k={"amt":243886893.00,"bk":"交运设备","close":12.98,"code":"600818","high":12.98,"hsl":8.15,"low":12.09,
+"name":"中路股份","open":12.61,"osc":6.95,"pct":1.41,"pctChange":0.18,"period":"day1","preClose":12.80,
+"tradeDate":"20240229","tsClose":1709136000000,"tsOpen":1709136000000,"vol":193961}
+
+2024-03-05T13:36:18.140+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:36:22.523+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=76 k={"amt":23857824.00,"bk":"仪器仪表","close":35.33,"code":"688610","high":36.29,"hsl":4.75,"low":33.90,
+"name":"埃科光电","open":35.63,"osc":6.69,"pct":-1.12,"pctChange":-0.40,"period":"day1","preClose":35.73,
+"tradeDate":"20240124","tsClose":1706025600000,"tsOpen":1706025600000,"vol":6847}
+
+2024-03-05T13:36:22.523+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:25.271+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=84 k={"amt":412944507.00,"bk":"光伏设备","close":17.80,"code":"601865","high":18.75,"hsl":1.22,"low":17.09,
+"name":"福莱特","open":18.60,"osc":9.07,"pct":-2.79,"pctChange":-0.51,"period":"day1","preClose":18.31,
+"tradeDate":"20240205","tsClose":1707062400000,"tsOpen":1707062400000,"vol":231073}
+
+2024-03-05T13:36:25.659+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=84 k={"amt":178231074.00,"bk":"光伏设备","close":164.03,"code":"688032","high":171.82,"hsl":2.59,"low":156.00,
+"name":"禾迈股份","open":171.00,"osc":9.24,"pct":-4.16,"pctChange":-7.12,"period":"day1","preClose":171.15,
+"tradeDate":"20240205","tsClose":1707062400000,"tsOpen":1707062400000,"vol":10858}
+
+2024-03-05T13:36:27.345+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=56 k={"amt":217780877.78,"bk":"光伏设备","close":10.16,"code":"834770","high":10.86,"hsl":32.82,"low":9.44,
+"name":"艾能聚","open":10.00,"osc":14.06,"pct":0.59,"pctChange":0.06,"period":"day1","preClose":10.10,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":215988}
+
+2024-03-05T13:36:27.345+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:36:28.080+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=97 k={"amt":2826205225.19,"bk":"光学光电子","close":4.11,"code":"000725","high":4.11,"hsl":1.89,"low":3.99,
+"name":"京东方Ａ","open":3.99,"osc":3.01,"pct":3.01,"pctChange":0.12,"period":"day1","preClose":3.99,
+"tradeDate":"20240301","tsClose":1709222400000,"tsOpen":1709222400000,"vol":6960233}
+
+2024-03-05T13:36:28.080+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:36:28.101+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=94 k={"amt":187774552.45,"bk":"光学光电子","close":2.55,"code":"000727","high":2.55,"hsl":1.65,"low":2.47,
+"name":"冠捷科技","open":2.47,"osc":3.21,"pct":2.41,"pctChange":0.06,"period":"day1","preClose":2.49,
+"tradeDate":"20240227","tsClose":1708963200000,"tsOpen":1708963200000,"vol":747530}
+
+2024-03-05T13:36:28.403+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=52 k={"amt":87538939.46,"bk":"光学光电子","close":2.57,"code":"002217","high":2.64,"hsl":1.08,"low":2.57,
+"name":"合力泰","open":2.62,"osc":2.67,"pct":-1.91,"pctChange":-0.05,"period":"day1","preClose":2.62,
+"tradeDate":"20231220","tsClose":1703001600000,"tsOpen":1703001600000,"vol":337711}
+
+2024-03-05T13:36:28.403+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:28.836+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=94 k={"amt":1633927424.05,"bk":"光学光电子","close":7.98,"code":"002456","high":8.08,"hsl":6.43,"low":7.64,
+"name":"欧菲光","open":7.70,"osc":5.67,"pct":2.84,"pctChange":0.22,"period":"day1","preClose":7.76,
+"tradeDate":"20240227","tsClose":1708963200000,"tsOpen":1708963200000,"vol":2082855}
+
+2024-03-05T13:36:28.836+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:36:28.836+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=96 k={"amt":2008349965.44,"bk":"光学光电子","close":8.16,"code":"002456","high":8.16,"hsl":7.92,"low":7.35,
+"name":"欧菲光","open":7.35,"osc":10.92,"pct":9.97,"pctChange":0.74,"period":"day1","preClose":7.42,
+"tradeDate":"20240229","tsClose":1709136000000,"tsOpen":1709136000000,"vol":2566248}
+
+2024-03-05T13:36:28.836+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:36:29.014+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":10344728.00,"bk":"光学光电子","close":4.77,"code":"002808","high":4.82,"hsl":1.17,"low":4.72,
+"name":"ST恒久","open":4.77,"osc":2.08,"pct":-0.83,"pctChange":-0.04,"period":"day1","preClose":4.81,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":21729}
+
+2024-03-05T13:36:29.014+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:29.014+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=87 k={"amt":23228914.68,"bk":"光学光电子","close":2.95,"code":"002808","high":3.00,"hsl":4.32,"low":2.81,
+"name":"ST恒久","open":2.81,"osc":6.42,"pct":-0.34,"pctChange":-0.01,"period":"day1","preClose":2.96,
+"tradeDate":"20240208","tsClose":1707321600000,"tsOpen":1707321600000,"vol":80420}
+
+2024-03-05T13:36:29.122+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=60 k={"amt":620403743.87,"bk":"光学光电子","close":42.64,"code":"002952","high":42.64,"hsl":11.23,"low":40.01,
+"name":"亚世光电","open":40.58,"osc":6.79,"pct":10.01,"pctChange":3.88,"period":"day1","preClose":38.76,
+"tradeDate":"20240102","tsClose":1704124800000,"tsOpen":1704124800000,"vol":148239}
+
+2024-03-05T13:36:29.122+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:36:29.204+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":338004344.14,"bk":"光学光电子","close":9.23,"code":"002962","high":10.22,"hsl":16.70,"low":9.23,
+"name":"五方光电","open":10.22,"osc":9.65,"pct":-10.04,"pctChange":-1.03,"period":"day1","preClose":10.26,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":349459}
+
+2024-03-05T13:36:29.204+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:33.091+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=54 k={"amt":95054029.00,"bk":"光学光电子","close":2.47,"code":"688538","high":2.51,"hsl":0.67,"low":2.46,
+"name":"和辉光电-U","open":2.50,"osc":2.00,"pct":-1.20,"pctChange":-0.03,"period":"day1","preClose":2.50,
+"tradeDate":"20231222","tsClose":1703174400000,"tsOpen":1703174400000,"vol":383753}
+
+2024-03-05T13:36:33.091+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:34.935+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":126674128.91,"bk":"农牧饲渔","close":13.95,"code":"000998","high":14.01,"hsl":0.70,"low":13.83,
+"name":"隆平高科","open":13.96,"osc":1.29,"pct":-0.21,"pctChange":-0.03,"period":"day1","preClose":13.98,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":90983}
+
+2024-03-05T13:36:34.935+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:34.935+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=59 k={"amt":184729008.80,"bk":"农牧饲渔","close":14.10,"code":"000998","high":14.10,"hsl":1.01,"low":13.96,
+"name":"隆平高科","open":14.01,"osc":1.00,"pct":0.79,"pctChange":0.11,"period":"day1","preClose":13.99,
+"tradeDate":"20231229","tsClose":1703779200000,"tsOpen":1703779200000,"vol":131463}
+
+2024-03-05T13:36:34.935+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:36.169+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=74 k={"amt":55336966.00,"bk":"农牧饲渔","close":10.74,"code":"300138","high":11.40,"hsl":1.17,"low":10.61,
+"name":"晨光生物","open":11.38,"osc":6.95,"pct":-5.46,"pctChange":-0.62,"period":"day1","preClose":11.36,
+"tradeDate":"20240122","tsClose":1705852800000,"tsOpen":1705852800000,"vol":50478}
+
+2024-03-05T13:36:36.169+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:36.954+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=52 k={"amt":46547011.00,"bk":"农牧饲渔","close":7.09,"code":"600127","high":7.21,"hsl":1.02,"low":7.07,
+"name":"金健米业","open":7.14,"osc":1.96,"pct":-0.56,"pctChange":-0.04,"period":"day1","preClose":7.13,
+"tradeDate":"20231220","tsClose":1703001600000,"tsOpen":1703001600000,"vol":65286}
+
+2024-03-05T13:36:36.954+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:37.559+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":37404864.00,"bk":"农牧饲渔","close":2.02,"code":"600811","high":2.03,"hsl":0.51,"low":2.00,
+"name":"东方集团","open":2.02,"osc":1.48,"pct":-0.49,"pctChange":-0.01,"period":"day1","preClose":2.03,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":185968}
+
+2024-03-05T13:36:37.559+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:37.744+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":20140803.00,"bk":"农牧饲渔","close":6.28,"code":"600965","high":6.38,"hsl":0.39,"low":6.24,
+"name":"福成股份","open":6.33,"osc":2.21,"pct":-0.79,"pctChange":-0.05,"period":"day1","preClose":6.33,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":31970}
+
+2024-03-05T13:36:37.744+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:42.794+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=52 k={"amt":23946256.56,"bk":"包装材料","close":2.40,"code":"000659","high":2.46,"hsl":0.77,"low":2.40,
+"name":"珠海中富","open":2.42,"osc":2.48,"pct":-0.83,"pctChange":-0.02,"period":"day1","preClose":2.42,
+"tradeDate":"20231220","tsClose":1703001600000,"tsOpen":1703001600000,"vol":98768}
+
+2024-03-05T13:36:42.794+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:43.558+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":84351669.33,"bk":"包装材料","close":6.85,"code":"002735","high":7.35,"hsl":6.28,"low":6.69,
+"name":"王子新材","open":7.25,"osc":9.17,"pct":-4.86,"pctChange":-0.35,"period":"day1","preClose":7.20,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":120143}
+
+2024-03-05T13:36:43.601+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=75 k={"amt":36028294.42,"bk":"包装材料","close":7.49,"code":"002787","high":7.69,"hsl":1.95,"low":7.37,
+"name":"华源控股","open":7.65,"osc":4.20,"pct":-1.71,"pctChange":-0.13,"period":"day1","preClose":7.62,
+"tradeDate":"20240123","tsClose":1705939200000,"tsOpen":1705939200000,"vol":48242}
+
+2024-03-05T13:36:43.601+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:48.050+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=52 k={"amt":43649136.00,"bk":"化学制品","close":17.86,"code":"300109","high":18.24,"hsl":0.85,"low":17.78,
+"name":"新开源","open":18.05,"osc":2.56,"pct":-0.78,"pctChange":-0.14,"period":"day1","preClose":18.00,
+"tradeDate":"20231220","tsClose":1703001600000,"tsOpen":1703001600000,"vol":24358}
+
+2024-03-05T13:36:48.050+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:48.074+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=52 k={"amt":102070776.00,"bk":"化学制品","close":3.23,"code":"300135","high":3.30,"hsl":3.40,"low":3.21,
+"name":"宝利国际","open":3.26,"osc":2.76,"pct":-0.92,"pctChange":-0.03,"period":"day1","preClose":3.26,
+"tradeDate":"20231220","tsClose":1703001600000,"tsOpen":1703001600000,"vol":313062}
+
+2024-03-05T13:36:48.074+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:51.953+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=57 k={"amt":111688984.00,"bk":"化学制品","close":8.22,"code":"600352","high":8.30,"hsl":0.42,"low":8.10,
+"name":"浙江龙盛","open":8.28,"osc":2.41,"pct":-0.84,"pctChange":-0.07,"period":"day1","preClose":8.29,
+"tradeDate":"20231227","tsClose":1703606400000,"tsOpen":1703606400000,"vol":136484}
+
+2024-03-05T13:36:51.953+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:52.562+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=52 k={"amt":60163561.00,"bk":"化学制品","close":41.86,"code":"603026","high":42.95,"hsl":0.70,"low":41.78,
+"name":"胜华新材","open":42.52,"osc":2.74,"pct":-1.81,"pctChange":-0.77,"period":"day1","preClose":42.63,
+"tradeDate":"20231220","tsClose":1703001600000,"tsOpen":1703001600000,"vol":14285}
+
+2024-03-05T13:36:52.562+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:52.698+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":121267132.00,"bk":"化学制品","close":23.17,"code":"603110","high":24.83,"hsl":2.57,"low":22.80,
+"name":"东方材料","open":24.79,"osc":8.26,"pct":-5.77,"pctChange":-1.42,"period":"day1","preClose":24.59,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":51689}
+
+2024-03-05T13:36:52.698+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:54.539+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=84 k={"amt":74564403.00,"bk":"化学制品","close":9.19,"code":"605399","high":10.06,"hsl":2.53,"low":9.19,
+"name":"晨光新材","open":10.06,"osc":8.52,"pct":-9.99,"pctChange":-1.02,"period":"day1","preClose":10.21,
+"tradeDate":"20240205","tsClose":1707062400000,"tsOpen":1707062400000,"vol":78951}
+
+2024-03-05T13:36:54.539+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:54.675+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=76 k={"amt":19282971.00,"bk":"化学制品","close":13.63,"code":"688129","high":14.09,"hsl":1.18,"low":13.07,
+"name":"东来技术","open":13.66,"osc":7.46,"pct":-0.29,"pctChange":-0.04,"period":"day1","preClose":13.67,
+"tradeDate":"20240124","tsClose":1706025600000,"tsOpen":1706025600000,"vol":14214}
+
+2024-03-05T13:36:54.675+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:55.658+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":81410613.90,"bk":"化学制药","close":14.95,"code":"000623","high":15.05,"hsl":0.47,"low":14.89,
+"name":"吉林敖东","open":14.99,"osc":1.07,"pct":-0.20,"pctChange":-0.03,"period":"day1","preClose":14.98,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":54463}
+
+2024-03-05T13:36:55.658+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:56.169+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=94 k={"amt":70267250.71,"bk":"化学制药","close":5.67,"code":"002099","high":5.67,"hsl":0.78,"low":5.38,
+"name":"海翔药业","open":5.40,"osc":5.36,"pct":4.81,"pctChange":0.26,"period":"day1","preClose":5.41,
+"tradeDate":"20240227","tsClose":1708963200000,"tsOpen":1708963200000,"vol":126577}
+
+2024-03-05T13:36:56.232+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=52 k={"amt":23483433.73,"bk":"化学制药","close":2.73,"code":"002102","high":2.79,"hsl":0.37,"low":2.72,
+"name":"冠福股份","open":2.77,"osc":2.53,"pct":-1.44,"pctChange":-0.04,"period":"day1","preClose":2.77,
+"tradeDate":"20231220","tsClose":1703001600000,"tsOpen":1703001600000,"vol":85142}
+
+2024-03-05T13:36:56.232+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:56.324+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=94 k={"amt":67315929.00,"bk":"化学制药","close":10.88,"code":"002332","high":10.88,"hsl":0.64,"low":10.60,
+"name":"仙琚制药","open":10.61,"osc":2.63,"pct":2.16,"pctChange":0.23,"period":"day1","preClose":10.65,
+"tradeDate":"20240227","tsClose":1708963200000,"tsOpen":1708963200000,"vol":62606}
+
+2024-03-05T13:36:56.775+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=76 k={"amt":33121436.16,"bk":"化学制药","close":9.94,"code":"002923","high":10.19,"hsl":1.31,"low":9.59,
+"name":"润都股份","open":9.93,"osc":6.03,"pct":-0.10,"pctChange":-0.01,"period":"day1","preClose":9.95,
+"tradeDate":"20240124","tsClose":1706025600000,"tsOpen":1706025600000,"vol":33653}
+
+2024-03-05T13:36:56.775+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:58.325+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=57 k={"amt":37124313.00,"bk":"化学制药","close":7.27,"code":"300381","high":7.39,"hsl":1.05,"low":7.13,
+"name":"溢多利","open":7.26,"osc":3.54,"pct":-1.09,"pctChange":-0.08,"period":"day1","preClose":7.35,
+"tradeDate":"20231227","tsClose":1703606400000,"tsOpen":1703606400000,"vol":51260}
+
+2024-03-05T13:36:58.325+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:58.584+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=76 k={"amt":31239447.00,"bk":"化学制药","close":8.55,"code":"300636","high":8.68,"hsl":1.26,"low":8.26,
+"name":"同和药业","open":8.60,"osc":4.88,"pct":-0.58,"pctChange":-0.05,"period":"day1","preClose":8.60,
+"tradeDate":"20240124","tsClose":1706025600000,"tsOpen":1706025600000,"vol":36842}
+
+2024-03-05T13:36:58.584+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:58.931+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":22830488.00,"bk":"化学制药","close":27.24,"code":"301130","high":27.66,"hsl":1.44,"low":27.13,
+"name":"西点药业","open":27.63,"osc":1.92,"pct":-1.48,"pctChange":-0.41,"period":"day1","preClose":27.65,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":8348}
+
+2024-03-05T13:36:58.931+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:59.533+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=57 k={"amt":34416171.00,"bk":"化学制药","close":5.80,"code":"600812","high":5.83,"hsl":0.36,"low":5.76,
+"name":"华北制药","open":5.79,"osc":1.21,"pct":0.00,"pctChange":0.00,"period":"day1","preClose":5.80,
+"tradeDate":"20231227","tsClose":1703606400000,"tsOpen":1703606400000,"vol":59416}
+
+2024-03-05T13:36:59.533+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:59.795+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=52 k={"amt":40160659.00,"bk":"化学制药","close":14.18,"code":"603520","high":14.65,"hsl":0.82,"low":14.18,
+"name":"司太立","open":14.40,"osc":3.27,"pct":-1.25,"pctChange":-0.18,"period":"day1","preClose":14.36,
+"tradeDate":"20231220","tsClose":1703001600000,"tsOpen":1703001600000,"vol":27977}
+
+2024-03-05T13:36:59.795+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:00.125+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":24746025.00,"bk":"化学制药","close":9.10,"code":"688189","high":9.27,"hsl":0.99,"low":9.07,
+"name":"南新制药","open":9.27,"osc":2.16,"pct":-1.62,"pctChange":-0.15,"period":"day1","preClose":9.25,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":27073}
+
+2024-03-05T13:37:00.125+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:00.160+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=57 k={"amt":30371257.00,"bk":"化学制药","close":9.34,"code":"688221","high":9.52,"hsl":1.51,"low":9.23,
+"name":"前沿生物-U","open":9.50,"osc":3.05,"pct":-1.89,"pctChange":-0.18,"period":"day1","preClose":9.52,
+"tradeDate":"20231227","tsClose":1703606400000,"tsOpen":1703606400000,"vol":32460}
+
+2024-03-05T13:37:00.160+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:00.294+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=94 k={"amt":33201865.00,"bk":"化学制药","close":12.81,"code":"688553","high":12.84,"hsl":0.90,"low":12.50,
+"name":"汇宇制药-W","open":12.58,"osc":2.69,"pct":1.43,"pctChange":0.18,"period":"day1","preClose":12.63,
+"tradeDate":"20240227","tsClose":1708963200000,"tsOpen":1708963200000,"vol":26132}
+
+2024-03-05T13:37:00.733+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=52 k={"amt":46018710.39,"bk":"化学原料","close":8.86,"code":"000422","high":9.02,"hsl":0.57,"low":8.85,
+"name":"湖北宜化","open":8.89,"osc":1.91,"pct":-0.34,"pctChange":-0.03,"period":"day1","preClose":8.89,
+"tradeDate":"20231220","tsClose":1703001600000,"tsOpen":1703001600000,"vol":51494}
+
+2024-03-05T13:37:00.733+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:00.836+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=54 k={"amt":299908333.91,"bk":"化学原料","close":5.67,"code":"000683","high":5.78,"hsl":1.61,"low":5.59,
+"name":"远兴能源","open":5.75,"osc":3.32,"pct":-0.87,"pctChange":-0.05,"period":"day1","preClose":5.72,
+"tradeDate":"20231222","tsClose":1703174400000,"tsOpen":1703174400000,"vol":527224}
+
+2024-03-05T13:37:00.836+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:01.043+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=85 k={"amt":155405423.00,"bk":"化学原料","close":8.70,"code":"001217","high":9.15,"hsl":13.76,"low":8.06,
+"name":"华尔泰","open":8.68,"osc":12.17,"pct":-2.90,"pctChange":-0.26,"period":"day1","preClose":8.96,
+"tradeDate":"20240206","tsClose":1707148800000,"tsOpen":1707148800000,"vol":182891}
+
+2024-03-05T13:37:04.464+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=72 k={"amt":63357787.00,"bk":"化学原料","close":7.30,"code":"603113","high":7.45,"hsl":1.04,"low":7.03,
+"name":"金能科技","open":7.44,"osc":5.64,"pct":-2.01,"pctChange":-0.15,"period":"day1","preClose":7.45,
+"tradeDate":"20240118","tsClose":1705507200000,"tsOpen":1705507200000,"vol":87903}
+
+2024-03-05T13:37:04.464+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:05.297+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":50108396.80,"bk":"化纤行业","close":4.85,"code":"002206","high":4.91,"hsl":1.13,"low":4.80,
+"name":"海 利 得","open":4.87,"osc":2.26,"pct":-0.41,"pctChange":-0.02,"period":"day1","preClose":4.87,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":103311}
+
+2024-03-05T13:37:05.297+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:05.319+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=94 k={"amt":104239850.88,"bk":"化纤行业","close":12.32,"code":"002254","high":12.33,"hsl":1.06,"low":11.91,
+"name":"泰和新材","open":12.02,"osc":3.49,"pct":2.50,"pctChange":0.30,"period":"day1","preClose":12.02,
+"tradeDate":"20240227","tsClose":1708963200000,"tsOpen":1708963200000,"vol":85869}
+
+2024-03-05T13:37:05.357+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=72 k={"amt":317956708.60,"bk":"化纤行业","close":9.28,"code":"002493","high":9.42,"hsl":0.36,"low":9.08,
+"name":"荣盛石化","open":9.30,"osc":3.62,"pct":-1.07,"pctChange":-0.10,"period":"day1","preClose":9.38,
+"tradeDate":"20240118","tsClose":1705507200000,"tsOpen":1705507200000,"vol":344885}
+
+2024-03-05T13:37:05.357+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:07.871+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=87 k={"amt":71639458.00,"bk":"化肥行业","close":5.00,"code":"600078","high":5.08,"hsl":2.20,"low":4.85,
+"name":"ST澄星","open":4.85,"osc":4.51,"pct":-1.96,"pctChange":-0.10,"period":"day1","preClose":5.10,
+"tradeDate":"20240208","tsClose":1707321600000,"tsOpen":1707321600000,"vol":145566}
+
+2024-03-05T13:37:08.091+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=72 k={"amt":68725483.00,"bk":"化肥行业","close":2.99,"code":"600691","high":3.05,"hsl":0.98,"low":2.89,
+"name":"阳煤化工","open":3.04,"osc":5.25,"pct":-1.97,"pctChange":-0.06,"period":"day1","preClose":3.05,
+"tradeDate":"20240118","tsClose":1705507200000,"tsOpen":1705507200000,"vol":233096}
+
+2024-03-05T13:37:08.091+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:08.424+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=76 k={"amt":69917421.40,"bk":"医疗器械","close":8.17,"code":"002022","high":8.38,"hsl":1.68,"low":7.89,
+"name":"科华生物","open":8.22,"osc":5.98,"pct":-0.24,"pctChange":-0.02,"period":"day1","preClose":8.19,
+"tradeDate":"20240124","tsClose":1706025600000,"tsOpen":1706025600000,"vol":86178}
+
+2024-03-05T13:37:08.424+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:11.384+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":27937077.00,"bk":"医疗器械","close":32.74,"code":"301122","high":33.27,"hsl":1.93,"low":32.33,
+"name":"采纳股份","open":33.13,"osc":2.84,"pct":-1.00,"pctChange":-0.33,"period":"day1","preClose":33.07,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":8544}
+
+2024-03-05T13:37:11.384+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:12.159+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=87 k={"amt":31338386.00,"bk":"医疗器械","close":3.38,"code":"603880","high":3.39,"hsl":3.29,"low":3.29,
+"name":"ST南卫","open":3.29,"osc":2.89,"pct":-2.31,"pctChange":-0.08,"period":"day1","preClose":3.46,
+"tradeDate":"20240208","tsClose":1707321600000,"tsOpen":1707321600000,"vol":95087}
+
+2024-03-05T13:37:12.159+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:12.217+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":36734051.00,"bk":"医疗器械","close":9.39,"code":"603987","high":9.55,"hsl":0.89,"low":9.26,
+"name":"康德莱","open":9.52,"osc":3.06,"pct":-0.84,"pctChange":-0.08,"period":"day1","preClose":9.47,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":39182}
+
+2024-03-05T13:37:12.217+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:14.020+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=52 k={"amt":166844757.00,"bk":"医疗器械","close":85.28,"code":"688114","high":87.02,"hsl":0.92,"low":84.68,
+"name":"华大智造","open":85.81,"osc":2.72,"pct":-1.02,"pctChange":-0.88,"period":"day1","preClose":86.16,
+"tradeDate":"20231220","tsClose":1703001600000,"tsOpen":1703001600000,"vol":19525}
+
+2024-03-05T13:37:14.020+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:15.051+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=75 k={"amt":22928942.00,"bk":"医疗器械","close":20.11,"code":"688393","high":20.67,"hsl":1.22,"low":19.89,
+"name":"安必平","open":20.36,"osc":3.78,"pct":-2.62,"pctChange":-0.54,"period":"day1","preClose":20.65,
+"tradeDate":"20240123","tsClose":1705939200000,"tsOpen":1705939200000,"vol":11379}
+
+2024-03-05T13:37:15.051+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:15.148+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=76 k={"amt":38422218.00,"bk":"医疗器械","close":8.50,"code":"688468","high":8.77,"hsl":1.65,"low":8.32,
+"name":"科美诊断","open":8.72,"osc":5.21,"pct":-1.62,"pctChange":-0.14,"period":"day1","preClose":8.64,
+"tradeDate":"20240124","tsClose":1706025600000,"tsOpen":1706025600000,"vol":45315}
+
+2024-03-05T13:37:15.148+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:16.175+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=94 k={"amt":235001856.28,"bk":"医疗服务","close":6.71,"code":"000516","high":6.71,"hsl":1.62,"low":6.42,
+"name":"国际医学","open":6.50,"osc":4.45,"pct":2.91,"pctChange":0.19,"period":"day1","preClose":6.52,
+"tradeDate":"20240227","tsClose":1708963200000,"tsOpen":1708963200000,"vol":357895}
+
+2024-03-05T13:37:16.262+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=96 k={"amt":249870484.58,"bk":"医疗服务","close":3.42,"code":"002172","high":3.46,"hsl":9.73,"low":3.22,
+"name":"澳洋健康","open":3.31,"osc":7.19,"pct":2.40,"pctChange":0.08,"period":"day1","preClose":3.34,
+"tradeDate":"20240229","tsClose":1709136000000,"tsOpen":1709136000000,"vol":744406}
+
+2024-03-05T13:37:16.319+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":49218452.00,"bk":"医疗服务","close":2.95,"code":"002219","high":3.02,"hsl":0.51,"low":2.93,
+"name":"新里程","open":3.00,"osc":2.99,"pct":-1.99,"pctChange":-0.06,"period":"day1","preClose":3.01,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":165525}
+
+2024-03-05T13:37:16.319+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:16.626+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=54 k={"amt":95820267.00,"bk":"医疗服务","close":23.77,"code":"300244","high":24.09,"hsl":0.80,"low":23.63,
+"name":"迪安诊断","open":24.07,"osc":1.91,"pct":-1.16,"pctChange":-0.28,"period":"day1","preClose":24.05,
+"tradeDate":"20231222","tsClose":1703174400000,"tsOpen":1703174400000,"vol":40274}
+
+2024-03-05T13:37:16.626+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:17.192+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":63591860.00,"bk":"医疗服务","close":4.72,"code":"600327","high":4.76,"hsl":1.52,"low":4.69,
+"name":"大东方","open":4.72,"osc":1.48,"pct":0.00,"pctChange":0.00,"period":"day1","preClose":4.72,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":134535}
+
+2024-03-05T13:37:17.192+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:17.369+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=66 k={"amt":158466510.00,"bk":"医疗服务","close":54.07,"code":"603882","high":54.98,"hsl":0.63,"low":53.84,
+"name":"金域医学","open":54.80,"osc":2.08,"pct":-1.12,"pctChange":-0.61,"period":"day1","preClose":54.68,
+"tradeDate":"20240110","tsClose":1704816000000,"tsOpen":1704816000000,"vol":29163}
+
+2024-03-05T13:37:17.369+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:17.761+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":43252852.00,"bk":"医药商业","close":3.21,"code":"002589","high":3.26,"hsl":1.16,"low":3.20,
+"name":"瑞康医药","open":3.25,"osc":1.85,"pct":-0.93,"pctChange":-0.03,"period":"day1","preClose":3.24,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":134420}
+
+2024-03-05T13:37:17.761+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:17.932+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=75 k={"amt":33506890.00,"bk":"医药商业","close":17.13,"code":"301017","high":17.39,"hsl":1.82,"low":16.51,
+"name":"漱玉平民","open":17.07,"osc":5.05,"pct":-1.66,"pctChange":-0.29,"period":"day1","preClose":17.42,
+"tradeDate":"20240123","tsClose":1705939200000,"tsOpen":1705939200000,"vol":19846}
+
+2024-03-05T13:37:17.932+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:19.619+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=81 k={"amt":21537948.00,"bk":"医药商业","close":47.66,"code":"605266","high":49.80,"hsl":0.38,"low":46.96,
+"name":"健之佳","open":49.50,"osc":5.78,"pct":-3.05,"pctChange":-1.50,"period":"day1","preClose":49.16,
+"tradeDate":"20240131","tsClose":1706630400000,"tsOpen":1706630400000,"vol":4454}
+
+2024-03-05T13:37:19.620+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:19.979+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":97898364.78,"bk":"半导体","close":8.23,"code":"002185","high":8.29,"hsl":0.37,"low":8.17,
+"name":"华天科技","open":8.21,"osc":1.46,"pct":0.00,"pctChange":0.00,"period":"day1","preClose":8.23,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":119066}
+
+2024-03-05T13:37:19.979+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:22.379+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=76 k={"amt":25675019.00,"bk":"半导体","close":31.92,"code":"688045","high":32.80,"hsl":2.25,"low":30.58,
+"name":"必易微","open":32.80,"osc":6.85,"pct":-1.48,"pctChange":-0.48,"period":"day1","preClose":32.40,
+"tradeDate":"20240124","tsClose":1706025600000,"tsOpen":1706025600000,"vol":8134}
+
+2024-03-05T13:37:22.379+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:23.306+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=76 k={"amt":18075737.00,"bk":"半导体","close":33.13,"code":"688130","high":33.93,"hsl":3.49,"low":31.51,
+"name":"晶华微","open":33.11,"osc":7.25,"pct":-0.69,"pctChange":-0.23,"period":"day1","preClose":33.36,
+"tradeDate":"20240124","tsClose":1706025600000,"tsOpen":1706025600000,"vol":5574}
+
+2024-03-05T13:37:23.306+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:25.255+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=79 k={"amt":58472195.00,"bk":"半导体","close":41.69,"code":"688286","high":44.48,"hsl":2.59,"low":41.30,
+"name":"敏芯股份","open":43.58,"osc":7.30,"pct":-4.36,"pctChange":-1.90,"period":"day1","preClose":43.59,
+"tradeDate":"20240129","tsClose":1706457600000,"tsOpen":1706457600000,"vol":13861}
+
+2024-03-05T13:37:25.255+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:26.232+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=69 k={"amt":16727248.00,"bk":"半导体","close":61.20,"code":"688458","high":61.77,"hsl":1.41,"low":60.14,
+"name":"美芯晟","open":60.95,"osc":2.66,"pct":-0.08,"pctChange":-0.05,"period":"day1","preClose":61.25,
+"tradeDate":"20240115","tsClose":1705248000000,"tsOpen":1705248000000,"vol":2741}
+
+2024-03-05T13:37:26.232+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:26.308+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=66 k={"amt":67038662.00,"bk":"半导体","close":5.13,"code":"688469","high":5.15,"hsl":1.19,"low":5.05,
+"name":"芯联集成-U","open":5.13,"osc":1.96,"pct":0.39,"pctChange":0.02,"period":"day1","preClose":5.11,
+"tradeDate":"20240110","tsClose":1704816000000,"tsOpen":1704816000000,"vol":131666}
+
+2024-03-05T13:37:26.308+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:37:26.361+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=69 k={"amt":37134130.00,"bk":"半导体","close":34.09,"code":"688484","high":34.75,"hsl":1.84,"low":33.82,
+"name":"南芯科技","open":34.30,"osc":2.70,"pct":-1.10,"pctChange":-0.38,"period":"day1","preClose":34.47,
+"tradeDate":"20240115","tsClose":1705248000000,"tsOpen":1705248000000,"vol":10848}
+
+2024-03-05T13:37:26.361+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:28.921+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=87 k={"amt":90765846.16,"bk":"商业百货","close":2.54,"code":"002251","high":2.57,"hsl":4.28,"low":2.42,
+"name":"*ST步高","open":2.43,"osc":5.88,"pct":-0.39,"pctChange":-0.01,"period":"day1","preClose":2.55,
+"tradeDate":"20240208","tsClose":1707321600000,"tsOpen":1707321600000,"vol":369622}
+
+2024-03-05T13:37:29.272+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":60730430.00,"bk":"商业百货","close":6.30,"code":"600287","high":6.44,"hsl":2.21,"low":6.23,
+"name":"江苏舜天","open":6.42,"osc":3.28,"pct":-1.72,"pctChange":-0.11,"period":"day1","preClose":6.41,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":96526}
+
+2024-03-05T13:37:29.272+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:29.380+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=63 k={"amt":58859014.00,"bk":"商业百货","close":12.04,"code":"600306","high":12.04,"hsl":1.31,"low":11.71,
+"name":"*ST商城","open":12.04,"osc":2.88,"pct":4.97,"pctChange":0.57,"period":"day1","preClose":11.47,
+"tradeDate":"20240105","tsClose":1704384000000,"tsOpen":1704384000000,"vol":48933}
+
+2024-03-05T13:37:29.380+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:37:31.617+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=75 k={"amt":44198264.00,"bk":"商业百货","close":11.40,"code":"603708","high":11.50,"hsl":0.64,"low":11.25,
+"name":"家家悦","open":11.38,"osc":2.17,"pct":-1.21,"pctChange":-0.14,"period":"day1","preClose":11.54,
+"tradeDate":"20240123","tsClose":1705939200000,"tsOpen":1705939200000,"vol":38851}
+
+2024-03-05T13:37:31.617+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:32.063+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=66 k={"amt":310960194.57,"bk":"塑料制品","close":31.26,"code":"001368","high":31.26,"hsl":37.00,"low":28.22,
+"name":"通达创智","open":30.38,"osc":10.70,"pct":9.99,"pctChange":2.84,"period":"day1","preClose":28.42,
+"tradeDate":"20240110","tsClose":1704816000000,"tsOpen":1704816000000,"vol":103593}
+
+2024-03-05T13:37:32.063+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc 13, 满足上升趋势countdown 终结 index=90 k={"amt":72198575.46,"bk":"塑料制品","close":20.51,"code":"001368","high":21.04,"hsl":12.53,"low":20.19,
+"name":"通达创智","open":20.30,"osc":4.07,"pct":-1.68,"pctChange":-0.35,"period":"day1","preClose":20.86,
+"tradeDate":"20240221","tsClose":1708444800000,"tsOpen":1708444800000,"vol":35097}
+
+2024-03-05T13:37:32.438+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":212801702.86,"bk":"塑料制品","close":10.01,"code":"002395","high":11.18,"hsl":7.77,"low":10.01,
+"name":"双象股份","open":11.18,"osc":10.52,"pct":-9.98,"pctChange":-1.11,"period":"day1","preClose":11.12,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":208266}
+
+2024-03-05T13:37:32.438+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:32.920+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=72 k={"amt":56471629.00,"bk":"塑料制品","close":9.21,"code":"300243","high":9.54,"hsl":3.30,"low":8.92,
+"name":"瑞丰高材","open":9.20,"osc":6.69,"pct":-0.65,"pctChange":-0.06,"period":"day1","preClose":9.27,
+"tradeDate":"20240118","tsClose":1705507200000,"tsOpen":1705507200000,"vol":61698}
+
+2024-03-05T13:37:32.920+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:35.588+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":102443958.00,"bk":"塑料制品","close":8.65,"code":"605488","high":9.50,"hsl":21.65,"low":8.64,
+"name":"福莱新材","open":9.49,"osc":8.96,"pct":-9.90,"pctChange":-0.95,"period":"day1","preClose":9.60,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":116085}
+
+2024-03-05T13:37:35.588+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:35.697+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":56308799.00,"bk":"塑料制品","close":9.41,"code":"688323","high":10.50,"hsl":5.91,"low":9.10,
+"name":"瑞华泰","open":10.50,"osc":13.40,"pct":-9.95,"pctChange":-1.04,"period":"day1","preClose":10.45,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":57756}
+
+2024-03-05T13:37:37.392+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":55210514.61,"bk":"家用轻工","close":9.42,"code":"001222","high":9.73,"hsl":7.69,"low":8.89,
+"name":"源飞宠物","open":9.46,"osc":8.75,"pct":-1.88,"pctChange":-0.18,"period":"day1","preClose":9.60,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":60428}
+
+2024-03-05T13:37:38.706+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":53224872.00,"bk":"家用轻工","close":6.13,"code":"605299","high":6.49,"hsl":2.09,"low":6.09,
+"name":"舒华体育","open":6.49,"osc":6.13,"pct":-5.98,"pctChange":-0.39,"period":"day1","preClose":6.52,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":85556}
+
+2024-03-05T13:37:41.805+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=94 k={"amt":245619654.00,"bk":"家电行业","close":37.44,"code":"603486","high":37.48,"hsl":1.16,"low":36.72,
+"name":"科沃斯","open":37.14,"osc":2.03,"pct":0.24,"pctChange":0.09,"period":"day1","preClose":37.35,
+"tradeDate":"20240227","tsClose":1708963200000,"tsOpen":1708963200000,"vol":66248}
+
+2024-03-05T13:37:42.275+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=74 k={"amt":33093963.00,"bk":"家电行业","close":31.50,"code":"688793","high":32.08,"hsl":3.25,"low":29.68,
+"name":"倍轻松","open":31.93,"osc":7.49,"pct":-1.72,"pctChange":-0.55,"period":"day1","preClose":32.05,
+"tradeDate":"20240122","tsClose":1705852800000,"tsOpen":1705852800000,"vol":10778}
+
+2024-03-05T13:37:42.275+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:43.208+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=96 k={"amt":268407653.00,"bk":"小金属","close":8.09,"code":"603399","high":8.15,"hsl":6.70,"low":7.33,
+"name":"吉翔股份","open":7.66,"osc":10.64,"pct":4.93,"pctChange":0.38,"period":"day1","preClose":7.71,
+"tradeDate":"20240229","tsClose":1709136000000,"tsOpen":1709136000000,"vol":343017}
+
+2024-03-05T13:37:44.855+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":84843725.00,"bk":"工程咨询服务","close":23.94,"code":"300949","high":27.01,"hsl":19.96,"low":23.80,
+"name":"奥雅股份","open":27.01,"osc":11.66,"pct":-13.01,"pctChange":-3.58,"period":"day1","preClose":27.52,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":33938}
+
+2024-03-05T13:37:44.855+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:45.869+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=98 k={"amt":66378138.54,"bk":"工程建设","close":7.78,"code":"002140","high":7.82,"hsl":1.60,"low":7.57,
+"name":"东华科技","open":7.78,"osc":3.22,"pct":0.13,"pctChange":0.01,"period":"day1","preClose":7.77,
+"tradeDate":"20240304","tsClose":1709481600000,"tsOpen":1709481600000,"vol":86220}
+
+2024-03-05T13:37:46.198+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=84 k={"amt":119229462.00,"bk":"工程建设","close":17.10,"code":"300982","high":18.97,"hsl":8.44,"low":16.50,
+"name":"苏文电能","open":18.90,"osc":12.94,"pct":-10.42,"pctChange":-1.99,"period":"day1","preClose":19.09,
+"tradeDate":"20240205","tsClose":1707062400000,"tsOpen":1707062400000,"vol":67962}
+
+2024-03-05T13:37:46.198+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:46.454+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":112096653.00,"bk":"工程建设","close":4.09,"code":"600491","high":4.15,"hsl":1.80,"low":4.01,
+"name":"龙元建设","open":4.14,"osc":3.36,"pct":-1.92,"pctChange":-0.08,"period":"day1","preClose":4.17,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":275750}
+
+2024-03-05T13:37:46.454+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:46.526+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":192631793.00,"bk":"工程建设","close":6.70,"code":"600667","high":6.89,"hsl":1.35,"low":6.68,
+"name":"太极实业","open":6.87,"osc":3.05,"pct":-2.76,"pctChange":-0.19,"period":"day1","preClose":6.89,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":285354}
+
+2024-03-05T13:37:46.526+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:49.078+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=94 k={"amt":71998265.90,"bk":"工程机械","close":4.28,"code":"002204","high":4.28,"hsl":0.88,"low":4.20,
+"name":"大连重工","open":4.24,"osc":1.89,"pct":0.94,"pctChange":0.04,"period":"day1","preClose":4.24,
+"tradeDate":"20240227","tsClose":1708963200000,"tsOpen":1708963200000,"vol":169174}
+
+2024-03-05T13:37:49.463+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=96 k={"amt":396224585.00,"bk":"工程机械","close":7.43,"code":"601226","high":7.48,"hsl":4.73,"low":6.77,
+"name":"华电重工","open":6.78,"osc":10.11,"pct":5.84,"pctChange":0.41,"period":"day1","preClose":7.02,
+"tradeDate":"20240229","tsClose":1709136000000,"tsOpen":1709136000000,"vol":547614}
+
+2024-03-05T13:37:49.463+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:37:51.449+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=72 k={"amt":145534045.00,"bk":"房地产开发","close":2.92,"code":"600094","high":2.93,"hsl":2.24,"low":2.79,
+"name":"大名城","open":2.89,"osc":4.79,"pct":0.00,"pctChange":0.00,"period":"day1","preClose":2.92,
+"tradeDate":"20240118","tsClose":1705507200000,"tsOpen":1705507200000,"vol":510544}
+
+2024-03-05T13:37:51.449+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:51.449+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=78 k={"amt":166216942.00,"bk":"房地产开发","close":3.10,"code":"600094","high":3.16,"hsl":2.35,"low":3.04,
+"name":"大名城","open":3.05,"osc":3.95,"pct":1.97,"pctChange":0.06,"period":"day1","preClose":3.04,
+"tradeDate":"20240126","tsClose":1706198400000,"tsOpen":1706198400000,"vol":535653}
+
+2024-03-05T13:37:51.449+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:53.120+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=97 k={"amt":208362920.00,"bk":"房地产开发","close":13.74,"code":"600641","high":13.89,"hsl":1.64,"low":13.46,
+"name":"万业企业","open":13.75,"osc":3.15,"pct":0.66,"pctChange":0.09,"period":"day1","preClose":13.65,
+"tradeDate":"20240301","tsClose":1709222400000,"tsOpen":1709222400000,"vol":152344}
+
+2024-03-05T13:37:53.702+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=57 k={"amt":28612368.00,"bk":"房地产开发","close":10.02,"code":"600848","high":10.16,"hsl":0.12,"low":9.96,
+"name":"上海临港","open":10.05,"osc":1.99,"pct":-0.40,"pctChange":-0.04,"period":"day1","preClose":10.06,
+"tradeDate":"20231227","tsClose":1703606400000,"tsOpen":1703606400000,"vol":28535}
+
+2024-03-05T13:37:53.702+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:35:44.494+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":90625822.00,"bk":"专业服务","close":13.83,"code":"300012","high":14.02,"hsl":0.43,"low":13.72,
+"name":"华测检测","open":13.88,"osc":2.16,"pct":-0.65,"pctChange":-0.09,"period":"day1","preClose":13.92,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":65592}
+
+2024-03-05T13:35:44.494+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:35:44.494+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=58 k={"amt":176475415.00,"bk":"专业服务","close":14.01,"code":"300012","high":14.10,"hsl":0.83,"low":13.54,
+"name":"华测检测","open":13.61,"osc":4.10,"pct":2.56,"pctChange":0.35,"period":"day1","preClose":13.66,
+"tradeDate":"20231228","tsClose":1703692800000,"tsOpen":1703692800000,"vol":127059}
+
+2024-03-05T13:35:44.494+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:35:45.499+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=74 k={"amt":78439569.00,"bk":"专业服务","close":9.29,"code":"300887","high":9.83,"hsl":2.27,"low":9.18,
+"name":"谱尼测试","open":9.82,"osc":6.63,"pct":-5.30,"pctChange":-0.52,"period":"day1","preClose":9.81,
+"tradeDate":"20240122","tsClose":1705852800000,"tsOpen":1705852800000,"vol":82252}
+
+2024-03-05T13:35:45.499+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:35:46.894+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=96 k={"amt":298903594.00,"bk":"专业服务","close":12.10,"code":"603776","high":12.10,"hsl":10.93,"low":10.68,
+"name":"永安行","open":10.79,"osc":12.91,"pct":10.00,"pctChange":1.10,"period":"day1","preClose":11.00,
+"tradeDate":"20240229","tsClose":1709136000000,"tsOpen":1709136000000,"vol":253793}
+
+2024-03-05T13:35:47.080+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=97 k={"amt":39239325.00,"bk":"专业服务","close":46.09,"code":"688293","high":46.10,"hsl":1.12,"low":43.99,
+"name":"奥浦迈","open":44.88,"osc":4.67,"pct":2.06,"pctChange":0.93,"period":"day1","preClose":45.16,
+"tradeDate":"20240301","tsClose":1709222400000,"tsOpen":1709222400000,"vol":8730}
+
+2024-03-05T13:35:48.212+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=95 k={"amt":989885019.53,"bk":"专用设备","close":13.19,"code":"002009","high":14.22,"hsl":18.85,"low":12.97,
+"name":"天奇股份","open":14.22,"osc":9.67,"pct":2.01,"pctChange":0.26,"period":"day1","preClose":12.93,
+"tradeDate":"20240228","tsClose":1709049600000,"tsOpen":1709049600000,"vol":704229}
+
+2024-03-05T13:35:48.460+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":17666868.00,"bk":"专用设备","close":8.78,"code":"002111","high":8.94,"hsl":0.42,"low":8.75,
+"name":"威海广泰","open":8.91,"osc":2.13,"pct":-1.57,"pctChange":-0.14,"period":"day1","preClose":8.92,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":20065}
+
+2024-03-05T13:35:48.460+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:35:48.596+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=97 k={"amt":18743625.00,"bk":"专用设备","close":11.25,"code":"002209","high":11.25,"hsl":1.08,"low":11.25,
+"name":"达 意 隆","open":11.25,"osc":0.00,"pct":9.97,"pctChange":1.02,"period":"day1","preClose":10.23,
+"tradeDate":"20240301","tsClose":1709222400000,"tsOpen":1709222400000,"vol":16661}
+
+2024-03-05T13:35:48.596+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:35:49.197+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":94276542.25,"bk":"专用设备","close":5.77,"code":"002529","high":6.46,"hsl":6.19,"low":5.77,
+"name":"海源复材","open":6.44,"osc":10.76,"pct":-9.98,"pctChange":-0.64,"period":"day1","preClose":6.41,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":160812}
+
+2024-03-05T13:35:49.197+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:35:55.060+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=96 k={"amt":332998056.00,"bk":"专用设备","close":34.59,"code":"301338","high":34.59,"hsl":29.50,"low":29.11,
+"name":"凯格精机","open":29.90,"osc":16.92,"pct":6.83,"pctChange":2.21,"period":"day1","preClose":32.38,
+"tradeDate":"20240229","tsClose":1709136000000,"tsOpen":1709136000000,"vol":101177}
+
+2024-03-05T13:35:55.233+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=96 k={"amt":362223210.00,"bk":"专用设备","close":61.22,"code":"301512","high":61.67,"hsl":47.91,"low":53.97,
+"name":"智信精密","open":58.00,"osc":13.41,"pct":6.66,"pctChange":3.82,"period":"day1","preClose":57.40,
+"tradeDate":"20240229","tsClose":1709136000000,"tsOpen":1709136000000,"vol":63875}
+
+2024-03-05T13:35:58.122+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=93 k={"amt":37184429.00,"bk":"专用设备","close":21.16,"code":"603337","high":21.28,"hsl":0.37,"low":20.50,
+"name":"杰克股份","open":20.54,"osc":3.79,"pct":2.87,"pctChange":0.59,"period":"day1","preClose":20.57,
+"tradeDate":"20240226","tsClose":1708876800000,"tsOpen":1708876800000,"vol":17744}
+
+2024-03-05T13:35:58.954+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=91 k={"amt":145662994.00,"bk":"专用设备","close":30.83,"code":"603960","high":30.83,"hsl":1.81,"low":30.83,
+"name":"克来机电","open":30.83,"osc":0.00,"pct":9.99,"pctChange":2.80,"period":"day1","preClose":28.03,
+"tradeDate":"20240222","tsClose":1708531200000,"tsOpen":1708531200000,"vol":47247}
+
+2024-03-05T13:35:58.954+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:35:59.037+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=76 k={"amt":35258696.00,"bk":"专用设备","close":25.64,"code":"688001","high":26.28,"hsl":0.32,"low":24.60,
+"name":"华兴源创","open":26.01,"osc":6.54,"pct":-0.12,"pctChange":-0.03,"period":"day1","preClose":25.67,
+"tradeDate":"20240124","tsClose":1706025600000,"tsOpen":1706025600000,"vol":13946}
+
+2024-03-05T13:35:59.037+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:35:59.198+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=68 k={"amt":63538769.00,"bk":"专用设备","close":26.89,"code":"688097","high":28.12,"hsl":2.51,"low":26.84,
+"name":"博众精工","open":28.12,"osc":4.57,"pct":-4.07,"pctChange":-1.14,"period":"day1","preClose":28.03,
+"tradeDate":"20240112","tsClose":1704988800000,"tsOpen":1704988800000,"vol":23297}
+
+2024-03-05T13:35:59.198+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:35:59.658+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=84 k={"amt":43262831.00,"bk":"专用设备","close":33.08,"code":"688290","high":35.21,"hsl":2.21,"low":31.20,
+"name":"景业智能","open":34.17,"osc":11.74,"pct":-3.19,"pctChange":-1.09,"period":"day1","preClose":34.17,
+"tradeDate":"20240205","tsClose":1707062400000,"tsOpen":1707062400000,"vol":13300}
+
+2024-03-05T13:35:59.658+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:35:59.738+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":190494227.00,"bk":"专用设备","close":15.00,"code":"688328","high":17.00,"hsl":20.07,"low":14.21,
+"name":"深科达","open":17.00,"osc":16.64,"pct":-10.55,"pctChange":-1.77,"period":"day1","preClose":16.77,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":123488}
+
+2024-03-05T13:35:59.811+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=78 k={"amt":63732408.00,"bk":"专用设备","close":18.54,"code":"688377","high":19.73,"hsl":1.74,"low":18.30,
+"name":"迪威尔","open":19.50,"osc":7.33,"pct":-4.92,"pctChange":-0.96,"period":"day1","preClose":19.50,
+"tradeDate":"20240126","tsClose":1706198400000,"tsOpen":1706198400000,"vol":33925}
+
+2024-03-05T13:35:59.812+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:05.329+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=57 k={"amt":59470983.00,"bk":"中药","close":2.51,"code":"600252","high":2.53,"hsl":0.69,"low":2.48,
+"name":"中恒集团","open":2.52,"osc":1.99,"pct":0.00,"pctChange":0.00,"period":"day1","preClose":2.51,
+"tradeDate":"20231227","tsClose":1703606400000,"tsOpen":1703606400000,"vol":237772}
+
+2024-03-05T13:36:05.329+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:05.329+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=59 k={"amt":86200590.00,"bk":"中药","close":2.51,"code":"600252","high":2.53,"hsl":1.00,"low":2.51,
+"name":"中恒集团","open":2.51,"osc":0.79,"pct":-0.40,"pctChange":-0.01,"period":"day1","preClose":2.52,
+"tradeDate":"20231229","tsClose":1703779200000,"tsOpen":1703779200000,"vol":342197}
+
+2024-03-05T13:36:05.329+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:05.830+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=72 k={"amt":138746009.00,"bk":"中药","close":56.33,"code":"600976","high":57.02,"hsl":1.63,"low":54.55,
+"name":"健民集团","open":56.96,"osc":4.31,"pct":-1.69,"pctChange":-0.97,"period":"day1","preClose":57.30,
+"tradeDate":"20240118","tsClose":1705507200000,"tsOpen":1705507200000,"vol":24954}
+
+2024-03-05T13:36:05.830+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:06.507+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":28465497.00,"bk":"中药","close":14.82,"code":"605199","high":15.06,"hsl":0.48,"low":14.81,
+"name":"葫芦娃","open":15.00,"osc":1.67,"pct":-1.20,"pctChange":-0.18,"period":"day1","preClose":15.00,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":19099}
+
+2024-03-05T13:36:06.508+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:06.806+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=94 k={"amt":587733523.15,"bk":"互联网服务","close":2.94,"code":"002195","high":2.94,"hsl":3.63,"low":2.76,
+"name":"岩山科技","open":2.78,"osc":6.45,"pct":5.38,"pctChange":0.15,"period":"day1","preClose":2.79,
+"tradeDate":"20240227","tsClose":1708963200000,"tsOpen":1708963200000,"vol":2050719}
+
+2024-03-05T13:36:06.849+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=54 k={"amt":193639318.96,"bk":"互联网服务","close":16.33,"code":"002232","high":16.87,"hsl":2.87,"low":16.21,
+"name":"启明信息","open":16.68,"osc":3.94,"pct":-2.45,"pctChange":-0.41,"period":"day1","preClose":16.74,
+"tradeDate":"20231222","tsClose":1703174400000,"tsOpen":1703174400000,"vol":117244}
+
+2024-03-05T13:36:06.849+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:07.434+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":53381905.00,"bk":"互联网服务","close":5.35,"code":"002766","high":5.41,"hsl":1.18,"low":5.28,
+"name":"索菱股份","open":5.37,"osc":2.42,"pct":-0.56,"pctChange":-0.03,"period":"day1","preClose":5.38,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":99987}
+
+2024-03-05T13:36:07.435+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:10.847+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":92058251.00,"bk":"互联网服务","close":5.84,"code":"300290","high":5.96,"hsl":2.46,"low":5.79,
+"name":"荣科科技","open":5.96,"osc":2.88,"pct":-1.18,"pctChange":-0.07,"period":"day1","preClose":5.91,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":157523}
+
+2024-03-05T13:36:10.847+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:11.502+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=96 k={"amt":358547278.00,"bk":"互联网服务","close":12.49,"code":"300399","high":12.86,"hsl":16.58,"low":10.00,
+"name":"天利科技","open":10.94,"osc":24.44,"pct":6.75,"pctChange":0.79,"period":"day1","preClose":11.70,
+"tradeDate":"20240229","tsClose":1709136000000,"tsOpen":1709136000000,"vol":321173}
+
+2024-03-05T13:36:13.300+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":9359773.00,"bk":"互联网服务","close":1.53,"code":"600070","high":1.65,"hsl":1.16,"low":1.53,
+"name":"ST富润","open":1.60,"osc":7.45,"pct":-4.97,"pctChange":-0.08,"period":"day1","preClose":1.61,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":58973}
+
+2024-03-05T13:36:13.300+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:14.089+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=69 k={"amt":227743857.00,"bk":"互联网服务","close":44.25,"code":"600845","high":44.64,"hsl":0.30,"low":43.97,
+"name":"宝信软件","open":44.47,"osc":1.51,"pct":-0.52,"pctChange":-0.23,"period":"day1","preClose":44.48,
+"tradeDate":"20240115","tsClose":1705248000000,"tsOpen":1705248000000,"vol":51452}
+
+2024-03-05T13:36:14.089+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:16.580+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=84 k={"amt":10168489.06,"bk":"互联网服务","close":8.90,"code":"833030","high":9.55,"hsl":5.06,"low":8.50,
+"name":"立方控股","open":9.40,"osc":11.08,"pct":-6.12,"pctChange":-0.58,"period":"day1","preClose":9.48,
+"tradeDate":"20240205","tsClose":1707062400000,"tsOpen":1707062400000,"vol":11327}
+
+2024-03-05T13:36:16.580+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:17.779+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":20248121.00,"bk":"交运设备","close":38.10,"code":"301322","high":38.98,"hsl":2.01,"low":38.06,
+"name":"绿通科技","open":38.81,"osc":2.37,"pct":-1.83,"pctChange":-0.71,"period":"day1","preClose":38.81,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":5274}
+
+2024-03-05T13:36:17.779+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:18.140+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=96 k={"amt":243886893.00,"bk":"交运设备","close":12.98,"code":"600818","high":12.98,"hsl":8.15,"low":12.09,
+"name":"中路股份","open":12.61,"osc":6.95,"pct":1.41,"pctChange":0.18,"period":"day1","preClose":12.80,
+"tradeDate":"20240229","tsClose":1709136000000,"tsOpen":1709136000000,"vol":193961}
+
+2024-03-05T13:36:18.140+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:36:22.523+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=76 k={"amt":23857824.00,"bk":"仪器仪表","close":35.33,"code":"688610","high":36.29,"hsl":4.75,"low":33.90,
+"name":"埃科光电","open":35.63,"osc":6.69,"pct":-1.12,"pctChange":-0.40,"period":"day1","preClose":35.73,
+"tradeDate":"20240124","tsClose":1706025600000,"tsOpen":1706025600000,"vol":6847}
+
+2024-03-05T13:36:22.523+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:25.271+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=84 k={"amt":412944507.00,"bk":"光伏设备","close":17.80,"code":"601865","high":18.75,"hsl":1.22,"low":17.09,
+"name":"福莱特","open":18.60,"osc":9.07,"pct":-2.79,"pctChange":-0.51,"period":"day1","preClose":18.31,
+"tradeDate":"20240205","tsClose":1707062400000,"tsOpen":1707062400000,"vol":231073}
+
+2024-03-05T13:36:25.659+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=84 k={"amt":178231074.00,"bk":"光伏设备","close":164.03,"code":"688032","high":171.82,"hsl":2.59,"low":156.00,
+"name":"禾迈股份","open":171.00,"osc":9.24,"pct":-4.16,"pctChange":-7.12,"period":"day1","preClose":171.15,
+"tradeDate":"20240205","tsClose":1707062400000,"tsOpen":1707062400000,"vol":10858}
+
+2024-03-05T13:36:27.345+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=56 k={"amt":217780877.78,"bk":"光伏设备","close":10.16,"code":"834770","high":10.86,"hsl":32.82,"low":9.44,
+"name":"艾能聚","open":10.00,"osc":14.06,"pct":0.59,"pctChange":0.06,"period":"day1","preClose":10.10,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":215988}
+
+2024-03-05T13:36:27.345+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:36:28.080+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=97 k={"amt":2826205225.19,"bk":"光学光电子","close":4.11,"code":"000725","high":4.11,"hsl":1.89,"low":3.99,
+"name":"京东方Ａ","open":3.99,"osc":3.01,"pct":3.01,"pctChange":0.12,"period":"day1","preClose":3.99,
+"tradeDate":"20240301","tsClose":1709222400000,"tsOpen":1709222400000,"vol":6960233}
+
+2024-03-05T13:36:28.080+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:36:28.101+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=94 k={"amt":187774552.45,"bk":"光学光电子","close":2.55,"code":"000727","high":2.55,"hsl":1.65,"low":2.47,
+"name":"冠捷科技","open":2.47,"osc":3.21,"pct":2.41,"pctChange":0.06,"period":"day1","preClose":2.49,
+"tradeDate":"20240227","tsClose":1708963200000,"tsOpen":1708963200000,"vol":747530}
+
+2024-03-05T13:36:28.403+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=52 k={"amt":87538939.46,"bk":"光学光电子","close":2.57,"code":"002217","high":2.64,"hsl":1.08,"low":2.57,
+"name":"合力泰","open":2.62,"osc":2.67,"pct":-1.91,"pctChange":-0.05,"period":"day1","preClose":2.62,
+"tradeDate":"20231220","tsClose":1703001600000,"tsOpen":1703001600000,"vol":337711}
+
+2024-03-05T13:36:28.403+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:28.836+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=94 k={"amt":1633927424.05,"bk":"光学光电子","close":7.98,"code":"002456","high":8.08,"hsl":6.43,"low":7.64,
+"name":"欧菲光","open":7.70,"osc":5.67,"pct":2.84,"pctChange":0.22,"period":"day1","preClose":7.76,
+"tradeDate":"20240227","tsClose":1708963200000,"tsOpen":1708963200000,"vol":2082855}
+
+2024-03-05T13:36:28.836+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:36:28.836+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=96 k={"amt":2008349965.44,"bk":"光学光电子","close":8.16,"code":"002456","high":8.16,"hsl":7.92,"low":7.35,
+"name":"欧菲光","open":7.35,"osc":10.92,"pct":9.97,"pctChange":0.74,"period":"day1","preClose":7.42,
+"tradeDate":"20240229","tsClose":1709136000000,"tsOpen":1709136000000,"vol":2566248}
+
+2024-03-05T13:36:28.836+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:36:29.014+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":10344728.00,"bk":"光学光电子","close":4.77,"code":"002808","high":4.82,"hsl":1.17,"low":4.72,
+"name":"ST恒久","open":4.77,"osc":2.08,"pct":-0.83,"pctChange":-0.04,"period":"day1","preClose":4.81,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":21729}
+
+2024-03-05T13:36:29.014+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:29.014+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=87 k={"amt":23228914.68,"bk":"光学光电子","close":2.95,"code":"002808","high":3.00,"hsl":4.32,"low":2.81,
+"name":"ST恒久","open":2.81,"osc":6.42,"pct":-0.34,"pctChange":-0.01,"period":"day1","preClose":2.96,
+"tradeDate":"20240208","tsClose":1707321600000,"tsOpen":1707321600000,"vol":80420}
+
+2024-03-05T13:36:29.122+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=60 k={"amt":620403743.87,"bk":"光学光电子","close":42.64,"code":"002952","high":42.64,"hsl":11.23,"low":40.01,
+"name":"亚世光电","open":40.58,"osc":6.79,"pct":10.01,"pctChange":3.88,"period":"day1","preClose":38.76,
+"tradeDate":"20240102","tsClose":1704124800000,"tsOpen":1704124800000,"vol":148239}
+
+2024-03-05T13:36:29.122+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:36:29.204+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":338004344.14,"bk":"光学光电子","close":9.23,"code":"002962","high":10.22,"hsl":16.70,"low":9.23,
+"name":"五方光电","open":10.22,"osc":9.65,"pct":-10.04,"pctChange":-1.03,"period":"day1","preClose":10.26,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":349459}
+
+2024-03-05T13:36:29.204+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:33.091+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=54 k={"amt":95054029.00,"bk":"光学光电子","close":2.47,"code":"688538","high":2.51,"hsl":0.67,"low":2.46,
+"name":"和辉光电-U","open":2.50,"osc":2.00,"pct":-1.20,"pctChange":-0.03,"period":"day1","preClose":2.50,
+"tradeDate":"20231222","tsClose":1703174400000,"tsOpen":1703174400000,"vol":383753}
+
+2024-03-05T13:36:33.091+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:34.935+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":126674128.91,"bk":"农牧饲渔","close":13.95,"code":"000998","high":14.01,"hsl":0.70,"low":13.83,
+"name":"隆平高科","open":13.96,"osc":1.29,"pct":-0.21,"pctChange":-0.03,"period":"day1","preClose":13.98,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":90983}
+
+2024-03-05T13:36:34.935+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:34.935+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=59 k={"amt":184729008.80,"bk":"农牧饲渔","close":14.10,"code":"000998","high":14.10,"hsl":1.01,"low":13.96,
+"name":"隆平高科","open":14.01,"osc":1.00,"pct":0.79,"pctChange":0.11,"period":"day1","preClose":13.99,
+"tradeDate":"20231229","tsClose":1703779200000,"tsOpen":1703779200000,"vol":131463}
+
+2024-03-05T13:36:34.935+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:36.169+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=74 k={"amt":55336966.00,"bk":"农牧饲渔","close":10.74,"code":"300138","high":11.40,"hsl":1.17,"low":10.61,
+"name":"晨光生物","open":11.38,"osc":6.95,"pct":-5.46,"pctChange":-0.62,"period":"day1","preClose":11.36,
+"tradeDate":"20240122","tsClose":1705852800000,"tsOpen":1705852800000,"vol":50478}
+
+2024-03-05T13:36:36.169+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:36.954+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=52 k={"amt":46547011.00,"bk":"农牧饲渔","close":7.09,"code":"600127","high":7.21,"hsl":1.02,"low":7.07,
+"name":"金健米业","open":7.14,"osc":1.96,"pct":-0.56,"pctChange":-0.04,"period":"day1","preClose":7.13,
+"tradeDate":"20231220","tsClose":1703001600000,"tsOpen":1703001600000,"vol":65286}
+
+2024-03-05T13:36:36.954+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:37.559+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":37404864.00,"bk":"农牧饲渔","close":2.02,"code":"600811","high":2.03,"hsl":0.51,"low":2.00,
+"name":"东方集团","open":2.02,"osc":1.48,"pct":-0.49,"pctChange":-0.01,"period":"day1","preClose":2.03,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":185968}
+
+2024-03-05T13:36:37.559+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:37.744+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":20140803.00,"bk":"农牧饲渔","close":6.28,"code":"600965","high":6.38,"hsl":0.39,"low":6.24,
+"name":"福成股份","open":6.33,"osc":2.21,"pct":-0.79,"pctChange":-0.05,"period":"day1","preClose":6.33,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":31970}
+
+2024-03-05T13:36:37.744+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:42.794+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=52 k={"amt":23946256.56,"bk":"包装材料","close":2.40,"code":"000659","high":2.46,"hsl":0.77,"low":2.40,
+"name":"珠海中富","open":2.42,"osc":2.48,"pct":-0.83,"pctChange":-0.02,"period":"day1","preClose":2.42,
+"tradeDate":"20231220","tsClose":1703001600000,"tsOpen":1703001600000,"vol":98768}
+
+2024-03-05T13:36:42.794+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:43.558+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":84351669.33,"bk":"包装材料","close":6.85,"code":"002735","high":7.35,"hsl":6.28,"low":6.69,
+"name":"王子新材","open":7.25,"osc":9.17,"pct":-4.86,"pctChange":-0.35,"period":"day1","preClose":7.20,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":120143}
+
+2024-03-05T13:36:43.601+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=75 k={"amt":36028294.42,"bk":"包装材料","close":7.49,"code":"002787","high":7.69,"hsl":1.95,"low":7.37,
+"name":"华源控股","open":7.65,"osc":4.20,"pct":-1.71,"pctChange":-0.13,"period":"day1","preClose":7.62,
+"tradeDate":"20240123","tsClose":1705939200000,"tsOpen":1705939200000,"vol":48242}
+
+2024-03-05T13:36:43.601+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:48.050+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=52 k={"amt":43649136.00,"bk":"化学制品","close":17.86,"code":"300109","high":18.24,"hsl":0.85,"low":17.78,
+"name":"新开源","open":18.05,"osc":2.56,"pct":-0.78,"pctChange":-0.14,"period":"day1","preClose":18.00,
+"tradeDate":"20231220","tsClose":1703001600000,"tsOpen":1703001600000,"vol":24358}
+
+2024-03-05T13:36:48.050+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:48.074+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=52 k={"amt":102070776.00,"bk":"化学制品","close":3.23,"code":"300135","high":3.30,"hsl":3.40,"low":3.21,
+"name":"宝利国际","open":3.26,"osc":2.76,"pct":-0.92,"pctChange":-0.03,"period":"day1","preClose":3.26,
+"tradeDate":"20231220","tsClose":1703001600000,"tsOpen":1703001600000,"vol":313062}
+
+2024-03-05T13:36:48.074+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:51.953+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=57 k={"amt":111688984.00,"bk":"化学制品","close":8.22,"code":"600352","high":8.30,"hsl":0.42,"low":8.10,
+"name":"浙江龙盛","open":8.28,"osc":2.41,"pct":-0.84,"pctChange":-0.07,"period":"day1","preClose":8.29,
+"tradeDate":"20231227","tsClose":1703606400000,"tsOpen":1703606400000,"vol":136484}
+
+2024-03-05T13:36:51.953+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:52.562+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=52 k={"amt":60163561.00,"bk":"化学制品","close":41.86,"code":"603026","high":42.95,"hsl":0.70,"low":41.78,
+"name":"胜华新材","open":42.52,"osc":2.74,"pct":-1.81,"pctChange":-0.77,"period":"day1","preClose":42.63,
+"tradeDate":"20231220","tsClose":1703001600000,"tsOpen":1703001600000,"vol":14285}
+
+2024-03-05T13:36:52.562+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:52.698+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":121267132.00,"bk":"化学制品","close":23.17,"code":"603110","high":24.83,"hsl":2.57,"low":22.80,
+"name":"东方材料","open":24.79,"osc":8.26,"pct":-5.77,"pctChange":-1.42,"period":"day1","preClose":24.59,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":51689}
+
+2024-03-05T13:36:52.698+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:54.539+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=84 k={"amt":74564403.00,"bk":"化学制品","close":9.19,"code":"605399","high":10.06,"hsl":2.53,"low":9.19,
+"name":"晨光新材","open":10.06,"osc":8.52,"pct":-9.99,"pctChange":-1.02,"period":"day1","preClose":10.21,
+"tradeDate":"20240205","tsClose":1707062400000,"tsOpen":1707062400000,"vol":78951}
+
+2024-03-05T13:36:54.539+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:54.675+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=76 k={"amt":19282971.00,"bk":"化学制品","close":13.63,"code":"688129","high":14.09,"hsl":1.18,"low":13.07,
+"name":"东来技术","open":13.66,"osc":7.46,"pct":-0.29,"pctChange":-0.04,"period":"day1","preClose":13.67,
+"tradeDate":"20240124","tsClose":1706025600000,"tsOpen":1706025600000,"vol":14214}
+
+2024-03-05T13:36:54.675+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:55.658+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":81410613.90,"bk":"化学制药","close":14.95,"code":"000623","high":15.05,"hsl":0.47,"low":14.89,
+"name":"吉林敖东","open":14.99,"osc":1.07,"pct":-0.20,"pctChange":-0.03,"period":"day1","preClose":14.98,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":54463}
+
+2024-03-05T13:36:55.658+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:56.169+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=94 k={"amt":70267250.71,"bk":"化学制药","close":5.67,"code":"002099","high":5.67,"hsl":0.78,"low":5.38,
+"name":"海翔药业","open":5.40,"osc":5.36,"pct":4.81,"pctChange":0.26,"period":"day1","preClose":5.41,
+"tradeDate":"20240227","tsClose":1708963200000,"tsOpen":1708963200000,"vol":126577}
+
+2024-03-05T13:36:56.232+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=52 k={"amt":23483433.73,"bk":"化学制药","close":2.73,"code":"002102","high":2.79,"hsl":0.37,"low":2.72,
+"name":"冠福股份","open":2.77,"osc":2.53,"pct":-1.44,"pctChange":-0.04,"period":"day1","preClose":2.77,
+"tradeDate":"20231220","tsClose":1703001600000,"tsOpen":1703001600000,"vol":85142}
+
+2024-03-05T13:36:56.232+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:56.324+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=94 k={"amt":67315929.00,"bk":"化学制药","close":10.88,"code":"002332","high":10.88,"hsl":0.64,"low":10.60,
+"name":"仙琚制药","open":10.61,"osc":2.63,"pct":2.16,"pctChange":0.23,"period":"day1","preClose":10.65,
+"tradeDate":"20240227","tsClose":1708963200000,"tsOpen":1708963200000,"vol":62606}
+
+2024-03-05T13:36:56.775+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=76 k={"amt":33121436.16,"bk":"化学制药","close":9.94,"code":"002923","high":10.19,"hsl":1.31,"low":9.59,
+"name":"润都股份","open":9.93,"osc":6.03,"pct":-0.10,"pctChange":-0.01,"period":"day1","preClose":9.95,
+"tradeDate":"20240124","tsClose":1706025600000,"tsOpen":1706025600000,"vol":33653}
+
+2024-03-05T13:36:56.775+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:58.325+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=57 k={"amt":37124313.00,"bk":"化学制药","close":7.27,"code":"300381","high":7.39,"hsl":1.05,"low":7.13,
+"name":"溢多利","open":7.26,"osc":3.54,"pct":-1.09,"pctChange":-0.08,"period":"day1","preClose":7.35,
+"tradeDate":"20231227","tsClose":1703606400000,"tsOpen":1703606400000,"vol":51260}
+
+2024-03-05T13:36:58.325+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:58.584+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=76 k={"amt":31239447.00,"bk":"化学制药","close":8.55,"code":"300636","high":8.68,"hsl":1.26,"low":8.26,
+"name":"同和药业","open":8.60,"osc":4.88,"pct":-0.58,"pctChange":-0.05,"period":"day1","preClose":8.60,
+"tradeDate":"20240124","tsClose":1706025600000,"tsOpen":1706025600000,"vol":36842}
+
+2024-03-05T13:36:58.584+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:58.931+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":22830488.00,"bk":"化学制药","close":27.24,"code":"301130","high":27.66,"hsl":1.44,"low":27.13,
+"name":"西点药业","open":27.63,"osc":1.92,"pct":-1.48,"pctChange":-0.41,"period":"day1","preClose":27.65,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":8348}
+
+2024-03-05T13:36:58.931+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:59.533+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=57 k={"amt":34416171.00,"bk":"化学制药","close":5.80,"code":"600812","high":5.83,"hsl":0.36,"low":5.76,
+"name":"华北制药","open":5.79,"osc":1.21,"pct":0.00,"pctChange":0.00,"period":"day1","preClose":5.80,
+"tradeDate":"20231227","tsClose":1703606400000,"tsOpen":1703606400000,"vol":59416}
+
+2024-03-05T13:36:59.533+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:36:59.795+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=52 k={"amt":40160659.00,"bk":"化学制药","close":14.18,"code":"603520","high":14.65,"hsl":0.82,"low":14.18,
+"name":"司太立","open":14.40,"osc":3.27,"pct":-1.25,"pctChange":-0.18,"period":"day1","preClose":14.36,
+"tradeDate":"20231220","tsClose":1703001600000,"tsOpen":1703001600000,"vol":27977}
+
+2024-03-05T13:36:59.795+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:00.125+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":24746025.00,"bk":"化学制药","close":9.10,"code":"688189","high":9.27,"hsl":0.99,"low":9.07,
+"name":"南新制药","open":9.27,"osc":2.16,"pct":-1.62,"pctChange":-0.15,"period":"day1","preClose":9.25,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":27073}
+
+2024-03-05T13:37:00.125+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:00.160+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=57 k={"amt":30371257.00,"bk":"化学制药","close":9.34,"code":"688221","high":9.52,"hsl":1.51,"low":9.23,
+"name":"前沿生物-U","open":9.50,"osc":3.05,"pct":-1.89,"pctChange":-0.18,"period":"day1","preClose":9.52,
+"tradeDate":"20231227","tsClose":1703606400000,"tsOpen":1703606400000,"vol":32460}
+
+2024-03-05T13:37:00.160+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:00.294+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=94 k={"amt":33201865.00,"bk":"化学制药","close":12.81,"code":"688553","high":12.84,"hsl":0.90,"low":12.50,
+"name":"汇宇制药-W","open":12.58,"osc":2.69,"pct":1.43,"pctChange":0.18,"period":"day1","preClose":12.63,
+"tradeDate":"20240227","tsClose":1708963200000,"tsOpen":1708963200000,"vol":26132}
+
+2024-03-05T13:37:00.733+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=52 k={"amt":46018710.39,"bk":"化学原料","close":8.86,"code":"000422","high":9.02,"hsl":0.57,"low":8.85,
+"name":"湖北宜化","open":8.89,"osc":1.91,"pct":-0.34,"pctChange":-0.03,"period":"day1","preClose":8.89,
+"tradeDate":"20231220","tsClose":1703001600000,"tsOpen":1703001600000,"vol":51494}
+
+2024-03-05T13:37:00.733+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:00.836+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=54 k={"amt":299908333.91,"bk":"化学原料","close":5.67,"code":"000683","high":5.78,"hsl":1.61,"low":5.59,
+"name":"远兴能源","open":5.75,"osc":3.32,"pct":-0.87,"pctChange":-0.05,"period":"day1","preClose":5.72,
+"tradeDate":"20231222","tsClose":1703174400000,"tsOpen":1703174400000,"vol":527224}
+
+2024-03-05T13:37:00.836+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:01.043+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=85 k={"amt":155405423.00,"bk":"化学原料","close":8.70,"code":"001217","high":9.15,"hsl":13.76,"low":8.06,
+"name":"华尔泰","open":8.68,"osc":12.17,"pct":-2.90,"pctChange":-0.26,"period":"day1","preClose":8.96,
+"tradeDate":"20240206","tsClose":1707148800000,"tsOpen":1707148800000,"vol":182891}
+
+2024-03-05T13:37:04.464+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=72 k={"amt":63357787.00,"bk":"化学原料","close":7.30,"code":"603113","high":7.45,"hsl":1.04,"low":7.03,
+"name":"金能科技","open":7.44,"osc":5.64,"pct":-2.01,"pctChange":-0.15,"period":"day1","preClose":7.45,
+"tradeDate":"20240118","tsClose":1705507200000,"tsOpen":1705507200000,"vol":87903}
+
+2024-03-05T13:37:04.464+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:05.297+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":50108396.80,"bk":"化纤行业","close":4.85,"code":"002206","high":4.91,"hsl":1.13,"low":4.80,
+"name":"海 利 得","open":4.87,"osc":2.26,"pct":-0.41,"pctChange":-0.02,"period":"day1","preClose":4.87,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":103311}
+
+2024-03-05T13:37:05.297+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:05.319+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=94 k={"amt":104239850.88,"bk":"化纤行业","close":12.32,"code":"002254","high":12.33,"hsl":1.06,"low":11.91,
+"name":"泰和新材","open":12.02,"osc":3.49,"pct":2.50,"pctChange":0.30,"period":"day1","preClose":12.02,
+"tradeDate":"20240227","tsClose":1708963200000,"tsOpen":1708963200000,"vol":85869}
+
+2024-03-05T13:37:05.357+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=72 k={"amt":317956708.60,"bk":"化纤行业","close":9.28,"code":"002493","high":9.42,"hsl":0.36,"low":9.08,
+"name":"荣盛石化","open":9.30,"osc":3.62,"pct":-1.07,"pctChange":-0.10,"period":"day1","preClose":9.38,
+"tradeDate":"20240118","tsClose":1705507200000,"tsOpen":1705507200000,"vol":344885}
+
+2024-03-05T13:37:05.357+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:07.871+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=87 k={"amt":71639458.00,"bk":"化肥行业","close":5.00,"code":"600078","high":5.08,"hsl":2.20,"low":4.85,
+"name":"ST澄星","open":4.85,"osc":4.51,"pct":-1.96,"pctChange":-0.10,"period":"day1","preClose":5.10,
+"tradeDate":"20240208","tsClose":1707321600000,"tsOpen":1707321600000,"vol":145566}
+
+2024-03-05T13:37:08.091+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=72 k={"amt":68725483.00,"bk":"化肥行业","close":2.99,"code":"600691","high":3.05,"hsl":0.98,"low":2.89,
+"name":"阳煤化工","open":3.04,"osc":5.25,"pct":-1.97,"pctChange":-0.06,"period":"day1","preClose":3.05,
+"tradeDate":"20240118","tsClose":1705507200000,"tsOpen":1705507200000,"vol":233096}
+
+2024-03-05T13:37:08.091+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:08.424+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=76 k={"amt":69917421.40,"bk":"医疗器械","close":8.17,"code":"002022","high":8.38,"hsl":1.68,"low":7.89,
+"name":"科华生物","open":8.22,"osc":5.98,"pct":-0.24,"pctChange":-0.02,"period":"day1","preClose":8.19,
+"tradeDate":"20240124","tsClose":1706025600000,"tsOpen":1706025600000,"vol":86178}
+
+2024-03-05T13:37:08.424+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:11.384+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":27937077.00,"bk":"医疗器械","close":32.74,"code":"301122","high":33.27,"hsl":1.93,"low":32.33,
+"name":"采纳股份","open":33.13,"osc":2.84,"pct":-1.00,"pctChange":-0.33,"period":"day1","preClose":33.07,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":8544}
+
+2024-03-05T13:37:11.384+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:12.159+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=87 k={"amt":31338386.00,"bk":"医疗器械","close":3.38,"code":"603880","high":3.39,"hsl":3.29,"low":3.29,
+"name":"ST南卫","open":3.29,"osc":2.89,"pct":-2.31,"pctChange":-0.08,"period":"day1","preClose":3.46,
+"tradeDate":"20240208","tsClose":1707321600000,"tsOpen":1707321600000,"vol":95087}
+
+2024-03-05T13:37:12.159+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:12.217+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":36734051.00,"bk":"医疗器械","close":9.39,"code":"603987","high":9.55,"hsl":0.89,"low":9.26,
+"name":"康德莱","open":9.52,"osc":3.06,"pct":-0.84,"pctChange":-0.08,"period":"day1","preClose":9.47,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":39182}
+
+2024-03-05T13:37:12.217+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:14.020+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=52 k={"amt":166844757.00,"bk":"医疗器械","close":85.28,"code":"688114","high":87.02,"hsl":0.92,"low":84.68,
+"name":"华大智造","open":85.81,"osc":2.72,"pct":-1.02,"pctChange":-0.88,"period":"day1","preClose":86.16,
+"tradeDate":"20231220","tsClose":1703001600000,"tsOpen":1703001600000,"vol":19525}
+
+2024-03-05T13:37:14.020+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:15.051+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=75 k={"amt":22928942.00,"bk":"医疗器械","close":20.11,"code":"688393","high":20.67,"hsl":1.22,"low":19.89,
+"name":"安必平","open":20.36,"osc":3.78,"pct":-2.62,"pctChange":-0.54,"period":"day1","preClose":20.65,
+"tradeDate":"20240123","tsClose":1705939200000,"tsOpen":1705939200000,"vol":11379}
+
+2024-03-05T13:37:15.051+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:15.148+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=76 k={"amt":38422218.00,"bk":"医疗器械","close":8.50,"code":"688468","high":8.77,"hsl":1.65,"low":8.32,
+"name":"科美诊断","open":8.72,"osc":5.21,"pct":-1.62,"pctChange":-0.14,"period":"day1","preClose":8.64,
+"tradeDate":"20240124","tsClose":1706025600000,"tsOpen":1706025600000,"vol":45315}
+
+2024-03-05T13:37:15.148+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:16.175+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=94 k={"amt":235001856.28,"bk":"医疗服务","close":6.71,"code":"000516","high":6.71,"hsl":1.62,"low":6.42,
+"name":"国际医学","open":6.50,"osc":4.45,"pct":2.91,"pctChange":0.19,"period":"day1","preClose":6.52,
+"tradeDate":"20240227","tsClose":1708963200000,"tsOpen":1708963200000,"vol":357895}
+
+2024-03-05T13:37:16.262+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=96 k={"amt":249870484.58,"bk":"医疗服务","close":3.42,"code":"002172","high":3.46,"hsl":9.73,"low":3.22,
+"name":"澳洋健康","open":3.31,"osc":7.19,"pct":2.40,"pctChange":0.08,"period":"day1","preClose":3.34,
+"tradeDate":"20240229","tsClose":1709136000000,"tsOpen":1709136000000,"vol":744406}
+
+2024-03-05T13:37:16.319+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":49218452.00,"bk":"医疗服务","close":2.95,"code":"002219","high":3.02,"hsl":0.51,"low":2.93,
+"name":"新里程","open":3.00,"osc":2.99,"pct":-1.99,"pctChange":-0.06,"period":"day1","preClose":3.01,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":165525}
+
+2024-03-05T13:37:16.319+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:16.626+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=54 k={"amt":95820267.00,"bk":"医疗服务","close":23.77,"code":"300244","high":24.09,"hsl":0.80,"low":23.63,
+"name":"迪安诊断","open":24.07,"osc":1.91,"pct":-1.16,"pctChange":-0.28,"period":"day1","preClose":24.05,
+"tradeDate":"20231222","tsClose":1703174400000,"tsOpen":1703174400000,"vol":40274}
+
+2024-03-05T13:37:16.626+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:17.192+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":63591860.00,"bk":"医疗服务","close":4.72,"code":"600327","high":4.76,"hsl":1.52,"low":4.69,
+"name":"大东方","open":4.72,"osc":1.48,"pct":0.00,"pctChange":0.00,"period":"day1","preClose":4.72,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":134535}
+
+2024-03-05T13:37:17.192+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:17.369+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=66 k={"amt":158466510.00,"bk":"医疗服务","close":54.07,"code":"603882","high":54.98,"hsl":0.63,"low":53.84,
+"name":"金域医学","open":54.80,"osc":2.08,"pct":-1.12,"pctChange":-0.61,"period":"day1","preClose":54.68,
+"tradeDate":"20240110","tsClose":1704816000000,"tsOpen":1704816000000,"vol":29163}
+
+2024-03-05T13:37:17.369+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:17.761+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":43252852.00,"bk":"医药商业","close":3.21,"code":"002589","high":3.26,"hsl":1.16,"low":3.20,
+"name":"瑞康医药","open":3.25,"osc":1.85,"pct":-0.93,"pctChange":-0.03,"period":"day1","preClose":3.24,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":134420}
+
+2024-03-05T13:37:17.761+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:17.932+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=75 k={"amt":33506890.00,"bk":"医药商业","close":17.13,"code":"301017","high":17.39,"hsl":1.82,"low":16.51,
+"name":"漱玉平民","open":17.07,"osc":5.05,"pct":-1.66,"pctChange":-0.29,"period":"day1","preClose":17.42,
+"tradeDate":"20240123","tsClose":1705939200000,"tsOpen":1705939200000,"vol":19846}
+
+2024-03-05T13:37:17.932+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:19.619+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=81 k={"amt":21537948.00,"bk":"医药商业","close":47.66,"code":"605266","high":49.80,"hsl":0.38,"low":46.96,
+"name":"健之佳","open":49.50,"osc":5.78,"pct":-3.05,"pctChange":-1.50,"period":"day1","preClose":49.16,
+"tradeDate":"20240131","tsClose":1706630400000,"tsOpen":1706630400000,"vol":4454}
+
+2024-03-05T13:37:19.620+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:19.979+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":97898364.78,"bk":"半导体","close":8.23,"code":"002185","high":8.29,"hsl":0.37,"low":8.17,
+"name":"华天科技","open":8.21,"osc":1.46,"pct":0.00,"pctChange":0.00,"period":"day1","preClose":8.23,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":119066}
+
+2024-03-05T13:37:19.979+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:22.379+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=76 k={"amt":25675019.00,"bk":"半导体","close":31.92,"code":"688045","high":32.80,"hsl":2.25,"low":30.58,
+"name":"必易微","open":32.80,"osc":6.85,"pct":-1.48,"pctChange":-0.48,"period":"day1","preClose":32.40,
+"tradeDate":"20240124","tsClose":1706025600000,"tsOpen":1706025600000,"vol":8134}
+
+2024-03-05T13:37:22.379+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:23.306+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=76 k={"amt":18075737.00,"bk":"半导体","close":33.13,"code":"688130","high":33.93,"hsl":3.49,"low":31.51,
+"name":"晶华微","open":33.11,"osc":7.25,"pct":-0.69,"pctChange":-0.23,"period":"day1","preClose":33.36,
+"tradeDate":"20240124","tsClose":1706025600000,"tsOpen":1706025600000,"vol":5574}
+
+2024-03-05T13:37:23.306+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:25.255+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=79 k={"amt":58472195.00,"bk":"半导体","close":41.69,"code":"688286","high":44.48,"hsl":2.59,"low":41.30,
+"name":"敏芯股份","open":43.58,"osc":7.30,"pct":-4.36,"pctChange":-1.90,"period":"day1","preClose":43.59,
+"tradeDate":"20240129","tsClose":1706457600000,"tsOpen":1706457600000,"vol":13861}
+
+2024-03-05T13:37:25.255+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:26.232+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=69 k={"amt":16727248.00,"bk":"半导体","close":61.20,"code":"688458","high":61.77,"hsl":1.41,"low":60.14,
+"name":"美芯晟","open":60.95,"osc":2.66,"pct":-0.08,"pctChange":-0.05,"period":"day1","preClose":61.25,
+"tradeDate":"20240115","tsClose":1705248000000,"tsOpen":1705248000000,"vol":2741}
+
+2024-03-05T13:37:26.232+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:26.308+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=66 k={"amt":67038662.00,"bk":"半导体","close":5.13,"code":"688469","high":5.15,"hsl":1.19,"low":5.05,
+"name":"芯联集成-U","open":5.13,"osc":1.96,"pct":0.39,"pctChange":0.02,"period":"day1","preClose":5.11,
+"tradeDate":"20240110","tsClose":1704816000000,"tsOpen":1704816000000,"vol":131666}
+
+2024-03-05T13:37:26.308+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:37:26.361+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=69 k={"amt":37134130.00,"bk":"半导体","close":34.09,"code":"688484","high":34.75,"hsl":1.84,"low":33.82,
+"name":"南芯科技","open":34.30,"osc":2.70,"pct":-1.10,"pctChange":-0.38,"period":"day1","preClose":34.47,
+"tradeDate":"20240115","tsClose":1705248000000,"tsOpen":1705248000000,"vol":10848}
+
+2024-03-05T13:37:26.361+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:28.921+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=87 k={"amt":90765846.16,"bk":"商业百货","close":2.54,"code":"002251","high":2.57,"hsl":4.28,"low":2.42,
+"name":"*ST步高","open":2.43,"osc":5.88,"pct":-0.39,"pctChange":-0.01,"period":"day1","preClose":2.55,
+"tradeDate":"20240208","tsClose":1707321600000,"tsOpen":1707321600000,"vol":369622}
+
+2024-03-05T13:37:29.272+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=55 k={"amt":60730430.00,"bk":"商业百货","close":6.30,"code":"600287","high":6.44,"hsl":2.21,"low":6.23,
+"name":"江苏舜天","open":6.42,"osc":3.28,"pct":-1.72,"pctChange":-0.11,"period":"day1","preClose":6.41,
+"tradeDate":"20231225","tsClose":1703433600000,"tsOpen":1703433600000,"vol":96526}
+
+2024-03-05T13:37:29.272+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:29.380+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=63 k={"amt":58859014.00,"bk":"商业百货","close":12.04,"code":"600306","high":12.04,"hsl":1.31,"low":11.71,
+"name":"*ST商城","open":12.04,"osc":2.88,"pct":4.97,"pctChange":0.57,"period":"day1","preClose":11.47,
+"tradeDate":"20240105","tsClose":1704384000000,"tsOpen":1704384000000,"vol":48933}
+
+2024-03-05T13:37:29.380+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:37:31.617+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=75 k={"amt":44198264.00,"bk":"商业百货","close":11.40,"code":"603708","high":11.50,"hsl":0.64,"low":11.25,
+"name":"家家悦","open":11.38,"osc":2.17,"pct":-1.21,"pctChange":-0.14,"period":"day1","preClose":11.54,
+"tradeDate":"20240123","tsClose":1705939200000,"tsOpen":1705939200000,"vol":38851}
+
+2024-03-05T13:37:31.617+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:32.063+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=66 k={"amt":310960194.57,"bk":"塑料制品","close":31.26,"code":"001368","high":31.26,"hsl":37.00,"low":28.22,
+"name":"通达创智","open":30.38,"osc":10.70,"pct":9.99,"pctChange":2.84,"period":"day1","preClose":28.42,
+"tradeDate":"20240110","tsClose":1704816000000,"tsOpen":1704816000000,"vol":103593}
+
+2024-03-05T13:37:32.063+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc 13, 满足上升趋势countdown 终结 index=90 k={"amt":72198575.46,"bk":"塑料制品","close":20.51,"code":"001368","high":21.04,"hsl":12.53,"low":20.19,
+"name":"通达创智","open":20.30,"osc":4.07,"pct":-1.68,"pctChange":-0.35,"period":"day1","preClose":20.86,
+"tradeDate":"20240221","tsClose":1708444800000,"tsOpen":1708444800000,"vol":35097}
+
+2024-03-05T13:37:32.438+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":212801702.86,"bk":"塑料制品","close":10.01,"code":"002395","high":11.18,"hsl":7.77,"low":10.01,
+"name":"双象股份","open":11.18,"osc":10.52,"pct":-9.98,"pctChange":-1.11,"period":"day1","preClose":11.12,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":208266}
+
+2024-03-05T13:37:32.438+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:32.920+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=72 k={"amt":56471629.00,"bk":"塑料制品","close":9.21,"code":"300243","high":9.54,"hsl":3.30,"low":8.92,
+"name":"瑞丰高材","open":9.20,"osc":6.69,"pct":-0.65,"pctChange":-0.06,"period":"day1","preClose":9.27,
+"tradeDate":"20240118","tsClose":1705507200000,"tsOpen":1705507200000,"vol":61698}
+
+2024-03-05T13:37:32.920+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:35.588+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":102443958.00,"bk":"塑料制品","close":8.65,"code":"605488","high":9.50,"hsl":21.65,"low":8.64,
+"name":"福莱新材","open":9.49,"osc":8.96,"pct":-9.90,"pctChange":-0.95,"period":"day1","preClose":9.60,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":116085}
+
+2024-03-05T13:37:35.588+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:35.697+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":56308799.00,"bk":"塑料制品","close":9.41,"code":"688323","high":10.50,"hsl":5.91,"low":9.10,
+"name":"瑞华泰","open":10.50,"osc":13.40,"pct":-9.95,"pctChange":-1.04,"period":"day1","preClose":10.45,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":57756}
+
+2024-03-05T13:37:37.392+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":55210514.61,"bk":"家用轻工","close":9.42,"code":"001222","high":9.73,"hsl":7.69,"low":8.89,
+"name":"源飞宠物","open":9.46,"osc":8.75,"pct":-1.88,"pctChange":-0.18,"period":"day1","preClose":9.60,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":60428}
+
+2024-03-05T13:37:38.706+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":53224872.00,"bk":"家用轻工","close":6.13,"code":"605299","high":6.49,"hsl":2.09,"low":6.09,
+"name":"舒华体育","open":6.49,"osc":6.13,"pct":-5.98,"pctChange":-0.39,"period":"day1","preClose":6.52,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":85556}
+
+2024-03-05T13:37:41.805+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=94 k={"amt":245619654.00,"bk":"家电行业","close":37.44,"code":"603486","high":37.48,"hsl":1.16,"low":36.72,
+"name":"科沃斯","open":37.14,"osc":2.03,"pct":0.24,"pctChange":0.09,"period":"day1","preClose":37.35,
+"tradeDate":"20240227","tsClose":1708963200000,"tsOpen":1708963200000,"vol":66248}
+
+2024-03-05T13:37:42.275+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=74 k={"amt":33093963.00,"bk":"家电行业","close":31.50,"code":"688793","high":32.08,"hsl":3.25,"low":29.68,
+"name":"倍轻松","open":31.93,"osc":7.49,"pct":-1.72,"pctChange":-0.55,"period":"day1","preClose":32.05,
+"tradeDate":"20240122","tsClose":1705852800000,"tsOpen":1705852800000,"vol":10778}
+
+2024-03-05T13:37:42.275+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:43.208+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=96 k={"amt":268407653.00,"bk":"小金属","close":8.09,"code":"603399","high":8.15,"hsl":6.70,"low":7.33,
+"name":"吉翔股份","open":7.66,"osc":10.64,"pct":4.93,"pctChange":0.38,"period":"day1","preClose":7.71,
+"tradeDate":"20240229","tsClose":1709136000000,"tsOpen":1709136000000,"vol":343017}
+
+2024-03-05T13:37:44.855+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=86 k={"amt":84843725.00,"bk":"工程咨询服务","close":23.94,"code":"300949","high":27.01,"hsl":19.96,"low":23.80,
+"name":"奥雅股份","open":27.01,"osc":11.66,"pct":-13.01,"pctChange":-3.58,"period":"day1","preClose":27.52,
+"tradeDate":"20240207","tsClose":1707235200000,"tsOpen":1707235200000,"vol":33938}
+
+2024-03-05T13:37:44.855+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:45.869+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=98 k={"amt":66378138.54,"bk":"工程建设","close":7.78,"code":"002140","high":7.82,"hsl":1.60,"low":7.57,
+"name":"东华科技","open":7.78,"osc":3.22,"pct":0.13,"pctChange":0.01,"period":"day1","preClose":7.77,
+"tradeDate":"20240304","tsClose":1709481600000,"tsOpen":1709481600000,"vol":86220}
+
+2024-03-05T13:37:46.198+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=84 k={"amt":119229462.00,"bk":"工程建设","close":17.10,"code":"300982","high":18.97,"hsl":8.44,"low":16.50,
+"name":"苏文电能","open":18.90,"osc":12.94,"pct":-10.42,"pctChange":-1.99,"period":"day1","preClose":19.09,
+"tradeDate":"20240205","tsClose":1707062400000,"tsOpen":1707062400000,"vol":67962}
+
+2024-03-05T13:37:46.198+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:46.454+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":112096653.00,"bk":"工程建设","close":4.09,"code":"600491","high":4.15,"hsl":1.80,"low":4.01,
+"name":"龙元建设","open":4.14,"osc":3.36,"pct":-1.92,"pctChange":-0.08,"period":"day1","preClose":4.17,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":275750}
+
+2024-03-05T13:37:46.454+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:46.526+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=56 k={"amt":192631793.00,"bk":"工程建设","close":6.70,"code":"600667","high":6.89,"hsl":1.35,"low":6.68,
+"name":"太极实业","open":6.87,"osc":3.05,"pct":-2.76,"pctChange":-0.19,"period":"day1","preClose":6.89,
+"tradeDate":"20231226","tsClose":1703520000000,"tsOpen":1703520000000,"vol":285354}
+
+2024-03-05T13:37:46.526+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:49.078+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=94 k={"amt":71998265.90,"bk":"工程机械","close":4.28,"code":"002204","high":4.28,"hsl":0.88,"low":4.20,
+"name":"大连重工","open":4.24,"osc":1.89,"pct":0.94,"pctChange":0.04,"period":"day1","preClose":4.24,
+"tradeDate":"20240227","tsClose":1708963200000,"tsOpen":1708963200000,"vol":169174}
+
+2024-03-05T13:37:49.463+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=96 k={"amt":396224585.00,"bk":"工程机械","close":7.43,"code":"601226","high":7.48,"hsl":4.73,"low":6.77,
+"name":"华电重工","open":6.78,"osc":10.11,"pct":5.84,"pctChange":0.41,"period":"day1","preClose":7.02,
+"tradeDate":"20240229","tsClose":1709136000000,"tsOpen":1709136000000,"vol":547614}
+
+2024-03-05T13:37:49.463+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新高, 终止countdown
+2024-03-05T13:37:51.449+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=72 k={"amt":145534045.00,"bk":"房地产开发","close":2.92,"code":"600094","high":2.93,"hsl":2.24,"low":2.79,
+"name":"大名城","open":2.89,"osc":4.79,"pct":0.00,"pctChange":0.00,"period":"day1","preClose":2.92,
+"tradeDate":"20240118","tsClose":1705507200000,"tsOpen":1705507200000,"vol":510544}
+
+2024-03-05T13:37:51.449+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:51.449+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=78 k={"amt":166216942.00,"bk":"房地产开发","close":3.10,"code":"600094","high":3.16,"hsl":2.35,"low":3.04,
+"name":"大名城","open":3.05,"osc":3.95,"pct":1.97,"pctChange":0.06,"period":"day1","preClose":3.04,
+"tradeDate":"20240126","tsClose":1706198400000,"tsOpen":1706198400000,"vol":535653}
+
+2024-03-05T13:37:51.449+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown
+2024-03-05T13:37:53.120+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds 9, 满足上升趋势setup index=97 k={"amt":208362920.00,"bk":"房地产开发","close":13.74,"code":"600641","high":13.89,"hsl":1.64,"low":13.46,
+"name":"万业企业","open":13.75,"osc":3.15,"pct":0.66,"pctChange":0.09,"period":"day1","preClose":13.65,
+"tradeDate":"20240301","tsClose":1709222400000,"tsOpen":1709222400000,"vol":152344}
+
+2024-03-05T13:37:53.702+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       :
+tds -9, 满足下降趋势setup index=57 k={"amt":28612368.00,"bk":"房地产开发","close":10.02,"code":"600848","high":10.16,"hsl":0.12,"low":9.96,
+"name":"上海临港","open":10.05,"osc":1.99,"pct":-0.40,"pctChange":-0.04,"period":"day1","preClose":10.06,
+"tradeDate":"20231227","tsClose":1703606400000,"tsOpen":1703606400000,"vol":28535}
+
+2024-03-05T13:37:53.702+08:00  INFO 68958 --- [           main] pro.jiaoyi.common.indicator.TDUtil       : tdc reset, 价格新低, 终止countdown

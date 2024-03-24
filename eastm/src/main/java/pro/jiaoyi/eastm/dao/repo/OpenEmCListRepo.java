@@ -16,6 +16,6 @@ public interface OpenEmCListRepo extends JpaRepository<OpenEmCListEntity, Long>,
 
     OpenEmCListEntity findByF12CodeAndTradeDate(String code, String t);
 
-    @Query(value = "SELECT * FROM t_open_market WHERE f3pct > 0.5 AND f3pct < 5 AND f6amt > 10000000", nativeQuery = true)
+    @Query(value = "SELECT * FROM t_open_market WHERE f3pct > 0.5 AND f3pct < 5 AND f6amt > 50000000", nativeQuery = true)
     List<OpenEmCListEntity> findOpenHigh();
 }

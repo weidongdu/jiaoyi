@@ -15,6 +15,7 @@ public enum TypeEnum {
     ZZ1000("zz1000", "4.中证1000", "https://csi-web-dev.oss-cn-shanghai-finance-1-pub.aliyuncs.com/static/html/csindex/public/uploads/file/autofile/cons/000852cons.xls"),
     INDEX_INCLUDE("INDEX_INCLUDE", "4.指数成份(包括)", ""),
     INDEX_EXCLUDE("INDEX_EXCLUDE", "4.指数成份(不包括)", ""),
+    B1_5Y("B1_5Y", "5.1.5Y之上", ""),
     ALL("all", "全部", "");
 
 

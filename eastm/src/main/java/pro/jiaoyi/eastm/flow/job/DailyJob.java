@@ -10,7 +10,7 @@ import pro.jiaoyi.eastm.flow.BaseFlow;
 import java.util.Comparator;
 import java.util.List;
 
-//@Component
+@Component
 @Slf4j
 public class DailyJob {
     private final List<BaseFlow> baseFlows;

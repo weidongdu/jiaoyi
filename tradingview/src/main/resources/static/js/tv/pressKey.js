@@ -289,7 +289,7 @@ function getColor(value) {
 }
 
 // 处理背景的函数
-function updateBackground(arr) {
+function updateBackground(arr,pctArr) {
     if (!arr) {
         console.log("arr is null");
         return;
@@ -334,7 +334,8 @@ function updateBackground(arr) {
         div.className = 'colorDiv';
 
         // 创建显示 value 的文本节点
-        let text = (i + 1) + '-' + (arr[i] / 2880 * 100).toFixed(0) + "%";
+        // let text = (i + 1) + '-' + (arr[i] / 2880 * 100).toFixed(0) +':'+ pctArr[i];
+        let text = '/' + (arr[i] / 2880 * 100).toFixed(0) +':'+ pctArr[i];
         let valueNode = document.createTextNode(text);
 
         // 设置文字颜色
@@ -395,11 +396,14 @@ const renderChart = (data) => {
         // 数据数组
         if (data.fsCount) {
             var str = data.fsCount
-            console.log(str);
+            var strPct = data.fsCountPct
+
+            console.log(str,strPct);
             var arr = str.split(',');
-            console.log(arr);
+            var arrPct = strPct.split(',');
+            console.log(arr,arrPct);
             if (arr.length > 0) {
-                updateBackground(arr);
+                updateBackground(arr,arrPct);
             }
         }
 

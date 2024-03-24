@@ -21,6 +21,7 @@ import pro.jiaoyi.tradingview.model.chart.Constants;
 import pro.jiaoyi.tradingview.model.chart.TvMarker;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -58,18 +59,35 @@ public class TvService {
     private void extractedFsCount(String code, TvChart tvChart) {
         List<FenshiAmtSummaryEntity> fs = fenshiAmtSummaryRepo.findRecentDataByCode(code, 30);
         StringBuilder fsCount = new StringBuilder();
+        StringBuilder fsCountPct = new StringBuilder();
+
         if (!fs.isEmpty()) {
             //倒序遍历
+            HashMap<String, BigDecimal> tdPctMap = new HashMap<>();
+            List<EmDailyK> ks = emClient.getDailyKs(code, LocalDate.now(), 500, false);
+            if (ks.size() > 35) {
+                for (int i = ks.size() - 1; i >= ks.size() - 30; i--) {
+                    EmDailyK k = ks.get(i);
+                    tdPctMap.put(k.getTradeDate(), k.getPct());
+                }
+            }
+
             for (int i = fs.size() - 1; i >= 0; i--) {
                 FenshiAmtSummaryEntity f = fs.get(i);
                 fsCount.append(f.getCount()).append(",");
+
+                BigDecimal pct = tdPctMap.getOrDefault(f.getTradeDate(), BigDecimal.ZERO).setScale(1, RoundingMode.HALF_UP);
+
+                fsCountPct.append(pct).append(",");
             }
             //删除最后 ,
             if (!fsCount.isEmpty()) {
                 fsCount = new StringBuilder(fsCount.substring(0, fsCount.length() - 1));
+                fsCountPct = new StringBuilder(fsCountPct.substring(0, fsCountPct.length() - 1));
             }
         }
         tvChart.setFsCount(fsCount.toString());
+        tvChart.setFsCountPct(fsCountPct.toString());
     }
 
     public TvChart getTvChart(String code, LocalDate date, Integer limit) {

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pro.jiaoyi.common.indicator.MaUtil.MaUtil;
+import pro.jiaoyi.common.util.BDUtil;
 import pro.jiaoyi.common.util.DateUtil;
 import pro.jiaoyi.eastm.api.EmClient;
 import pro.jiaoyi.eastm.config.IndexEnum;
@@ -235,15 +236,123 @@ public class TvTransUtil {
 
         //设置 高低点
         highLowMarker(tvChart, 5);
+        maDiff(tvChart);
+        tvChart.getMks().sort(Comparator.comparing(o -> DateUtil.strToLocalDate(o.getTime(), "yyyy-MM-dd")));
         return tvChart;
+    }
+
+    /**
+     * 设置ma差值
+     */
+    private void maDiff(TvChart tvChart) {
+        List<TvK> k = tvChart.getK();
+        if (k == null || k.size() < 250) {
+            return;
+        }
+        List<TvMarker> mks = null;
+        if (tvChart.getMks() != null) {
+            mks = tvChart.getMks();
+        } else {
+            mks = new ArrayList<>();
+            tvChart.setMks(mks);
+        }
+
+        BigDecimal[] closeArr = k.stream().map(TvK::getClose).toList().toArray(BigDecimal[]::new);
+        BigDecimal[] ma5 = MaUtil.ma(5, closeArr, 3);
+        BigDecimal[] ma10 = MaUtil.ma(10, closeArr, 3);
+        BigDecimal[] ma20 = MaUtil.ma(20, closeArr, 3);
+        BigDecimal[] ma30 = MaUtil.ma(30, closeArr, 3);
+        BigDecimal[] ma60 = MaUtil.ma(60, closeArr, 3);
+        BigDecimal[] ma120 = MaUtil.ma(120, closeArr, 3);
+        BigDecimal[] ma250 = MaUtil.ma(250, closeArr, 3);
+        BigDecimal[] diff = new BigDecimal[ma250.length];
+
+        String up = "rgba(255, 255, 0, ";
+        String dn = "rgba(0, 255, 0, ";
+
+        for (int i = 0; i < ma60.length; i++) {
+            if (closeArr[i].compareTo(BigDecimal.ZERO) > 0
+                    && ma5[i].compareTo(BigDecimal.ZERO) > 0
+                    && ma10[i].compareTo(BigDecimal.ZERO) > 0
+                    && ma20[i].compareTo(BigDecimal.ZERO) > 0
+                    && ma30[i].compareTo(BigDecimal.ZERO) > 0
+                    && ma60[i].compareTo(BigDecimal.ZERO) > 0
+                    && ma120[i].compareTo(BigDecimal.ZERO) > 0
+                    && ma250[i].compareTo(BigDecimal.ZERO) > 0) {
+
+                //取最大值 与 最小值
+                BigDecimal[] bs = {ma5[i], ma10[i], ma20[i], ma30[i], ma60[i], ma120[i], ma250[i]};
+                BigDecimal max = Arrays.stream(bs).max(Comparator.naturalOrder()).get();
+                BigDecimal min = Arrays.stream(bs).min(Comparator.naturalOrder()).get();
+                diff[i] = max.subtract(min);
+                diff[i] = diff[i].divide(closeArr[i], 4, RoundingMode.HALF_UP);
+
+                if (diff[i].compareTo(new BigDecimal("0.05")) < 0) {
+                    TvMarker tvMarker = new TvMarker();
+                    tvMarker.setTime(k.get(i).getTime());
+                    tvMarker.setText(BDUtil.p100(diff[i], 0));
+//                    tvMarker.setText(" ");
+
+                    if (closeArr[i].compareTo(max) > 0) {
+
+                        if (diff[i].compareTo(new BigDecimal("0.01")) < 0) {
+                            tvMarker.setColor(up + "0.9)");
+                        } else if (diff[i].compareTo(new BigDecimal("0.02")) < 0) {
+                            tvMarker.setColor(up + "0.8)");
+                        } else if (diff[i].compareTo(new BigDecimal("0.03")) < 0) {
+                            tvMarker.setColor(up + "0.7)");
+                        } else if (diff[i].compareTo(new BigDecimal("0.04")) < 0) {
+                            tvMarker.setColor(up + "0.6)");
+                        } else {
+                            tvMarker.setColor(up + "0.5)");
+                        }
+                        tvMarker.setPosition(Constants.MARKER_POSITION_BELOWBAR);
+                        tvMarker.setShape(Constants.MARKER_SHAPE_ARROW_UP);
+
+
+                    } else if (closeArr[i].compareTo(min) < 0) {
+                        if (diff[i].compareTo(new BigDecimal("0.01")) < 0) {
+                            tvMarker.setColor(dn + "0.9)");
+                        } else if (diff[i].compareTo(new BigDecimal("0.02")) < 0) {
+                            tvMarker.setColor(dn + "0.8)");
+                        } else if (diff[i].compareTo(new BigDecimal("0.03")) < 0) {
+                            tvMarker.setColor(dn + "0.7)");
+                        } else if (diff[i].compareTo(new BigDecimal("0.04")) < 0) {
+                            tvMarker.setColor(dn + "0.6)");
+                        } else {
+                            tvMarker.setColor(dn + "0.5)");
+                        }
+                        tvMarker.setPosition(Constants.MARKER_POSITION_ABOVEBAR);
+                        tvMarker.setShape(Constants.MARKER_SHAPE_ARROW_DOWN);
+                    } else {
+                        tvMarker.setColor(Colors.WHITE.getColor());
+                        tvMarker.setPosition(Constants.MARKER_POSITION_BELOWBAR);
+                        tvMarker.setShape(Constants.MARKER_SHAPE_ARROW_UP);
+
+                        continue;
+                    }
+
+                    mks.add(tvMarker);
+                }
+            }
+        }
+
+
     }
 
     /**
      * 设置高低点数据
      */
     public void highLowMarker(TvChart tvChart, int gap) {
-        List<TvMarker> mks = new ArrayList<>();
-        tvChart.setMks(mks);
+
+        List<TvMarker> mks = null;
+        if (tvChart.getMks() != null) {
+            mks = tvChart.getMks();
+        } else {
+            mks = new ArrayList<>();
+            tvChart.setMks(mks);
+        }
+
         List<TvK> k = tvChart.getK();
         if (k == null || k.size() < 2 * gap + 1) {
             return;
@@ -334,7 +443,7 @@ public class TvTransUtil {
     }
 
 
-    public static void sortMks(List<TvMarker> mks){
+    public static void sortMks(List<TvMarker> mks) {
         mks.sort(Comparator.comparing(o -> DateUtil.strToLocalDate(o.getTime(), "yyyy-MM-dd")));
     }
 }
